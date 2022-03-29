@@ -16,6 +16,12 @@ variable "ec2_name" {
   default     = "my-ec2-instance"
 }
 
+variable "ec2_group" {
+  description = "The Group that the EC2 instance belongs to"
+  type        = string
+  default     = "my-ec2-group"
+}
+
 variable "ec2_ami" {
   description = "The Amazon Machine Image"
   type        = string

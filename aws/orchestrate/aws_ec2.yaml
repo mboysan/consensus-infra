@@ -1,0 +1,17 @@
+---
+plugin: aws_ec2
+
+regions:
+  - eu-west-1
+
+keyed_groups:
+  - key: tags.Group
+    prefix: tag_Group
+
+hostnames:
+  # A list in order of precedence for hostname variables.
+  - ip-address
+
+#compose:
+#  ansible_host: public_ip_address
+#  ansible_user: "'ubuntu'"

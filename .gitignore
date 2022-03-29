@@ -9,6 +9,7 @@ secrets.sh
 *.lock.hcl
 *.tfstate
 *.tfstate.backup
+*.tfstate.lock.info
 
 HELP.md
 target/

@@ -29,25 +29,27 @@ module "ec2_nodes" {
   source   = "./modules/ec2"
   for_each = local.node_names
 
-  ec2_name = each.key
-
   ec2_availability_zone = module.defaults.availability_zone
 
   aws_subnet         = module.defaults.aws_subnet
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
+
+  ec2_name  = each.key
+  ec2_group = "nodes"
 }
 
 module "ec2_client" {
   source = "./modules/ec2"
 
-  ec2_name = local.client_name
-
   ec2_availability_zone = module.defaults.availability_zone
 
   aws_subnet         = module.defaults.aws_subnet
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
+
+  ec2_name  = "client"
+  ec2_group = "clients"
 }
 
 output "nodes" {
