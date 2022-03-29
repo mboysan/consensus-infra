@@ -1,7 +1,7 @@
 variable "profile" {
   description = "AWS Profile"
   type        = string
-  default     = "terraform"
+  default     = "default"
 }
 
 variable "region" {

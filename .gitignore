@@ -6,7 +6,7 @@ secrets.sh
 
 ### terraform
 .terraform
-*.hcl
+*.lock.hcl
 *.tfstate
 *.tfstate.backup
 
