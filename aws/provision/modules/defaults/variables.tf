@@ -10,7 +10,7 @@ variable "region" {
   default     = "eu-west-1"
 }
 
-variable "az" {
+variable "availability_zone" {
   description = "Default Availability Zone"
   type        = string
   default     = "eu-west-1c"

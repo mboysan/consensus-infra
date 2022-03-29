@@ -6,14 +6,14 @@ output "region" {
   value = var.region
 }
 
-output "az" {
-  value = var.az
+output "availability_zone" {
+  value = var.availability_zone
 }
 
-output "vpc" {
+output "aws_vpc" {
   value = data.aws_vpc.default
 }
 
-output "public_subnet" {
+output "aws_subnet" {
   value = data.aws_subnet.default_az1
 }

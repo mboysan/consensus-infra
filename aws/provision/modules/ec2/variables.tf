@@ -1,3 +1,9 @@
+variable "ec2_availability_zone" {
+  description = "Availability zone of the ec2 instance"
+  type        = string
+  default     = "eu-west-1c"
+}
+
 variable "ec2_count" {
   description = "Should the EC2 be created?"
   type        = number
@@ -7,19 +13,7 @@ variable "ec2_count" {
 variable "ec2_name" {
   description = "The Name of the EC2"
   type        = string
-  default     = "consensus-node"
-}
-
-variable "ec2_security_group_name" {
-  description = "The Name of the EC2 Security Group"
-  type        = string
-  default     = "consensus-security-group"
-}
-
-variable "ec2_security_group_description" {
-  description = "The Description of the EC2 Security Group"
-  type        = string
-  default     = "consensus security group"
+  default     = "my-ec2-instance"
 }
 
 variable "ec2_ami" {
@@ -34,23 +28,18 @@ variable "ec2_instance_type" {
   default     = "t2.micro" # Free Tier eligible
 }
 
-variable "vpc_id" {
-  description = "The ID of the VPC"
-  type        = string
+variable "aws_key_pair" {
+  description = "The object reference of the aws_key_pair resource"
 }
 
-variable "public_subnet_id" {
-  description = "The ID of the Public Subnet"
-  type        = string
+variable "aws_security_group" {
+  description = "The object reference of the aws_security_group resource"
 }
 
-variable "ec2_ssh_key_name" {
-  description = "The SSH Key Name"
-  type        = string
-  default     = "ec2_instance_key"
+variable "aws_subnet" {
+  description = "The object reference of the aws_subnet resource"
 }
 
-variable "ec2_ssh_public_key_path" {
-  description = "The local path to the SSH Public Key"
-  type        = string
-}
+#variable "aws_network_interface" {
+#  description = "The object reference of the aws_network_interface resource"
+#}

@@ -1,6 +1,5 @@
-variable "vpc_id" {
-  description = "The ID of the VPC"
-  type        = string
+variable "aws_vpc" {
+  description = "The object reference of the aws_vpc resource"
 }
 
 variable "ec2_security_group_name" {
