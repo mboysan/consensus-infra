@@ -25,13 +25,6 @@ module "security" {
   ec2_ssh_public_key_path = "./access/aws_instance_key.pub"
 }
 
-#module "network" {
-#  source             = "./modules/network"
-#  aws_security_group = module.security.aws_security_group
-#  aws_subnet         = module.defaults.aws_subnet
-#  private_ips_count  = sum([length(local.node_names), 2])
-#}
-
 module "ec2_nodes" {
   source   = "./modules/ec2"
   for_each = local.node_names
@@ -43,8 +36,6 @@ module "ec2_nodes" {
   aws_subnet         = module.defaults.aws_subnet
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
-  #  aws_network_interface = module.network.aws_network_interface
-
 }
 
 module "ec2_client" {
@@ -57,7 +48,6 @@ module "ec2_client" {
   aws_subnet         = module.defaults.aws_subnet
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
-  #  aws_network_interface = module.network.aws_network_interface
 }
 
 output "nodes" {

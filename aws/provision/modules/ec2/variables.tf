@@ -39,7 +39,3 @@ variable "aws_security_group" {
 variable "aws_subnet" {
   description = "The object reference of the aws_subnet resource"
 }
-
-#variable "aws_network_interface" {
-#  description = "The object reference of the aws_network_interface resource"
-#}

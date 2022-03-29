@@ -5,7 +5,7 @@ secrets.sh
 *.ppk
 
 ### terraform
-local/.terraform
+.terraform
 *.hcl
 *.tfstate
 *.tfstate.backup

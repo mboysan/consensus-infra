@@ -11,11 +11,6 @@ resource "aws_instance" "ec2" {
 
   key_name = var.aws_key_pair.key_name
 
-  #  network_interface {
-  #    device_index         = 0
-  #    network_interface_id = var.aws_network_interface.id
-  #  }
-
   tags = {
     Name = var.ec2_name
   }
