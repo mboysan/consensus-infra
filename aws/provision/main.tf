@@ -48,7 +48,7 @@ module "ec2_client" {
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
 
-  ec2_name  = "client"
+  ec2_name  = "consensus-client"
   ec2_group = "clients"
 }
 

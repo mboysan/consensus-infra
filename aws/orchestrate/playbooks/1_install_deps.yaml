@@ -1,0 +1,50 @@
+---
+- name: Install dependencies on nodes
+  hosts: nodes
+
+  vars:
+    - home_dir: /home/ubuntu
+    - working_dir: '{{ home_dir }}/consensus'
+
+  tasks:
+    - name: T1.1 - Cloning mboysan/consensus repo
+      ansible.builtin.git:
+        repo: https://github.com/mboysan/consensus
+        dest: '{{ working_dir }}'
+        single_branch: yes
+        version: main
+
+    - name: T1.2 - mvn package consensus
+      shell: |
+        bash -ilc 'mvn clean package -DskipTests'
+      args:
+        chdir: '{{ working_dir }}'
+      register: result
+#    - name: DEBUG - print result from T1.2
+#      ansible.builtin.debug:
+#        var: result.stdout
+
+- name: Install dependencies on clients
+  hosts: clients
+
+  vars:
+    - home_dir: /home/ubuntu
+    - working_dir: '{{ home_dir }}/YCSB'
+
+  tasks:
+    - name: T2.1 - Cloning mboysan/YCSB repo
+      ansible.builtin.git:
+        repo: https://github.com/mboysan/YCSB
+        dest: '{{ working_dir }}'
+        single_branch: yes
+        version: master
+
+    - name: T2.2 - mvn package YCSB
+      shell: |
+        bash -ilc 'mvn -pl site.ycsb:consensus-binding -am clean package -DskipTests'
+      args:
+        chdir: '{{ working_dir }}'
+      register: result
+#    - name: DEBUG - print result from T2.2
+#      ansible.builtin.debug:
+#        var: result.stdout

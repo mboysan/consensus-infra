@@ -4,9 +4,9 @@ plugin: aws_ec2
 regions:
   - eu-west-1
 
-keyed_groups:
-  - key: tags.Group
-    prefix: tag_Group
+groups:
+  nodes: "'nodes' in tags.Group"
+  clients: "'clients' in tags.Group"
 
 hostnames:
   # A list in order of precedence for hostname variables.

@@ -19,7 +19,7 @@ aws_secret_access_key=<your_aws_secret_key>
 ## List AWS resources
 execute: 
 ```
-ansible-inventory -i aws_ec2.yaml --graph
+ansible-inventory -i inventory_aws_ec2.yaml --graph
 ```
 
 # Setting ansible.cfg location
@@ -56,17 +56,17 @@ ansible-playbook play.yaml
 # Useful commands
 ```
 # see resources as list
-ansible-inventory -i aws_ec2.yaml --list
+ansible-inventory -i inventory_aws_ec2.yaml --list
 
 # see resources as graph
-ansible-inventory -i aws_ec2.yaml --graph
+ansible-inventory -i inventory_aws_ec2.yaml --graph
 
 # ping a group of nodes
-ansible tag_Group_nodes -i aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem
+ansible nodes -i inventory_aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem
 
 # ping a group of nodes as login user 'ubuntu'
-ansible tag_Group_nodes -i aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible nodes -i inventory_aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 
 # run playbook
-ansible-playbook play.yaml -i aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible-playbook play.yaml -i inventory_aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 ```
