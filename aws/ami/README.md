@@ -1,38 +1,24 @@
-# Prerequisites
-- An aws account. Also make sure you are eligible for using aws free-tier and/or you can pay for the resources you use.
-- [packer](https://www.packer.io/)
-- [aws cli](https://aws.amazon.com/cli/) 
+# About
 
-# Creating your AMI on AWS
+This module shall be used to create an Amazon Machine Image (AMI) to be used as the base for the ec2 instances.
 
-## Preparing AWS credentials
+## Prerequisites
+- Read the [readme](../README.md) at the parent dir.
+- Install [packer](https://www.packer.io/).
 
-### Method-1 (Preferred)
-1. create a file called `credentials` under home dir `~/.aws/`
-2. edit the file with the following contents:
+Note: all the commands listed in the following sections shall be executed in this directory (working directory).
+
+## Creating your AMI on AWS
+
+View and configure the [packer configuration file](./packer.pkr.hcl) for your needs.
+
+Creating and publishing the ami is as simple as running:
 ```
-[default]
-aws_access_key_id=<your_aws_access_key>
-aws_secret_access_key=<your_aws_secret_key>
+packer build packer.pkr.hcl
 ```
-
-### Method-2
-1. Create a script called `secrets.sh` with the contents:
-```
-#!/bin/bash
-export ACCESS_KEY=<your_aws_access_key>
-export SECRET_KEY=<your_aws_secret_key>
-```
-2. make executable `chmod +x secrets.sh` 
-3. and run with `source secrets.sh`
-
-## Building AMI image
-1. navigate to ami dir: `cd aws/ami/`
-2. run `packer build packer.json`
-   
 This will create an ami with all the dependencies installed with the [`ami-bootstrap.sh`](ami-bootstrap.sh) script.
 
-## Validating
+### Verifying
+To verify:
 1. Navigate to your aws account -> EC2.
 2. Create a new instance and inspect the ami created with name: **ami-full-deps**
-

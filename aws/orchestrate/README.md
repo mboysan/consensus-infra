@@ -1,58 +1,49 @@
-# Prerequisites
-- An aws account. Also make sure you are eligible for using aws free-tier and/or you can pay for the resources you use.
-- [aws cli](https://aws.amazon.com/cli/)
-- [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- [python3, pip3, boto3](https://stackoverflow.com/a/59073019)
+# About
 
-# Confirm Installation
+This module shall be used to run the performance tests on the infrastructure [provision](../provision)ed.
 
-## Preparing AWS credentials
+## Prerequisites
+- Read the [readme](../README.md) at the parent dir.
+- Install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- Install [python3, pip3, boto3](https://stackoverflow.com/a/59073019).
 
-1. create a file called `credentials` under home dir `~/.aws/`
-2. edit the file using the following template:
-```
-[default]
-region=eu-west-1
-aws_access_key_id=<your_aws_access_key>
-aws_secret_access_key=<your_aws_secret_key>
-```
+Note: all the commands listed in the following sections shall be executed in this directory (working directory).
 
-## List AWS resources
-execute: 
+## Confirm Installation
+
+You can confirm if the inventory setup works properly by executing: 
 ```
 ansible-inventory -i inventory/aws_ec2.yaml --graph
 ```
 
-# Setting ansible.cfg location
+## Setting ansible.cfg location
 
-## Prepare
-1. Make sure you view the contents of `./ansible.cfg`
-2. Make any necessary changes like modifying the aws private-key location.
+The [ansible.cfg](ansible.cfg) file located in this directory shall be used for the orchestration. Make sure you view
+the contents of this file and make changes (modifying aws private-key location etc.) where necessary.
 
-## Setting the config location
+Following are the two main methods that can be used to set up the config location.
 
 ### Method-1 (preferred)
-1. Backup default config under `/etc/ansible/ansible.cfg`
-2. Move `./ansible.cfg` under `/etc/ansible` directory
-3. Ansible should pick up this configuration by default
+1. Backup default config under `/etc/ansible/ansible.cfg`.
+2. Move `./ansible.cfg` under `/etc/ansible` directory.
+3. Ansible should pick up this configuration by default.
 
 ### Method-2 (security risk)
 1. Make sure you read [security related issues with this method](https://docs.ansible.com/ansible/devel/reference_appendices/config.html#cfg-in-world-writable-dir)
-2. run 
+2. Run 
 ```
 export ANSIBLE_CONFIG=./ansible.cfg
 ```
-3. Ansible should now the current dir.
+3. Ansible should pick up the config in the current directory.
 
-## Verify
+### Verifying
+
+Execute the following to verify if ansible was able to pick up the correct configuration:
 ```
 ansible-config view
 ```
 
-# Run the playbook
-```
-ansible-playbook play.yaml
-```
+
 
 # Useful commands
 ```
@@ -67,6 +58,9 @@ ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instanc
 
 # ping a group of nodes as login user 'ubuntu'
 ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+
+# running a playbook
+ansible-playbook play.yaml
 
 # run playbook
 ansible-playbook play.yaml -i inventory/aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
