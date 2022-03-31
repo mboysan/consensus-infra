@@ -1,0 +1,13 @@
+---
+- name: Installs necessary project dependencies on workers
+  hosts: workers
+  roles:
+    - workers
+
+  tasks:
+    - name: T1 - Clone registry repository
+      ansible.builtin.git:
+        repo: '{{ workers_mvn_repo }}'
+        dest: '{{ workers_working_dir }}/mvn-repo'
+        single_branch: yes
+        version: releases

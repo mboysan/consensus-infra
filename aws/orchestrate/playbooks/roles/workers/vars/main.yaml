@@ -1,0 +1,8 @@
+# home directory of the worker
+workers_home_dir: /home/ubuntu
+
+# working directory of the worker
+workers_working_dir: '{{ workers_home_dir }}/worker'
+
+# git repository for necessary dependencies
+workers_mvn_repo: https://github.com/mboysan/mvn-repo

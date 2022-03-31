@@ -9,9 +9,10 @@
 ## Preparing AWS credentials
 
 1. create a file called `credentials` under home dir `~/.aws/`
-2. edit the file with the following contents:
+2. edit the file using the following template:
 ```
 [default]
+region=eu-west-1
 aws_access_key_id=<your_aws_access_key>
 aws_secret_access_key=<your_aws_secret_key>
 ```
@@ -19,7 +20,7 @@ aws_secret_access_key=<your_aws_secret_key>
 ## List AWS resources
 execute: 
 ```
-ansible-inventory -i inventory_aws_ec2.yaml --graph
+ansible-inventory -i inventory/aws_ec2.yaml --graph
 ```
 
 # Setting ansible.cfg location
@@ -56,17 +57,17 @@ ansible-playbook play.yaml
 # Useful commands
 ```
 # see resources as list
-ansible-inventory -i inventory_aws_ec2.yaml --list
+ansible-inventory -i inventory/aws_ec2.yaml --list
 
 # see resources as graph
-ansible-inventory -i inventory_aws_ec2.yaml --graph
+ansible-inventory -i inventory/aws_ec2.yaml --graph
 
 # ping a group of nodes
-ansible nodes -i inventory_aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem
+ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem
 
 # ping a group of nodes as login user 'ubuntu'
-ansible nodes -i inventory_aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 
 # run playbook
-ansible-playbook play.yaml -i inventory_aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible-playbook play.yaml -i inventory/aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 ```
