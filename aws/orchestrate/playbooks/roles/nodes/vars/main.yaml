@@ -1,0 +1,2 @@
+# working directory of the node
+nodes_working_dir: '{{ workers_project_dir }}/consensus'

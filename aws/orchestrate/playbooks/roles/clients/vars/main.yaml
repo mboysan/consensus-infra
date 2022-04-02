@@ -1,0 +1,2 @@
+# working directory of the node
+clients_working_dir: '{{ workers_project_dir }}/ycsb'

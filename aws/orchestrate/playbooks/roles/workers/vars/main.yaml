@@ -1,8 +1,12 @@
 # home directory of the worker
 workers_home_dir: /home/ubuntu
 
-# working directory of the worker
-workers_working_dir: '{{ workers_home_dir }}/worker'
+# the destination that the project will be cloned to
+workers_project_dir: '{{ workers_home_dir }}/project'
+
+workers_project_log_path: '{{ workers_project_dir }}/logs'
+workers_project_log_file: '{{ workers_project_log_path }}/logs.txt'
+workers_project_log_level: 'DEBUG'
 
 # git repository for necessary dependencies
 workers_mvn_repo: https://github.com/mboysan/mvn-repo
