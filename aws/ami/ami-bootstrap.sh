@@ -5,6 +5,10 @@ sleep 30
 # -------------------------------------------------- already included
 # git
 
+# -------------------------------------------------- iperf (for network performance testing)
+sudo apt-get update
+sudo apt-get install -y iperf
+
 # -------------------------------------------------- jdk-17
 # prepare
 sudo mkdir -p /opt/java/latest
@@ -63,3 +67,10 @@ newgrp docker
 
 # verify
 docker --version
+
+# -------------------------------------------------- Further configuration
+# configure the firewall to allow everything
+sudo iptables -P INPUT ACCEPT
+sudo iptables -P OUTPUT ACCEPT
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -F

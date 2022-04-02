@@ -25,7 +25,7 @@ variable "ec2_group" {
 variable "ec2_ami" {
   description = "The Amazon Machine Image"
   type        = string
-  default     = "ami-0c1cc728e5cb78cc2" # Ubuntu based full dependencies ami created by packer (see ./aws/ami).
+  default     = "ami-full-deps" # Ubuntu based full dependencies ami created by packer (see aws/ami folder).
 }
 
 variable "ec2_instance_type" {
