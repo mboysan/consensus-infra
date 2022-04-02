@@ -3,14 +3,14 @@
 This module shall be used to create an Amazon Machine Image (AMI) to be used as the base for the ec2 instances.
 
 ## Prerequisites
-- Read the [readme](../README.md) at the parent dir.
+- Read the [readme](../../README.md) at the aws dir.
 - Install [packer](https://www.packer.io/).
 
 Note: all the commands listed in the following sections shall be executed in this directory (working directory).
 
 ## Creating your AMI on AWS
 
-View and configure the [packer configuration file](./packer.pkr.hcl) for your needs.
+View and configure the [packer configuration file](packer.pkr.hcl) for your needs.
 
 Creating and publishing the ami is as simple as running:
 ```

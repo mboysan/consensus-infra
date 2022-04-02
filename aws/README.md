@@ -25,7 +25,5 @@ aws_secret_access_key=<your_aws_secret_key>
 
 ## Guide
 
-1. For building an Amazon Machine Image (AMI) to use for the base for your ec2 instances, check out the [ami](./ami)
-folder.
-2. For provisioning the infrastructure, follow the guide at [provision](./provision) folder.
-3. For orchestrating the ec2 instances and running the performance tests use the [orchestrate](./orchestrate) folder.
+1. For provisioning the infrastructure, follow the guide at [provision](./provision) folder.
+2. For orchestrating the ec2 instances and running the performance tests use the [orchestrate](./orchestrate) folder.

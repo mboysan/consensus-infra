@@ -6,6 +6,9 @@ This module shall be used to provision the performance testing infrastructure (i
 - Read the [readme](../README.md) at the parent dir.
 - Install [terraform](https://www.terraform.io/).
 
+This project configuration uses a pre-built Amazon Machine Image (AMI). For building your own AMI to use for the base 
+for your ec2 instances, check out the [ami](./ami) folder.
+
 Note: all the commands listed in the following sections shall be executed in this directory (working directory).
 
 ## Provisioning the Infrastructure
