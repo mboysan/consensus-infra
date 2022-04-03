@@ -24,3 +24,10 @@ variable "ec2_ssh_public_key_path" {
   description = "The local path to the SSH Public Key"
   type        = string
 }
+
+variable "aws_security_group_ingress" {
+  type = object({
+    start_port = number
+    end_port = number
+  })
+}

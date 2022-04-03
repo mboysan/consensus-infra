@@ -30,8 +30,8 @@ resource "aws_security_group" "ec2_security_group" {
 
   # 5 ports to open for all other purposes
   ingress {
-    from_port   = 8080
-    to_port     = 8085
+    from_port   = var.aws_security_group_ingress.start_port
+    to_port     = var.aws_security_group_ingress.end_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

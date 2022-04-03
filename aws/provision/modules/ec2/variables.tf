@@ -4,16 +4,17 @@ variable "ec2_count" {
   default     = 1
 }
 
-variable "ec2_name" {
-  description = "The Name of the EC2"
-  type        = string
-  default     = "my-ec2-instance"
-}
+variable "ec2_tags" {
+  type = object({
+    # The Name of the EC2 instance
+    Name  = string
 
-variable "ec2_group" {
-  description = "The Group that the EC2 instance belongs to"
-  type        = string
-  default     = "my-ec2-group"
+    # The Group that the EC2 instance belongs to
+    Group = string
+
+    # The Index of the ec2 instance in the group
+    Index = string
+  })
 }
 
 variable "ec2_ami_name" {

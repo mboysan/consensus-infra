@@ -20,8 +20,5 @@ resource "aws_instance" "ec2" {
 
   key_name = var.aws_key_pair.key_name
 
-  tags = {
-    Name  = var.ec2_name
-    Group = var.ec2_group
-  }
+  tags = var.ec2_tags
 }

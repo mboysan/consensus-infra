@@ -19,6 +19,16 @@ variable "aws_ec2_ami_name" {
   type        = string
 }
 
+variable "reserved_port_start" {
+  description = "Start index of the reserved port (used for ec2 security group ingress rules)"
+  type        = number
+}
+
+variable "reserved_port_end" {
+  description = "End index of the reserved port (used for ec2 security group ingress rules)"
+  type        = number
+}
+
 # --- Rest of the setup
 provider "aws" {
   profile = var.aws_profile
@@ -26,25 +36,29 @@ provider "aws" {
 }
 
 locals {
-  node_names = toset([
-    "consensus-node-0",
-    #    "consensus-node-1",
-    #    "consensus-node-2",
-    #    "consensus-node-3",
-    #    "consensus-node-4",
-  ])
+  node_names = tomap({
+    "0" = "node0",
+    "1" = "node1",
+    #    "2" = "node2",
+    #    "3" = "node3",
+    #    "4" = "node4",
+  })
   client_name = "consensus-client"
 }
 
 module "defaults" {
-  source = "./modules/defaults"
+  source                = "./modules/defaults"
   aws_availability_zone = var.aws_availability_zone
 }
 
 module "security" {
   source = "./modules/security"
 
-  aws_vpc                 = module.defaults.aws_vpc
+  aws_vpc                    = module.defaults.aws_vpc
+  aws_security_group_ingress = {
+    start_port = var.reserved_port_start
+    end_port   = var.reserved_port_end
+  }
   ec2_ssh_public_key_path = "./access/aws_instance_key.pub"
 }
 
@@ -59,8 +73,12 @@ module "ec2_nodes" {
   aws_key_pair       = module.security.aws_key_pair
 
   ec2_ami_name = var.aws_ec2_ami_name
-  ec2_name  = each.key
-  ec2_group = "nodes"
+
+  ec2_tags = {
+    Index = each.key
+    Name  = each.value
+    Group = "nodes"
+  }
 }
 
 module "ec2_client" {
@@ -73,16 +91,20 @@ module "ec2_client" {
   aws_key_pair       = module.security.aws_key_pair
 
   ec2_ami_name = var.aws_ec2_ami_name
-  ec2_name  = "consensus-client"
-  ec2_group = "clients"
+
+  ec2_tags = {
+    Index = "0"
+    Name  = "client"
+    Group = "clients"
+  }
 }
 
-#output "nodes" {
-#  depends_on = [module.ec2_nodes]
-#  value      = module.ec2_nodes
-#}
-#
-#output "client" {
-#  depends_on = [module.ec2_client]
-#  value      = module.ec2_client
-#}
+output "nodes" {
+  depends_on = [module.ec2_nodes]
+  value      = module.ec2_nodes
+}
+
+output "client" {
+  depends_on = [module.ec2_client]
+  value      = module.ec2_client
+}
