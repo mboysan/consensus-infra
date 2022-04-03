@@ -1,0 +1,1 @@
+all_GROUP_aws_region: "{{ lookup('env','AWS_DEFAULT_REGION') | mandatory }}"

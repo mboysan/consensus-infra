@@ -3,6 +3,7 @@
 This module shall be used to run the performance tests on the infrastructure [provision](../provision)ed.
 
 ## Prerequisites
+### On Controller Machine
 - Read the [readme](../README.md) at the parent dir.
 - Install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - Install [python3, pip3, boto3](https://stackoverflow.com/a/59073019).

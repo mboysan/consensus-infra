@@ -1,8 +1,8 @@
 ### misc
 env_setup.sh
+playground.yaml
 
 ### aws
-secrets.sh
 *.pem
 *.pub
 *.ppk

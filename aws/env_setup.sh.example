@@ -9,8 +9,8 @@ export HISTCONTROL=ignorespace
  export AWS_PROFILE=
  export AWS_DEFAULT_REGION=eu-west-1
  export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1c
- export AWS_ACCESS_KEY=<your access key>
- export AWS_SECRET_KEY=<your secret key>
+ export AWS_ACCESS_KEY=AKIA5Y6IAIFGLK3362HP
+ export AWS_SECRET_KEY=gLOOfp7ix91xx99SftCWpO4qf22138eQcf85Lp5B
  export AWS_AMI_NAME=ami-full-deps
 
 # Terraform variables
@@ -25,4 +25,59 @@ export HISTCONTROL=ignorespace
  export PKR_VAR_aws_ec2_ami_name=$AWS_AMI_NAME
 
 # Ansible variables
- export ANSIBLE_CONFIG=$CURRENT_DIR/orchestrate/ansible.cfg
+ ansibleWorkingDir=$CURRENT_DIR/orchestrate
+ export ANSIBLE_CONFIG=$ansibleWorkingDir/ansible.cfg
+ # if you change this variable, make sure you also update ./inventory/aws_ec2.yaml -> aws_profile argument.
+ export ANSIBLE_AWS_PROFILE=ansible
+
+function awsCredentialsSetup() {
+   local awsUserDir=~/.aws
+   local awsUserCredentialsFile=$awsUserDir/credentials
+
+   if [ ! -d "$awsUserDir" ]; then
+     echo "$awsUserDir directory doesn't exist, aws-cli is not properly configured?"
+     return;
+   fi
+
+   local userInput="no"
+   echo "[WARN]"
+   echo "Ansible needs a dedicated profile in ~/.aws/credentials file.
+   This step will append an [ansible] profile section in this file without modifying original contents of the file.
+   If no properly configured aws profile is supplied, ansible will not be able to continue using aws plugins.
+   If you skip this step, make sure you have a dedicated profile section and pass the name of the profile to
+   AWS_PROFILE environment variable above."
+   echo "Would you like to skip this step? [y/No]"
+   read -r userInput
+
+   if [ -z "$userInput" ]; then
+     userInput='no'
+   fi
+
+   if [ "no" != "$userInput" ]; then
+     return;
+   fi
+
+   if [ ! -f "$awsUserCredentialsFile" ]; then
+     echo "[INFO] creating $awsUserCredentialsFile file"
+     touch $awsUserCredentialsFile
+   fi
+
+   if grep -q "$ANSIBLE_AWS_PROFILE" "$awsUserCredentialsFile" ; then
+      echo "[INFO] profile [$ANSIBLE_AWS_PROFILE] exists in $awsUserCredentialsFile, no modification done." ;
+      return;
+   fi
+
+   local profileSection=$(cat <<EOF
+
+[$ANSIBLE_AWS_PROFILE]
+region=$AWS_DEFAULT_REGION
+aws_access_key_id=$AWS_ACCESS_KEY
+aws_secret_access_key=$AWS_SECRET_KEY
+EOF
+)
+
+   echo "$profileSection" >> $awsUserCredentialsFile
+   echo "[INFO] created [$ANSIBLE_AWS_PROFILE] profile in $awsUserCredentialsFile." ;
+}
+
+awsCredentialsSetup
