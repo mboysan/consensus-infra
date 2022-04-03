@@ -7,8 +7,21 @@ This module shall be used to run the performance tests on the infrastructure [pr
 - Read the [readme](../README.md) at the parent dir.
 - Install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - Install [python3, pip3, boto3](https://stackoverflow.com/a/59073019).
+- Ubuntu for control machine (optional): to run [prepare_orchestration.sh](prepare_orchestration.sh) script.
 
 Note: all the commands listed in the following sections shall be executed in this directory (working directory).
+
+## Creating the Ansible Inventory
+
+We need to create the inventory of servers to allow ansible to successfully ssh and execute commands. You can populate
+the inventory manually by connecting to your aws account and getting public ip addresses of all the instances and
+placing them into [inventory/aws_ec2_static.ini](inventory/aws_ec2_static.ini) file. Or, you can simply run the
+[prepare_orchestration.sh](prepare_orchestration.sh) script located in this directory, given that you have successfully
+[provision](../provision)ed the aws stack.
+```
+# run for preparing the ansible setup.
+./prepare_orchestration.sh
+```
 
 ## Confirm Installation
 
