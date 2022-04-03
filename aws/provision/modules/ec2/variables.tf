@@ -1,9 +1,3 @@
-variable "ec2_availability_zone" {
-  description = "Availability zone of the ec2 instance"
-  type        = string
-  default     = "eu-west-1c"
-}
-
 variable "ec2_count" {
   description = "Should the EC2 be created?"
   type        = number
@@ -22,16 +16,20 @@ variable "ec2_group" {
   default     = "my-ec2-group"
 }
 
-variable "ec2_ami" {
+variable "ec2_ami_name" {
   description = "The Amazon Machine Image"
   type        = string
-  default     = "ami-full-deps" # Ubuntu based full dependencies ami created by packer (see aws/ami folder).
 }
 
 variable "ec2_instance_type" {
   description = "The EC2 Instance type"
   type        = string
   default     = "t2.micro" # Free Tier eligible
+}
+
+variable "aws_availability_zone" {
+  description = "AWS Availability Zone"
+  type        = string
 }
 
 variable "aws_key_pair" {

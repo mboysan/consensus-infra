@@ -1,17 +1,4 @@
-variable "profile" {
-  description = "AWS Profile"
+variable "aws_availability_zone" {
+  description = "AWS Availability Zone"
   type        = string
-  default     = "default"
-}
-
-variable "region" {
-  description = "Region for AWS resources"
-  type        = string
-  default     = "eu-west-1"
-}
-
-variable "availability_zone" {
-  description = "Default Availability Zone"
-  type        = string
-  default     = "eu-west-1c"
 }

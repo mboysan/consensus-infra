@@ -12,18 +12,20 @@ recommendations. Also make sure you are eligible for using aws free-tier and/or 
 ## Preparing AWS credentials
 
 Almost all the tools used in this folder group needs to be configured properly with aws credentials to be able to
-make the required api calls to amazon. There are many ways of configuring the credentials and adopting the configuration
-of the tools to the method you choose. However, we prefer using the following method:
-1. Create a file called `credentials` under home dir `~/.aws/`.
-2. Edit the file using the following template:
+make the required api calls to amazon web services. There are many ways of configuring the credentials and adopting 
+the configuration of the tools to the method you choose. However, we prefer using the following method:
+1. An environment configuration script is provided in [env_setup.sh.example](env_setup.sh.example).
+2. Rename it and make it executable
 ```
-[default]
-region=eu-west-1
-aws_access_key_id=<your_aws_access_key>
-aws_secret_access_key=<your_aws_secret_key>
+mv env_setup.sh.example env_setup.sh
+chmod +x env_setup.sh
+```
+3. Finally, source it
+```
+source env_setup.sh
 ```
 
 ## Guide
-
+After preparing your aws credentials appropriately, you can check out the guides:
 1. For provisioning the infrastructure, follow the guide at [provision](./provision) folder.
 2. For orchestrating the ec2 instances and running the performance tests use the [orchestrate](./orchestrate) folder.

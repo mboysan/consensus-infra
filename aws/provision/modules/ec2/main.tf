@@ -3,12 +3,12 @@ data "aws_ami" "ami" {
   owners      = ["self"]
   filter {
     name   = "name"
-    values = [var.ec2_ami]
+    values = [var.ec2_ami_name]
   }
 }
 
 resource "aws_instance" "ec2" {
-  availability_zone = var.ec2_availability_zone
+  availability_zone = var.aws_availability_zone
   count             = var.ec2_count
 
   ami           = data.aws_ami.ami.id
