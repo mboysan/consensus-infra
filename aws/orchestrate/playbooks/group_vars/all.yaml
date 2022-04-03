@@ -1,7 +1,0 @@
-all_GROUP_slf4j_reload4j_dependency_version: '1.7.36'
-all_GROUP_reload4j_dependency_version: '1.2.19'
-all_GROUP_ycsb_dependency_version: '0.18.0-SNAPSHOT'
-all_GROUP_consensus_dependency_version: '1.0-SNAPSHOT'
-
-all_GROUP_slf4j_reload4j_dependency_url: 'https://repo1.maven.org/maven2/org/slf4j/slf4j-reload4j/{{ all_GROUP_slf4j_reload4j_dependency_version }}/slf4j-reload4j-{{ all_GROUP_slf4j_reload4j_dependency_version }}.jar'
-all_GROUP_reload4j_dependency_url: 'https://repo1.maven.org/maven2/ch/qos/reload4j/reload4j/{{ all_GROUP_reload4j_dependency_version }}/reload4j-{{ all_GROUP_reload4j_dependency_version }}.jar'

@@ -1,0 +1,1 @@
+clients_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/ycsb'

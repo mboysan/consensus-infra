@@ -1,11 +1,11 @@
 # -------- Configuration template for log4j --------
 
 # configure root logger
-log4j.rootLogger={{ workers_project_log_level }}, FILE
+log4j.rootLogger={{ workers_GROUP_project_log_level }}, FILE
 
 # Define the file appender
 log4j.appender.FILE=org.apache.log4j.FileAppender
-log4j.appender.FILE.File={{ workers_project_log_file }}
+log4j.appender.FILE.File={{ workers_GROUP_project_log_file }}
 log4j.appender.FILE.ImmediateFlush=true
 log4j.appender.FILE.Append=false
 log4j.appender.FILE.layout=org.apache.log4j.EnhancedPatternLayout

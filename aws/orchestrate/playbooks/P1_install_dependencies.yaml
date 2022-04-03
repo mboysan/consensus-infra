@@ -1,87 +1,83 @@
 #------------------------------------------------------------------------------------------------------------
 # An idempotent playbook that installs dependencies on workers.
+#
+# At the end of the playbook, following executables can be found in each role:
+# - nodes: <nodes_GROUP_working_dir>/consensus.jar
+# - clients: <clients_GROUP_working_dir>/bin/ycsb.sh
 #------------------------------------------------------------------------------------------------------------
 
 ---
 - name: P1.1 - Installs necessary project dependencies on workers
   hosts: workers
-  roles:
-    - workers
   tasks:
     # !!! WARN !!!
     - name: P1.1_T1 - Delete project dir
       file:
-        path: '{{ workers_project_dir }}'
+        path: '{{ workers_GROUP_project_dir }}'
         state: absent
 
-    - name: P1.1_T2 - Clone registry repository
+    - name: P1.1_T2 - Clone project repository
       ansible.builtin.git:
-        repo: '{{ workers_mvn_repo }}'
-        dest: '{{ workers_project_dir }}'
+        repo: '{{ workers_GROUP_project_repo_url }}'
+        dest: '{{ workers_GROUP_project_dir }}'
         single_branch: yes
         version: releases
         force: yes
 
 - name: P1.2 - Installs necessary project dependencies on nodes
   hosts: nodes
-  roles:
-    - nodes
   tasks:
     - name: P1.2_T1 - Create lib directory in nodes working dir
       file:
-        path: '{{ nodes_working_dir }}/lib'
+        path: '{{ nodes_GROUP_working_dir }}/lib'
         state: directory
 
     - name: P1.2_T2 - Get slf4j-reload4j dependency for nodes
       get_url:
-        url: '{{ all_GROUP_slf4j_reload4j_dependency_url }}'
-        dest: '{{ nodes_working_dir }}/lib/slf4j-reload4j.jar'
+        url: '{{ workers_GROUP_dependency_slf4j_reload4j_url }}'
+        dest: '{{ nodes_GROUP_working_dir }}/lib/slf4j-reload4j.jar'
         force: yes
 
     - name: P1.2_T3 - Get reload4j dependency for nodes
       get_url:
-        url: '{{ all_GROUP_reload4j_dependency_url }}'
-        dest: '{{ nodes_working_dir }}/lib/reload4j.jar'
+        url: '{{ workers_GROUP_dependency_reload4j_url }}'
+        dest: '{{ nodes_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
     - name: P1.2_T4 - Rename consensus.jar
       shell: "mv *.jar consensus.jar"
       args:
-        chdir: '{{ nodes_working_dir }}'
+        chdir: '{{ nodes_GROUP_working_dir }}'
 
 - name: P1.3 - Installs necessary project dependencies on clients
   hosts: clients
-  roles:
-    - clients
   tasks:
     - name: P1.3_T1 - Untar ycsb tar file
       shell: "tar xvf *.tar.gz --strip 1 -C ."
       args:
-        chdir: '{{ clients_working_dir }}'
+        chdir: '{{ clients_GROUP_working_dir }}'
 
     - name: P1.3_T2 - Get slf4j-reload4j dependency for clients
       get_url:
-        url: '{{ all_GROUP_slf4j_reload4j_dependency_url }}'
-        dest: '{{ clients_working_dir }}/lib/slf4j-reload4j.jar'
+        url: '{{ workers_GROUP_dependency_slf4j_reload4j_url }}'
+        dest: '{{ clients_GROUP_working_dir }}/lib/slf4j-reload4j.jar'
         force: yes
 
     - name: P1.3_T3 - Get reload4j dependency for clients
       get_url:
-        url: '{{ all_GROUP_reload4j_dependency_url }}'
-        dest: '{{ clients_working_dir }}/lib/reload4j.jar'
+        url: '{{ workers_GROUP_dependency_reload4j_url }}'
+        dest: '{{ clients_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
 - name: P1.4 - Configure log4j on workers
   hosts: workers
-  roles:
-    - workers
   tasks:
     - name: P1.4_T1 - Create logs directory
       file:
-        path: '{{ workers_project_log_path }}'
+        path: '{{ workers_GROUP_project_log_path }}'
         state: directory
 
     - name: P1.4_T1 - Copy log4j template
       template:
         src: log4j.template.j2
-        dest: '{{ workers_project_log_path }}/log4j.properties'
+        dest: '{{ workers_GROUP_project_log_path }}/log4j.properties'
