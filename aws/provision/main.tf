@@ -29,6 +29,11 @@ variable "reserved_port_end" {
   type        = number
 }
 
+variable "aws_ec2_ssh_public_key_path" {
+  description = "Public key file for ssh access to ec2 instances"
+  type        = string
+}
+
 # --- Rest of the setup
 provider "aws" {
   profile = var.aws_profile
@@ -37,8 +42,8 @@ provider "aws" {
 
 locals {
   node_names = tomap({
-    "0" = "node0",
-    "1" = "node1",
+#    "0" = "node0",
+#    "1" = "node1",
     #    "2" = "node2",
     #    "3" = "node3",
     #    "4" = "node4",
@@ -59,7 +64,7 @@ module "security" {
     start_port = var.reserved_port_start
     end_port   = var.reserved_port_end
   }
-  ec2_ssh_public_key_path = "./access/aws_instance_key.pub"
+  ec2_ssh_public_key_path = var.aws_ec2_ssh_public_key_path
 }
 
 module "ec2_nodes" {

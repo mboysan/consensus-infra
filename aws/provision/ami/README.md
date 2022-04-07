@@ -10,11 +10,12 @@ Note: all the commands listed in the following sections shall be executed in thi
 
 ## Creating your AMI on AWS
 
-View and configure the [packer configuration file](packer.pkr.hcl) for your needs.
+View and configure the [packer configuration file](aws_ami_packer.pkr.hcl) for your needs.
 
 Creating and publishing the ami is as simple as running:
 ```
-packer build packer.pkr.hcl
+packer init aws_ami_packer.pkr.hcl
+packer build aws_ami_packer.pkr.hcl
 ```
 This will create an ami with all the dependencies installed with the [`ami-bootstrap.sh`](ami-bootstrap.sh) script.
 
