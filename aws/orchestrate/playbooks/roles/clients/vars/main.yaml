@@ -1,0 +1,2 @@
+# task references
+clients_tasks_start_all: "roles/clients/tasks/start_all.yaml"

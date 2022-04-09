@@ -1,0 +1,67 @@
+#------------------------------------------------------------------------------------------------------------
+# TODO: info
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Test play
+  hosts: nodes
+  roles:
+    - nodes
+
+  tasks:
+    - name: Shell test
+#      vars:
+#        nodes_cli_params: "hello there"
+      shell:
+        cmd: |
+          bash -ilc 'echo {{ nodes_current_node_name }}'
+          bash -ilc 'java \
+                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
+                      -cp "lib/*:*" \
+                      com.mboysan.consensus.KVStoreClientCLI {{ nodes_cli_params }}'
+        chdir: "{{ nodes_GROUP_working_dir }}"
+      when: "inventory_hostname not in groups['stores']"
+      register: result
+
+#- name: Test play
+#  hosts: nodes
+#  vars:
+#    nodeName: "{{ group_names[0] }}"
+#    nodeId: "{{ group_names[0] | regex_search('[0-9]')}}"
+#  tasks:
+#    - name: Shell test
+#      shell:
+#        cmd: |
+#          bash -ilc 'java \
+#                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
+#                      -cp "lib/*:*" \
+#                      com.mboysan.consensus.KVStoreClientCLI'
+#        chdir: "{{ nodes_GROUP_working_dir }}"
+#      when: "inventory_hostname not in groups['stores']"
+#      register: result
+
+#- name: P2.1 - Gather private ip-s of nodes
+#  # uses ~/.aws/credentials to make api calls
+#  hosts: localhost
+#  connection: local
+#  tasks:
+#    - name: Gather EC2 remote facts.
+#      ec2_instance_info:
+#        profile: ansible
+#        region: "{{ all_GROUP_aws_region }}"
+#        filters:
+#          tag:Group : 'nodes'
+#      register: res_ec2_info
+#    - name: Debug facts
+#      debug:
+#        msg: "{{ res_ec2_info | json_query('instances[*].network_interfaces[*].private_ip_address') | join(', ') }} "
+#
+#    - name: debug3
+#      debug:
+#        msg: "{{ item.tags.Name }}:{{ item.private_ip_address }}"
+#      loop: "{{ res_ec2_info.instances }}"
+#
+#    - name: debug4
+#      debug:
+#        var: {{ item.tags.Name }}:{{ item.private_ip_address }}
+#      loop: "{{ res_ec2_info.instances }}"

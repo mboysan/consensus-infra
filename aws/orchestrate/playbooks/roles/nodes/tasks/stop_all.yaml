@@ -1,0 +1,6 @@
+- name: Gracefully stopping all nodes
+  shell:
+    cmd: |
+      bash -ilc 'ps -A | grep java | kill'
+    chdir: "{{ nodes_GROUP_working_dir }}"
+  when: "inventory_hostname not in groups['stores']"
