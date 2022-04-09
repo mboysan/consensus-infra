@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to start all nodes
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Starts all nodes
+  hosts: nodes
+  roles:
+    - nodes
+  tasks:
+    - name: Starting all nodes (async)
+      shell:
+        cmd: |
+          # run in background
+          bash -ilc 'java \
+                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
+                      -cp "lib/*:*" \
+                      com.mboysan.consensus.NodeCLI {{ mandatoryParams }} {{ nodes_cli_params }}' &
+          
+          bash -ilc '{{ workers_GROUP_project_dir }}/check_state.sh "node started"'
+        chdir: "{{ nodes_GROUP_working_dir }}"
+      vars:
+        mandatoryParams: "node.id={{ nodes_current_node_id }} port={{ nodes_node_serving_port }} destinations={{ workers_GROUP_node_destinations }}"
+      when: "inventory_hostname not in groups['stores']"
+      async: 100
+      poll: 0
+      register: start_nodes_task

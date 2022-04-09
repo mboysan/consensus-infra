@@ -1,9 +1,0 @@
-- name: Starting all nodes
-  shell:
-    cmd: |
-      bash -ilc 'java \
-                  -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
-                  -cp "lib/*:*" \
-                  com.mboysan.consensus.NodeCLI {{ nodes_cli_params }}'
-    chdir: "{{ nodes_GROUP_working_dir }}"
-  when: "inventory_hostname not in groups['stores']"

@@ -1,0 +1,17 @@
+#------------------------------------------------------------------------------------------------------------
+# Cleanup resources
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Cleans workers resources
+  hosts: workers
+
+  tasks:
+    - name: Cleaning up workers
+      shell:
+        cmd: |
+          # kill java processes (errors ignored)
+          bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
+          
+          # clean up log files (errors ignored)
+          bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'

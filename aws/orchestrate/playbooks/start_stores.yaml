@@ -1,0 +1,35 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to start all KV stores.
+# This playbook depends on all the nodes to be started first.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Starts all KV stores
+  hosts: stores
+  roles:
+    - stores
+  tasks:
+    - name: Starting all KV stores (async)
+      shell:
+        cmd: |
+          # run in background
+          bash -ilc 'java \
+                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
+                      -cp "lib/*:*" \
+                      com.mboysan.consensus.KVStoreServerCLI {{ mandatoryParams }} {{ stores_cli_params }}' &
+          
+          bash -ilc '{{ workers_GROUP_project_dir }}/check_state.sh "store started"'
+        chdir: "{{ nodes_GROUP_working_dir }}"
+      vars:
+        mandatoryParams: "--store port={{ stores_client_serving_port }} --node node.id={{ stores_current_node_id }} port={{ stores_node_serving_port }} destinations={{ workers_GROUP_node_destinations }}"
+      async: 100
+      poll: 0
+      register: start_stores_task
+
+    - name: Waiting stores to start
+      async_status:
+        jid: "{{ start_stores_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10

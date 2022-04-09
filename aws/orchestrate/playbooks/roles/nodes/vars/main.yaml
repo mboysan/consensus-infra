@@ -6,7 +6,3 @@ nodes_current_node_id: "{{ group_names[0] | regex_search('[0-9]')}}"
 # cli parameters for the java executable
 #nodes_cli_params:
 nodes_node_serving_port: "{{ lookup('env','NODE_SERVING_PORT') | mandatory }}"
-
-# task references
-nodes_tasks_start_all: "roles/nodes/tasks/start_all.yaml"
-nodes_tasks_stop_all: "roles/nodes/tasks/stop_all.yaml"

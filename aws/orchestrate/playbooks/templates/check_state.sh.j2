@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#----------------------------------------------------------------------------------------------------------
+# Script to check state of node/client/store. i.e, tries to find the given input from the log file
+#----------------------------------------------------------------------------------------------------------
+
+logFile={{ workers_GROUP_project_log_file }}
+checkString="$1"
+started=0
+retries=10
+while [[ $started != 1 ]]; do
+  started=$(grep -Fc "$checkString" "$logFile")
+  echo "state=$started ($retries retries left)"
+  retries=$((retries-1))
+  if [[ $retries == 0 ]]; then
+    exit 1
+  fi
+  sleep 5
+done
+exit 0

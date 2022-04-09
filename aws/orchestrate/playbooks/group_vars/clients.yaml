@@ -1,1 +1,3 @@
 clients_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/ycsb'
+clients_GROUP_config_dir: '{{ clients_GROUP_working_dir }}/conf'
+clients_GROUP_config_file: '{{ clients_GROUP_config_dir }}/client.properties'

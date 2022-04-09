@@ -69,6 +69,16 @@
         dest: '{{ clients_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
+    - name: P1.3_T4 - Create client conf dir
+      file:
+        path: '{{ clients_GROUP_config_dir }}'
+        state: directory
+
+    - name: P1.3_T5 - Copy client config
+      template:
+        src: client.properties.j2
+        dest: '{{ clients_GROUP_config_file }}'
+
 - name: P1.4 - Configure log4j on workers
   hosts: workers
   tasks:
@@ -79,5 +89,14 @@
 
     - name: P1.4_T1 - Copy log4j template
       template:
-        src: log4j.template.j2
+        src: log4j.properties.j2
         dest: '{{ workers_GROUP_project_log_config_file }}'
+
+- name: P1.5 - Copy scripts to workers
+  hosts: workers
+  tasks:
+    - name: P1.5_T1 - Copy check_state.sh
+      template:
+        src: check_state.sh.j2
+        dest: '{{ workers_GROUP_project_dir }}/check_state.sh'
+        mode: '0777'

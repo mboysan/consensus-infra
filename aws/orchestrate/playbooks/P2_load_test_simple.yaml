@@ -1,0 +1,16 @@
+#------------------------------------------------------------------------------------------------------------
+# Prepares nodes, stores & clients.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: start_nodes.yaml
+  vars:
+    nodes_cli_params: "protocol=raft"
+
+- ansible.builtin.import_playbook: start_stores.yaml
+  vars:
+    stores_cli_params: "protocol=raft"
+
+- ansible.builtin.import_playbook: start_clients.yaml
+  vars:
+    clients_cli_params: "workloads/workloada"

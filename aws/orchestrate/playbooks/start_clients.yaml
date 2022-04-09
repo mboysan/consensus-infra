@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to start all clients that initiate the load test.
+# This playbook depends on all KV stores to be started first.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Starts all clients
+  hosts: clients
+  tasks:
+    - name: Starting all clients
+      shell:
+        cmd: |
+          bash -ilc 'export JAVA_OPTS="-Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}}" && \
+                      ./bin/ycsb.sh run consensus -P {{ clients_GROUP_config_file }} -P {{ clients_cli_params }}'
+        chdir: "{{ clients_GROUP_working_dir }}"
