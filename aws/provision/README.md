@@ -13,8 +13,8 @@ Note: all the commands listed in the following sections shall be executed in thi
 
 ## Provisioning the Infrastructure
 
-Note that the terraform configuration ([main.tf](main.tf)) used here relies on the default VPC created in `eu-west-1` region
-with its default settings.
+Note that the terraform configuration ([main.tf](main.tf)) used here relies on the default VPC created in `eu-west-1` 
+region with its default settings.
 
 To plan the infra setup:
 ```

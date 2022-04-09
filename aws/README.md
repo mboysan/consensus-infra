@@ -30,9 +30,8 @@ aws_access_key_id=<your aws access key id>
 aws_secret_access_key==<your aws secret access key>
 ```
 
-After setting this file, review [env_setup.sh.example](env_setup.sh.example) and execute the following:
+After setting this file, review [env_setup.sh](env_setup.sh) and execute the following:
 ```
-mv env_setup.sh.example env_setup.sh
 chmod +x env_setup.sh
 source env_setup.sh
 ```

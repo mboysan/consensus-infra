@@ -42,8 +42,8 @@ provider "aws" {
 
 locals {
   node_names = tomap({
-#    "0" = "node0",
-#    "1" = "node1",
+    "0" = "node0",
+    "1" = "node1",
     #    "2" = "node2",
     #    "3" = "node3",
     #    "4" = "node4",
