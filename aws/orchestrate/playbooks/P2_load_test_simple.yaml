@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------------------------------
-# Prepares nodes, stores & clients.
+# Performs a simple load test with a default workload
 #------------------------------------------------------------------------------------------------------------
 
 ---
@@ -14,3 +14,5 @@
 - ansible.builtin.import_playbook: util_start_clients.yaml
   vars:
     cli_params: "workloads/workloada"
+
+- ansible.builtin.import_playbook: util_cleanup.yaml
