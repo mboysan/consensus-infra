@@ -1,7 +1,0 @@
-# name of the current node (e.g. node0) taken from the 'stores' hosts
-stores_current_node_name: "{{ group_names[0] }}"
-# id of the current node (e.g. 0) taken from the 'stores' hosts
-stores_current_node_id: "{{ group_names[0] | regex_search('[0-9]')}}"
-
-stores_node_serving_port: "{{ nodes_node_serving_port }}"
-stores_client_serving_port: "{{ lookup('env','CLIENT_SERVING_PORT') | mandatory }}"

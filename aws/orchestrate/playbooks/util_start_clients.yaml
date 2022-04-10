@@ -11,5 +11,5 @@
       shell:
         cmd: |
           bash -ilc 'export JAVA_OPTS="-Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}}" && \
-                      ./bin/ycsb.sh run consensus -P {{ clients_GROUP_config_file }} -P {{ clients_cli_params }}'
+                      ./bin/ycsb.sh run consensus -P {{ clients_GROUP_config_file }} -P {{ cli_params }}'
         chdir: "{{ clients_GROUP_working_dir }}"
