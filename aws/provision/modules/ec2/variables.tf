@@ -17,8 +17,8 @@ variable "ec2_tags" {
   })
 }
 
-variable "ec2_ami_name" {
-  description = "The Amazon Machine Image"
+variable "ec2_ami_id" {
+  description = "The Amazon Machine Image ID"
   type        = string
 }
 

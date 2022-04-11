@@ -1,22 +1,19 @@
 #------------------------------------------------------------------------------------------------------------
-# An idempotent playbook that installs dependencies on workers.
-#
-# At the end of the playbook, following executables can be found in each role:
-# - nodes: <nodes_GROUP_working_dir>/consensus.jar
-# - clients: <clients_GROUP_working_dir>/bin/ycsb.sh
+# A playbook that installs necessary project dependencies on workers.
+# NB! This playbook is not idempotent as it will overwrite the project directory.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: P1.1 - Installs necessary project dependencies on workers
+- name: P2.1 - Installs necessary project dependencies on workers
   hosts: workers
   tasks:
     # !!! WARN !!!
-    - name: P1.1_T1 - Delete project dir
+    - name: P2.1.1 - Delete project dir
       file:
         path: '{{ workers_GROUP_project_dir }}'
         state: absent
 
-    - name: P1.1_T2 - Clone project repository
+    - name: P2.1.2 - Clone project repository
       ansible.builtin.git:
         repo: '{{ workers_GROUP_project_repo_url }}'
         dest: '{{ workers_GROUP_project_dir }}'
@@ -24,78 +21,78 @@
         version: releases
         force: yes
 
-- name: P1.2 - Installs necessary project dependencies on nodes
+- name: P2.2 - Installs necessary project dependencies on nodes
   hosts: nodes
   tasks:
-    - name: P1.2_T1 - Create lib directory in nodes working dir
+    - name: P2.2.1 - Create lib directory in nodes working dir
       file:
         path: '{{ nodes_GROUP_working_dir }}/lib'
         state: directory
 
-    - name: P1.2_T2 - Get slf4j-reload4j dependency for nodes
+    - name: P2.2.2 - Get slf4j-reload4j dependency for nodes
       get_url:
         url: '{{ workers_GROUP_dependency_slf4j_reload4j_url }}'
         dest: '{{ nodes_GROUP_working_dir }}/lib/slf4j-reload4j.jar'
         force: yes
 
-    - name: P1.2_T3 - Get reload4j dependency for nodes
+    - name: P2.2.3 - Get reload4j dependency for nodes
       get_url:
         url: '{{ workers_GROUP_dependency_reload4j_url }}'
         dest: '{{ nodes_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
-    - name: P1.2_T4 - Rename consensus.jar
+    - name: P2.2.4 - Rename consensus.jar
       shell: "mv *.jar consensus.jar"
       args:
         chdir: '{{ nodes_GROUP_working_dir }}'
 
-- name: P1.3 - Installs necessary project dependencies on clients
+- name: P2.3 - Installs necessary project dependencies on clients
   hosts: clients
   tasks:
-    - name: P1.3_T1 - Untar ycsb tar file
+    - name: P2.3.1 - Untar ycsb tar file
       shell: "tar xvf *.tar.gz --strip 1 -C ."
       args:
         chdir: '{{ clients_GROUP_working_dir }}'
 
-    - name: P1.3_T2 - Get slf4j-reload4j dependency for clients
+    - name: P2.3.2 - Get slf4j-reload4j dependency for clients
       get_url:
         url: '{{ workers_GROUP_dependency_slf4j_reload4j_url }}'
         dest: '{{ clients_GROUP_working_dir }}/lib/slf4j-reload4j.jar'
         force: yes
 
-    - name: P1.3_T3 - Get reload4j dependency for clients
+    - name: P2.3.3 - Get reload4j dependency for clients
       get_url:
         url: '{{ workers_GROUP_dependency_reload4j_url }}'
         dest: '{{ clients_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
-    - name: P1.3_T4 - Create client conf dir
+    - name: P2.3.4 - Create client conf dir
       file:
         path: '{{ clients_GROUP_config_dir }}'
         state: directory
 
-    - name: P1.3_T5 - Copy client config
+    - name: P2.3.5 - Copy client config
       template:
         src: client.properties.j2
         dest: '{{ clients_GROUP_config_file }}'
 
-- name: P1.4 - Configure log4j on workers
+- name: P2.4 - Configure log4j on workers
   hosts: workers
   tasks:
-    - name: P1.4_T1 - Create logs directory
+    - name: P2.4.1 - Create logs directory
       file:
         path: '{{ workers_GROUP_project_log_path }}'
         state: directory
 
-    - name: P1.4_T1 - Copy log4j template
+    - name: P2.4.2 - Copy log4j template
       template:
         src: log4j.properties.j2
         dest: '{{ workers_GROUP_project_log_config_file }}'
 
-- name: P1.5 - Copy scripts to workers
+- name: P2.5 - Copy scripts to workers
   hosts: workers
   tasks:
-    - name: P1.5_T1 - Copy check_state.sh
+    - name: P2.5.1 - Copy check_state.sh
       template:
         src: check_state.sh.j2
         dest: '{{ workers_GROUP_project_dir }}/check_state.sh'

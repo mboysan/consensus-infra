@@ -14,8 +14,8 @@ variable "aws_availability_zone" {
   type        = string
 }
 
-variable "aws_ec2_ami_name" {
-  description = "The Amazon Machine Image (AMI)"
+variable "aws_ec2_ami_id" {
+  description = "The Amazon Machine Image (AMI) ID"
   type        = string
 }
 
@@ -77,7 +77,7 @@ module "ec2_nodes" {
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
 
-  ec2_ami_name = var.aws_ec2_ami_name
+  ec2_ami_id = var.aws_ec2_ami_id
 
   ec2_tags = {
     Index = each.key
@@ -95,7 +95,7 @@ module "ec2_client" {
   aws_security_group = module.security.aws_security_group
   aws_key_pair       = module.security.aws_key_pair
 
-  ec2_ami_name = var.aws_ec2_ami_name
+  ec2_ami_id = var.aws_ec2_ami_id
 
   ec2_tags = {
     Index = "0"

@@ -1,3 +1,7 @@
+**NB!** Following procedure is completely optional as [orchestrate](../../orchestrate) folder already contains a 
+playbook that installs all the necessary software and VM configurations for the ec2 instances. Please check the 
+relevant scripts used by ansible as the [ami-bootstrap.sh](ami-bootstrap.sh) script will no longer be maintained.
+
 # About
 
 This module shall be used to create an Amazon Machine Image (AMI) to be used as the base for the ec2 instances.

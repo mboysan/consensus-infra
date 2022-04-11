@@ -1,0 +1,31 @@
+#------------------------------------------------------------------------------------------------------------
+# A playbook that installs necessary software dependencies and configures required environment variables
+# on workers.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: P1.1 - Sets Up the VMs
+  hosts: workers
+  tasks:
+    - name: P1.1.1 - Copy the VM setup script
+      copy:
+        src: ./remote_scripts/setup_vm.sh
+        dest: "{{ workers_GROUP_home_dir }}/setup_vm.sh"
+        mode: "0777"
+
+    - name: P1.1.2 - Run the setup script (async)
+      shell:
+        cmd: |
+          bash -ilc './setup_vm.sh'
+        chdir: "{{ workers_GROUP_home_dir }}"
+      async: 600
+      poll: 0
+      register: setup_vm_task
+
+    - name: Waiting workers to finish VM setup
+      async_status:
+        jid: "{{ setup_vm_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 10
+      delay: 60

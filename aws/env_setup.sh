@@ -31,7 +31,8 @@ export HISTCONTROL=ignorespace
  export AWS_DEFAULT_REGION=$AWS_REGION
  # if you define a region parameter in aws/credentials file, this variable should align with that.
  export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1c
- export AWS_AMI_NAME=ami-full-deps
+ # Ubuntu-20.04, note that Amazon might regularly update this id, so feel free to insert the most recent one.
+ export AWS_AMI_ID="ami-08ca3fed11864d6bb"
 
 # Terraform variables
  export TERRAFORM_WORKING_DIR=$CURRENT_DIR/provision
@@ -40,7 +41,7 @@ export HISTCONTROL=ignorespace
  export TF_VAR_aws_profile=$AWS_PROFILE
  export TF_VAR_aws_region=$AWS_REGION
  export TF_VAR_aws_availability_zone=$AWS_DEFAULT_AVAILABILITY_ZONE
- export TF_VAR_aws_ec2_ami_name=$AWS_AMI_NAME
+ export TF_VAR_aws_ec2_ami_id=$AWS_AMI_ID
  export TF_VAR_aws_ec2_ssh_public_key_path=$TERRAFORM_WORKING_DIR/access/aws_instance_key.pub
 
 # Packer variables
