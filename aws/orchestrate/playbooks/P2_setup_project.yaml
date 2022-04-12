@@ -76,7 +76,7 @@
         src: client.properties.j2
         dest: '{{ clients_GROUP_config_file }}'
 
-- name: P2.4 - Configure log4j on workers
+- name: P2.4 - Configure log4j and metrics on workers
   hosts: workers
   tasks:
     - name: P2.4.1 - Create logs directory
@@ -88,6 +88,11 @@
       template:
         src: log4j.properties.j2
         dest: '{{ workers_GROUP_project_log_config_file }}'
+
+    - name: P2.4.3 - Create metrics directory
+      file:
+        path: '{{ workers_GROUP_project_metrics_path }}'
+        state: directory
 
 - name: P2.5 - Copy scripts to workers
   hosts: workers

@@ -3,15 +3,26 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Cleans workers resources
+- name: Cleans up resources of workers
   hosts: workers
 
   tasks:
-    - name: Cleaning up workers
+    - name: Stopping worker processes
       shell:
         cmd: |
           # kill java processes (errors ignored)
           bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
-          
+
+    - name: Deleting worker logs
+      shell:
+        cmd: |
           # clean up log files (errors ignored)
           bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
+      when: delete_logs == true
+
+    - name: Deleting worker metrics
+      shell:
+        cmd: |
+          # clean up metrics files (errors ignored)
+          bash -ilc 'rm {{ workers_GROUP_project_metrics_file }} || true'
+      when: delete_metrics == true

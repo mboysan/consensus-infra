@@ -6,10 +6,15 @@ workers_GROUP_project_repo_url: https://github.com/mboysan/mvn-repo
 # the destination that the project will be cloned to
 workers_GROUP_project_dir: '{{ workers_GROUP_home_dir }}/project'
 
+# configurations related to logs
 workers_GROUP_project_log_path: '{{ workers_GROUP_project_dir }}/logs'
 workers_GROUP_project_log_file: '{{ workers_GROUP_project_log_path }}/logs.txt'
 workers_GROUP_project_log_config_file: '{{ workers_GROUP_project_log_path }}/log4j.properties'
 workers_GROUP_project_log_level: 'DEBUG'
+
+# configurations related to metrics
+workers_GROUP_project_metrics_path: '{{ workers_GROUP_project_dir }}/metrics'
+workers_GROUP_project_metrics_file: '{{ workers_GROUP_project_metrics_path }}/graphite.txt'
 
 # --- dependencies
 workers_GROUP_dependency_slf4j_reload4j_version: '1.7.36'

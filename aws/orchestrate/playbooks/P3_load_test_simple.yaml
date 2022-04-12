@@ -16,3 +16,6 @@
     cli_params: "workloads/workloada"
 
 - ansible.builtin.import_playbook: util_cleanup.yaml
+  vars:
+    delete_logs: true
+    delete_metrics: false

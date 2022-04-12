@@ -13,11 +13,12 @@
           bash -ilc 'java \
                       -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
                       -cp "lib/*:*" \
-                      com.mboysan.consensus.NodeCLI {{ _mandatory_params }} {{ cli_params }}' &
+                      com.mboysan.consensus.NodeCLI {{ _metrics_params }} {{ _mandatory_params }} {{ cli_params }}' &
           
           bash -ilc '{{ workers_GROUP_project_dir }}/check_state.sh "node started"'
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
+        _metrics_params: "metrics.enabled=true metrics metrics.output.path={{ workers_GROUP_project_metrics_file }} metrics.step={{ nodes_GROUP_jvm_metrics_step }}"
         _mandatory_params: "node.id={{ nodes_GROUP_current_node_id }} port={{ nodes_GROUP_node_serving_port }} destinations={{ workers_GROUP_node_destinations }}"
       when: "inventory_hostname not in groups['stores']"
       async: 100
