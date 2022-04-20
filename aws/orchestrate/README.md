@@ -11,25 +11,6 @@ This module shall be used to run the performance tests on the infrastructure [pr
 
 Note: all the commands listed in the following sections shall be executed in this directory (working directory).
 
-## Creating the Ansible Inventory
-
-We need to create the inventory of servers to allow ansible to successfully ssh and execute commands. You can populate
-the inventory manually by connecting to your aws account and getting public ip addresses of all the instances and
-placing them into [inventory/aws_ec2_static.ini](inventory/aws_ec2_static.ini) file. Or, you can simply run the
-[prepare_orchestration.sh](prepare_orchestration.sh) script located in this directory, given that you have successfully
-[provision](../provision)ed the aws stack.
-```
-# run for preparing the ansible setup.
-./prepare_orchestration.sh
-```
-
-## Confirm Installation
-
-You can confirm if the inventory setup works properly by executing: 
-```
-ansible-inventory -i inventory/aws_ec2.yaml --graph
-```
-
 ## Setting ansible.cfg location
 
 The [ansible.cfg](ansible.cfg) file located in this directory shall be used for the orchestration. Make sure you view
@@ -57,7 +38,43 @@ Execute the following to verify if ansible was able to pick up the correct confi
 ansible-config view
 ```
 
+## Creating the Ansible Inventory
 
+We need to create the inventory of servers to allow ansible to successfully ssh and execute commands. You can populate
+the inventory manually by connecting to your aws account and getting public ip addresses of all the instances and
+placing them into [inventory/aws_ec2_static.ini](inventory/aws_ec2_static.ini) file (you can use this file as a sample). 
+Or, you can simply run the [prepare_orchestration.sh](prepare_orchestration.sh) script located in this directory, given 
+that you have successfully [provision](../provision)ed the aws stack.
+```
+# run for preparing the ansible setup.
+./prepare_orchestration.sh
+```
+
+### Confirm Inventory Setup
+
+You can confirm if the inventory setup works properly by executing:
+```
+ansible-inventory -i inventory/aws_ec2_static.yaml --graph
+```
+
+## Information on Playbooks
+
+Following is the naming pattern used for the playbooks.
+- `P<X>_<name>`: Playbooks starting with this naming pattern is used to prepare the hosts by installing 
+necessary software and project dependencies, i.e. `P` stands for "Prepare".
+- `T<X>_<name>`: Playbooks starting with this naming pattern is used to perform the load tests, 
+i.e. `T` stands for "Test".
+- `util_<name>`: Playbooks starting with this naming pattern is used as utility tasks such as starting, 
+stopping, cleanup etc. of hosts that are shared by all other playbooks.
+
+With the above information, one should first execute the playbooks that start with `P` with the numerical order defined.
+Only then, actual test playbooks shall be run, i.e. playbooks that start with `T`. The execution order of `T` playbooks
+are not important.
+
+Once you have prepared the ansible inventory, playbooks can be executed like:
+```
+ansible-playbook playbooks/<playbook-name>
+```
 
 # Useful commands
 ```
@@ -78,4 +95,7 @@ ansible-playbook play.yaml
 
 # run playbook
 ansible-playbook play.yaml -i inventory/aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+
+# run playbook with extra vars (--extra-vars or -e param)
+ansible-playbook play.yaml -e "key=value"
 ```

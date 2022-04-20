@@ -1,10 +1,7 @@
-# home directory of the worker
-workers_GROUP_home_dir: /home/ubuntu
-
 # git repository of the project executables
 workers_GROUP_project_repo_url: https://github.com/mboysan/mvn-repo
 # the destination that the project will be cloned to
-workers_GROUP_project_dir: '{{ workers_GROUP_home_dir }}/project'
+workers_GROUP_project_dir: '{{ all_GROUP_home_dir }}/project'
 
 # configurations related to logs
 workers_GROUP_project_log_path: '{{ workers_GROUP_project_dir }}/logs'

@@ -1,0 +1,2 @@
+# the destination that the project will be cloned to
+collectors_GROUP_project_dir: '{{ collectors_GROUP_home_dir }}/project'

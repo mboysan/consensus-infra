@@ -1,0 +1,14 @@
+#------------------------------------------------------------------------------------------------------------
+# A playbook that installs necessary project dependencies on collectors.
+# NB! This playbook is not idempotent as it will overwrite the project directory.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: P3.1 - Installs necessary project dependencies on collectors
+  hosts: collectors
+  any_errors_fatal: true
+  tasks:
+    - debug:
+        msg: "{{ collectors_GROUP_home_dir }}"
+
+# TODO: dummy playbook for now, will be completed

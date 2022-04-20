@@ -150,9 +150,36 @@ function populateWorkersInventory() {
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
+function populateCollectorsInventory() {
+    echo "[INFO] adding collectors"
+
+    # a temporary file for terraform output
+    local tmpJsonFile=$tmpDir/collectors.json
+
+    # get output from terraform
+    terraform output -json collector > $tmpJsonFile
+
+    # get inventory variables
+    name=$(jq -r '.ec2_instance[0] | (.tags.Name)' $tmpJsonFile)
+    publicIp=$(jq -r '.ec2_instance[0] | (.public_ip)' $tmpJsonFile)
+
+    echo "[INFO] group=clients, name=$name, public_ip=$publicIp"
+
+    # populate collectors group
+    echo "[collector]" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "$publicIp" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "" >> "$ANSIBLE_INVENTORY_FILE"
+
+    # populate collectors children
+    echo "[collectors:children]" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "$name" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "" >> "$ANSIBLE_INVENTORY_FILE"
+}
+
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
 populateClientsInventory
 populateNodesInventory 0
 populateStoresInventory
 populateWorkersInventory
+populateCollectorsInventory

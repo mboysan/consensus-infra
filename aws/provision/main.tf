@@ -48,7 +48,6 @@ locals {
     #    "3" = "node3",
     #    "4" = "node4",
   })
-  client_name = "consensus-client"
 }
 
 module "defaults" {
@@ -104,6 +103,24 @@ module "ec2_client" {
   }
 }
 
+module "ec2_collector" {
+  source = "./modules/ec2"
+
+  aws_availability_zone = var.aws_availability_zone
+
+  aws_subnet         = module.defaults.aws_subnet
+  aws_security_group = module.security.aws_security_group
+  aws_key_pair       = module.security.aws_key_pair
+
+  ec2_ami_id = var.aws_ec2_ami_id
+
+  ec2_tags = {
+    Index = "0"
+    Name  = "collector"
+    Group = "collectors"
+  }
+}
+
 output "nodes" {
   depends_on = [module.ec2_nodes]
   value      = module.ec2_nodes
@@ -112,4 +129,9 @@ output "nodes" {
 output "client" {
   depends_on = [module.ec2_client]
   value      = module.ec2_client
+}
+
+output "collector" {
+  depends_on = [module.ec2_collector]
+  value      = module.ec2_collector
 }

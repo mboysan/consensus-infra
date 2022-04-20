@@ -14,4 +14,4 @@
                       ./bin/ycsb.sh run consensus {{ _metrics_params }} -P {{ clients_GROUP_config_file }} -P {{ cli_params }}'
         chdir: "{{ clients_GROUP_working_dir }}"
       vars:
-        _metrics_params: "-p measurementtype=timeseries -p exportfile={{ workers_GROUP_project_metrics_file }} -p exporter=site.ycsb.measurements.exporter.GraphiteMeasurementsExporter"
+        _metrics_params: "-p measurementtype=timeseries -p exportfile={{ workers_GROUP_project_metrics_file }} -p metricsprefix={{ graphite_prefix }} -p exporter=site.ycsb.measurements.exporter.GraphiteMeasurementsExporter"

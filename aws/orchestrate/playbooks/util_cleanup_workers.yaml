@@ -18,11 +18,11 @@
         cmd: |
           # clean up log files (errors ignored)
           bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
-      when: delete_logs == true
+      when: delete_logs|bool
 
     - name: Deleting worker metrics
       shell:
         cmd: |
           # clean up metrics files (errors ignored)
           bash -ilc 'rm {{ workers_GROUP_project_metrics_file }} || true'
-      when: delete_metrics == true
+      when: delete_metrics|bool

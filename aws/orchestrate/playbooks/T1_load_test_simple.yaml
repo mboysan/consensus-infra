@@ -6,16 +6,19 @@
 - ansible.builtin.import_playbook: util_start_nodes.yaml
   vars:
     cli_params: "protocol=raft"
+    graphite_prefix: "t1.{{ nodes_GROUP_current_node_name }}"
 
 - ansible.builtin.import_playbook: util_start_stores.yaml
   vars:
     cli_params: "protocol=raft"
+    graphite_prefix: "t1.{{ stores_GROUP_current_node_name }}"
 
 - ansible.builtin.import_playbook: util_start_clients.yaml
   vars:
     cli_params: "workloads/workloada"
+    graphite_prefix: "t1.{{ clients_GROUP_current_client_name }}"
 
-- ansible.builtin.import_playbook: util_cleanup.yaml
+- ansible.builtin.import_playbook: util_cleanup_workers.yaml
   vars:
     delete_logs: true
     delete_metrics: false

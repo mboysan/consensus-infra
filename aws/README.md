@@ -40,3 +40,18 @@ source env_setup.sh
 After preparing your aws credentials appropriately, you can check out the guides:
 1. For provisioning the infrastructure, follow the guide at [provision](./provision) folder.
 2. For orchestrating the ec2 instances and running the performance tests use the [orchestrate](./orchestrate) folder.
+
+### Convenience Scripts
+
+You can find two scripts to conveniently initialize ([stack_init.sh](./stack_init.sh)) and destroy 
+([stack_destroy.sh](./stack_destroy.sh)) the aws environment. You can use them like the following:
+```
+# make the scripts executable.
+chmod +x *.sh
+
+# initialize the stack (loads environment variables for the current shell as well).
+source stack_init.sh
+
+# destroy the stack.
+./stack_destroy.sh
+```
