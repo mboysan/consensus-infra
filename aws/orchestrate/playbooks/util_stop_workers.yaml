@@ -1,0 +1,21 @@
+#------------------------------------------------------------------------------------------------------------
+# Stops workers optionally cleans log files
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Stops workers
+  hosts: workers
+
+  tasks:
+    - name: Stopping worker processes
+      shell:
+        cmd: |
+          # kill java processes (errors ignored)
+          bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
+
+    - name: Deleting worker logs
+      shell:
+        cmd: |
+          # clean up log files (errors ignored)
+          bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
+      when: delete_logs | default('true') | bool

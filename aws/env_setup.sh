@@ -19,6 +19,10 @@ export HISTCONTROL=ignorespace
  export NODE_SERVING_PORT=33330
  # port that the kv stores use to accept clients to connect
  export CLIENT_SERVING_PORT=33331
+ # port for graphite to bind to serve web browsers
+ export GRAPHITE_WEB_PORT=33330
+ # port for graphite to bind to serve netcat requests
+ export GRAPHITE_NC_PORT=33331
  # reserve some more ports just in case
  export RESERVED_PORT_START=$NODE_SERVING_PORT
  export RESERVED_PORT_END=$((CLIENT_SERVING_PORT + 4))

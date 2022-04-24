@@ -19,7 +19,7 @@
           bash -ilc '{{ workers_GROUP_project_dir }}/check_state.sh "store started"'
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
-        _metrics_params: "metrics.enabled=true metrics metrics.output.path={{ workers_GROUP_project_metrics_file }} metrics.step={{ nodes_GROUP_jvm_metrics_step }} metrics.prefix={{ graphite_prefix }}"
+        _metrics_params: "metrics.enabled=true metrics metrics.exportfile={{ workers_GROUP_project_metrics_file }} metrics.seperator=, metrics.step={{ nodes_GROUP_jvm_metrics_step }}"
         _mandatory_params: "--store port={{ stores_GROUP_client_serving_port }} --node node.id={{ stores_GROUP_current_node_id }} port={{ stores_GROUP_node_serving_port }} destinations={{ workers_GROUP_node_destinations }}"
       async: 100
       poll: 0

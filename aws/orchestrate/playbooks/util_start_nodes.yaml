@@ -18,7 +18,7 @@
           bash -ilc '{{ workers_GROUP_project_dir }}/check_state.sh "node started"'
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
-        _metrics_params: "metrics.enabled=true metrics metrics.output.path={{ workers_GROUP_project_metrics_file }} metrics.step={{ nodes_GROUP_jvm_metrics_step }} metrics.prefix={{ graphite_prefix }}"
+        _metrics_params: "metrics.enabled=true metrics metrics.exportfile={{ workers_GROUP_project_metrics_file }} metrics.seperator=, metrics.step={{ nodes_GROUP_jvm_metrics_step }}"
         _mandatory_params: "node.id={{ nodes_GROUP_current_node_id }} port={{ nodes_GROUP_node_serving_port }} destinations={{ workers_GROUP_node_destinations }}"
       when: "inventory_hostname not in groups['stores']"
       async: 100
