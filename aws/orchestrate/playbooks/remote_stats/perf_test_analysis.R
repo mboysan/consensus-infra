@@ -84,10 +84,6 @@ process("perf_test_wip_01.txt", c(
 # --------------------------------------------------------------------------------- plots
 
 epochMillisToTime <- function(timestamp) {
-  # as.POSIXlt(timestamp / 1000, origin = "1970-01-01")
-  # as.Date(as.POSIXlt(timestamp / 1000, origin = "1970-01-01"))
-  # format(as.POSIXlt(timestamp / 1000, origin = "1970-01-01"), "%H:%M:%OS3")
-  # timestamp / 1000
   timestamp / 1000
 }
 
