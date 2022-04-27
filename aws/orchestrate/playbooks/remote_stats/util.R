@@ -8,7 +8,7 @@ install.packages('roxygen2')  # for documentation
 install.packages('ggplot2')
 install.packages('xts')
 
-process <- function(filepath, lambdas) {
+process_csv_file <- function(filepath, lambdas) {
   con <- file(filepath, "r")
   while ( TRUE ) {
     line <- readLines(con, n = 1)
@@ -23,7 +23,7 @@ process <- function(filepath, lambdas) {
   close(con)
 }
 
-createCsvFiles <- function(operations) {
+create_csv_files <- function(operations) {
   files <- c()
   for (op in operations) {
     file <- tempfile(pattern = op, fileext = '.csv')
@@ -35,6 +35,6 @@ createCsvFiles <- function(operations) {
 
 #' Convert milliseconds (since epoch) to seconds.
 #' @param timestamp milliseconds since epoch
-epochMillisToSeconds <- function(timestamp) {
+epoch_millis_to_seconds <- function(timestamp) {
   timestamp / 1000
 }
