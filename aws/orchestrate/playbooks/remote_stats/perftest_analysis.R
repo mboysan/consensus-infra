@@ -1,44 +1,11 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env Rscript --vanilla
 
-dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) # create personal library
-.libPaths(Sys.getenv("R_LIBS_USER"))  # add to the path
+source("util.R")
 
-#install.packages('readr')
-#install.packages('stringr')
-# install.packages('collections')
 library('readr')
 library('stringr')
 library('ggplot2')
-library('dplyr')
-
-process <- function(filepath, lambdas) {
-  con <- file(filepath, "r")
-  while ( TRUE ) {
-    line <- readLines(con, n = 1)
-    if ( length(line) == 0 ) {
-      break
-    }
-    for (lambda in lambdas) {
-      do.call(lambda, as.list(line))
-    }
-  }
-
-  close(con)
-}
-
-createCsvFiles <- function(operations) {
-  files <- c()
-  for (op in operations) {
-    file <- tempfile(pattern = op, fileext = '.csv')
-    files <- c(files, file)
-  }
-  names(files) <- operations
-  files
-}
-
-isOperation <- function(line, operation) {
-  startsWith(line, paste0(operation, ','))
-}
+# library('dplyr')
 
 supportedOperations <- c(
   'read',
@@ -55,6 +22,10 @@ supportedOperations <- c(
 )
 
 csvFiles <- createCsvFiles(supportedOperations)
+
+isOperation <- function(line, operation) {
+  startsWith(line, paste0(operation, ','))
+}
 
 # write latencies to separate csv files based on operation type
 writeLatencies <- function(line) {
@@ -76,19 +47,15 @@ writeSummaryStats <- function(line) {
   }
 }
 
-process("perf_test_wip_01.txt", c(
+process("perftest_sample.txt", c(
   writeLatencies,
   writeSummaryStats
 ))
 
 # --------------------------------------------------------------------------------- plots
 
-epochMillisToTime <- function(timestamp) {
-  timestamp / 1000
-}
-
-readLatencyCsv <- read.csv(csvFiles[['read']], col.names = c('operation', 'latency', 'timestamp'))
-readLatencyCsv['time'] <- lapply(readLatencyCsv['timestamp'], FUN = epochMillisToTime)
+readLatencyCsv <- read.csv(csvFiles[['read']], header = FALSE, col.names = c('operation', 'latency', 'timestamp'))
+readLatencyCsv['time'] <- lapply(readLatencyCsv['timestamp'], FUN = epochMillisToSeconds)
 class(readLatencyCsv[,'time']) <- c('POSIXt','POSIXct')
 
 p <- ggplot(readLatencyCsv, aes(time, latency)) + geom_line() + scale_x_datetime(date_labels = "%H:%M:%OS3")
