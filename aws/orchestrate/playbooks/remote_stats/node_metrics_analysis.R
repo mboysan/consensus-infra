@@ -2,102 +2,64 @@
 
 source("util.R")
 
-library('xts')
-library('ggplot2')
-
 metrics_csv <- read.csv('node_metrics_sample.txt', header = FALSE, col.names = c('name', 'value', 'timestamp'))
 class(metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
 
-extract <- function(csv_data, prefix) {
-  csv_data[startsWith(csv_data['name']$name, prefix),]
-}
-
-#' Converts a csv data to xts data applying the function specified.
-#' @description
-#' By default, the converted data has a single named column called 'value' upon return.
-#' @param csv_data csv data to convert
-#' @param apply_function function to apply
-to_ts <- function(csv_data, apply_function, col_names = c('value')) {
-  idx <- csv_data[, 'timestamp']
-  data.ts <- xts(csv_data, order.by = idx)
-  data.ts <- period.apply(data.ts, endpoints(data.ts, on = "ms"), FUN = apply_function)
-  # name the computed column as 'value'
-  names(data.ts) <- col_names
-  data.ts
-}
-
-#' Plot time series data
-#' @description
-#' Function that plots a list of compatible xts data.
-#' @param xts_data_list a list of 2D xts data object
-#' @examples
-#' Replaces the following call:
-#' p <- ggplot() +
-#'   geom_line(data = jvm.memory.committed.sum.ts, aes(x=Index, value)) +
-#'   geom_line(data = jvm.memory.used.sum.ts, aes(x=Index, value)) +
-#'   scale_x_datetime(date_labels = "%H:%M:%OS3")
-plot_ts <- function(xts_data_list) {
-  p <- ggplot()
-  for (xts_data in xts_data_list) {
-    p <- p + geom_line(data = xts_data, aes(x = Index, value))
-  }
-  p <- p + scale_x_datetime(date_labels = "%H:%M:%OS3")
-  p
-}
-
 # ----------------------------------------------------------------------------- process jvm memory data
-#' Converts bytes to megabytes (in decimal).
-#' @param bytes bytes
-bytes_to_megabytes <- function(bytes) {
-  bytes / (1000 * 1000)
+
+memory_to_ts <- function(name) {
+  extract <- function(csv_data, prefix) {
+    csv_data[startsWith(csv_data['name']$name, prefix),]
+  }
+  memory_sum <- function(a) {
+    bytes_to_megabytes <- function(bytes) {
+      bytes / (1000 * 1000)
+    }
+    sum(bytes_to_megabytes(as.numeric(a$value)))
+  }
+  csv_to_ts(name, metrics_csv, extract, memory_sum)
 }
 
-memory_sum <- function(a) {
-  sum(bytes_to_megabytes(as.numeric(a$value)))
-}
-
-jvm.memory.max <- extract(metrics_csv, 'jvm.memory.max')
-jvm.memory.committed <- extract(metrics_csv, 'jvm.memory.committed')
-jvm.memory.used <- extract(metrics_csv, 'jvm.memory.used')
+jvm.memory.max <- memory_to_ts('jvm.memory.max')
+jvm.memory.committed <- memory_to_ts('jvm.memory.committed')
+jvm.memory.used <- memory_to_ts('jvm.memory.used')
 
 jvm.memory.plot <- plot_ts(list(
-  to_ts(jvm.memory.max, memory_sum),
-  to_ts(jvm.memory.committed, memory_sum),
-  to_ts(jvm.memory.used, memory_sum)
+  jvm.memory.max,
+  jvm.memory.committed,
+  jvm.memory.used
 ))
 jvm.memory.plot
 
 # ----------------------------------------------------------------------------- process cpu data
 
-to_numeric <- function(a) {
-  as.numeric(a$value)
+cpu_to_ts <- function(name) {
+  extract <- function(csv_data, prefix) {
+    csv_data[startsWith(csv_data['name']$name, prefix),]
+  }
+  to_numeric <- function(a) {
+    as.numeric(a$value)
+  }
+  csv_to_ts(name, metrics_csv, extract, to_numeric)
 }
 
-system.cpu.count <- extract(metrics_csv, 'system.cpu.count')
-system.load.average.1m <- extract(metrics_csv, 'system.load.average.1m')
-system.cpu.usage <- extract(metrics_csv, 'system.cpu.usage')
-process.cpu.usage <- extract(metrics_csv, 'process.cpu.usage')
+system.cpu.count <- cpu_to_ts('system.cpu.count')
+system.load.average.1m <- cpu_to_ts('system.load.average.1m')
+system.cpu.usage <- cpu_to_ts('system.cpu.usage')
+process.cpu.usage <- cpu_to_ts('process.cpu.usage')
 
 cpu_load_plot <- plot_ts(list(
-  to_ts(system.load.average.1m, to_numeric)
+  system.load.average.1m
 ))
 cpu_load_plot
 
 cpu_usage_plot <- plot_ts(list(
-  to_ts(system.cpu.usage, to_numeric),
-  to_ts(process.cpu.usage, to_numeric)
+  system.cpu.usage,
+  process.cpu.usage
 ))
 cpu_usage_plot
 
-# ----------------------------------------------------------------------------- all plots
-
-save_plots <- function (plot_list) {
-  for (item in plot_list) {
-    name <- item[[1]]
-    plot <- item[[2]]
-    ggsave(paste0(name, ".png"), plot)
-  }
-}
+# ----------------------------------------------------------------------------- finalize
 
 all_plots <- list(
   list("jvm_memory", jvm.memory.plot),

@@ -2,74 +2,61 @@
 
 source("util.R")
 
-library('readr')
-library('stringr')
-library('ggplot2')
-# library('dplyr')
+# ----------------------------------------------------------------------------- latency data
 
-supported_operations <- c(
-  'read',
-  'read-failed',
-  'update',
-  'update-failed',
-  'insert',
-  'insert-failed',
-  'scan',
-  'scan-failed',
-  'read-modify-write',
-  'read-modify-write-failed',
-  'summary-stats'
+millis_to_seconds <- function(timestamp) {
+  as.numeric(timestamp) / 1000
+}
+
+# col.names = name, value, timestamp
+latency_metrics_csv <- read.csv("perftest_sample.txt", header = FALSE, col.names = c('name', 'value', 'timestamp'))
+latency_metrics_csv['timestamp'] <- lapply(latency_metrics_csv['timestamp'], FUN = millis_to_seconds)
+class(latency_metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
+
+operation_to_ts <- function(operation) {
+  extract_latencies <- function(csv_data, operation) {
+    csv_data[csv_data['name']$name == operation,]
+  }
+  us_to_ms <- function(a) {
+    as.numeric(a$value) / 1000
+  }
+  csv_to_ts(operation, latency_metrics_csv, extract_latencies, us_to_ms)
+}
+
+read.latency <- operation_to_ts('read')
+read.failed.latency <- operation_to_ts('read-failed')
+update.latency <- operation_to_ts('update')
+update.failed.latency <- operation_to_ts('update-failed')
+insert.latency <- operation_to_ts('insert')
+insert.failed.latency <- operation_to_ts('insert-failed')
+scan.latency <- operation_to_ts('scan')
+scan.failed.latency <- operation_to_ts('scan-failed')
+read.modify.write.latency <- operation_to_ts('read-modify-write')
+read.modify.write.failed.latency <- operation_to_ts('read-modify-write-failed')
+
+read.latency.plot <- plot_ts(list(read.latency))
+read.latency.plot
+
+update.latency.plot <- plot_ts(list(update.latency))
+update.latency.plot
+
+# ----------------------------------------------------------------------------- summary stats data
+
+extract_summary_stats <- function(csv_data) {
+  csv_data[str_count(csv_data['name']$name, "(?<=^\\[).+(?=\\])") == 1,]
+}
+
+# col.names = name, type, value
+summary_stats_csv <- read.csv("perftest_sample.txt", header = FALSE, col.names = c('name', 'type', 'value'))
+summary.stats <- extract_summary_stats(summary_stats_csv)
+summary.stats
+
+# ----------------------------------------------------------------------------- finalize
+
+all_plots <- list(
+  list("read_latency", read.latency.plot),
+  list("update_latency", update.latency.plot)
+  #...
 )
 
-csv_files <- create_csv_files(supported_operations)
-
-is_operation <- function(line, operation) {
-  startsWith(line, paste0(operation, ','))
-}
-
-# write latencies to separate csv files based on operation type
-write_latencies <- function(line) {
-  for (op in names(csv_files)) {
-    if (is_operation(line, op)) {
-      file <- csv_files[[op]]
-      write(line, file, append=TRUE)
-    }
-  }
-}
-
-# write summary-stats to a csv file
-write_summary_stats <- function(line) {
-  # if line starts with a pattern like: [UPDATE], type, value
-  statName <- tolower(str_extract(line, "(?<=^\\[).+(?=\\])"))
-  if (!is.na(statName)) {
-    statsFile <- csv_files[['summary-stats']]
-    write(line, statsFile, append = TRUE)
-  }
-}
-
-process_csv_file("perftest_sample.txt", c(
-  write_latencies,
-  write_summary_stats
-))
-
-# --------------------------------------------------------------------------------- plots
-
-readLatencyCsv <- read.csv(csv_files[['read']], header = FALSE, col.names = c('operation', 'latency', 'timestamp'))
-readLatencyCsv['time'] <- lapply(readLatencyCsv['timestamp'], FUN = epoch_millis_to_seconds)
-class(readLatencyCsv[,'time']) <- c('POSIXt','POSIXct')
-
-p <- ggplot(readLatencyCsv, aes(time, latency)) + geom_line() + scale_x_datetime(date_labels = "%H:%M:%OS3")
-p
-
-
-# metrics_csv <- read.csv("perftest_sample.txt", header = FALSE, col.names = c('name', 'value', 'timestamp'))
-# class(metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
-#
-# extract <- function(csv_data, prefix) {
-#   is_operation <- csv_data['name']$name == prefix
-#   csv_data[is_operation, ]
-# }
-#
-# read.latency <- extract(metrics_csv, 'read')
-# read.latency <- extract(metrics_csv, 'read-failed')
-# read.latency
+save_plots(all_plots)
