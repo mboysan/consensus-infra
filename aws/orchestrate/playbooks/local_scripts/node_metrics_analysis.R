@@ -1,8 +1,33 @@
-#!/usr/bin/env Rscript --vanilla
+#!/usr/bin/env Rscript
+
+#' Analysis of node metrics resource usage metrics.
+#' @description
+#' Plots node metrics related results.
+#' @param metrics_file path to metrics file
+#' @param output_folder base folder to write output results
+#' @param output_file_prefix file prefix for an individual result
+#' @examples
+#' ./<script>.R <metrics_file> <output_folder> <output_file_prefix>
+#' ./node_metrics_analysis.R metrics.txt ./ client
 
 source("util.R")
 
-metrics_csv <- read.csv('node_metrics_sample.txt', header = FALSE, col.names = c('name', 'value', 'timestamp'))
+args <- commandArgs(trailingOnly=TRUE)
+args <- valiadate_args(
+  args = args,
+  validator = \(x) length(x) == 3,
+  failure_msg = "path to metrics file and/or output folder and/or output file prefix missing.",
+  defaults = c("collected_metrics/node_metrics_sample.txt", NULL, NULL)
+)
+
+metrics_file <- args[1]
+output_folder <- args[2]
+output_file_prefix <- args[3]
+
+# ----------------------------------------------------------------------------- prepare metrics
+info("analysing metrics of:", metrics_file)
+
+metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('name', 'value', 'timestamp'))
 class(metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
 
 # ----------------------------------------------------------------------------- process jvm memory data
@@ -67,7 +92,7 @@ all_plots <- list(
   list("cpu_usage", cpu_usage_plot)
 )
 
-save_plots(all_plots)
+save_plots(all_plots, output_folder, output_file_prefix)
 
 # ggsave('./test.png', p)
 

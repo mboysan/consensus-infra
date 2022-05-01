@@ -58,3 +58,6 @@ export HISTCONTROL=ignorespace
  export ANSIBLE_WORKING_DIR=$CURRENT_DIR/orchestrate
  export ANSIBLE_CONFIG=$ANSIBLE_WORKING_DIR/ansible.cfg
  export ANSIBLE_INVENTORY_FILE=$ANSIBLE_WORKING_DIR/inventory/aws_ec2_static.ini
+ # Controller specific environment variables
+ export LOCAL_SCRIPTS_PATH=$ANSIBLE_WORKING_DIR/playbooks/local_scripts
+ export METRICS_BASE_PATH=$LOCAL_SCRIPTS_PATH/collected_metrics

@@ -1,6 +1,30 @@
-#!/usr/bin/env Rscript --vanilla
+#!/usr/bin/env Rscript
+
+#' Analysis of performance test metrics.
+#' @description
+#' Plots perf test results.
+#' @param metrics_file path to metrics file
+#' @param output_folder base folder to write output results
+#' @param output_file_prefix file prefix for an individual result
+#' @examples
+#' ./<script>.R <metrics_file> <output_folder> <output_file_prefix>
+#' ./perftest_analysis.R metrics.txt ./ client
 
 source("util.R")
+
+args <- commandArgs(trailingOnly=TRUE)
+args <- valiadate_args(
+  args = args,
+  validator = \(x) length(x) == 3,
+  failure_msg = "path to metrics file and/or output folder and/or output file prefix missing.",
+  defaults = c("collected_metrics/perftest_sample.txt", NULL, NULL)
+)
+
+metrics_file <- args[1]
+output_folder <- args[2]
+output_file_prefix <- args[3]
+
+info("analysing metrics of:", metrics_file)
 
 # ----------------------------------------------------------------------------- latency data
 
@@ -9,7 +33,7 @@ millis_to_seconds <- function(timestamp) {
 }
 
 # col.names = name, value, timestamp
-latency_metrics_csv <- read.csv("perftest_sample.txt", header = FALSE, col.names = c('name', 'value', 'timestamp'))
+latency_metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('name', 'value', 'timestamp'))
 latency_metrics_csv['timestamp'] <- lapply(latency_metrics_csv['timestamp'], FUN = millis_to_seconds)
 class(latency_metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
 
@@ -47,7 +71,7 @@ extract_summary_stats <- function(csv_data) {
 }
 
 # col.names = name, type, value
-summary_stats_csv <- read.csv("perftest_sample.txt", header = FALSE, col.names = c('name', 'type', 'value'))
+summary_stats_csv <- read.csv(metrics_file, header = FALSE, col.names = c('name', 'type', 'value'))
 summary.stats <- extract_summary_stats(summary_stats_csv)
 summary.stats
 
@@ -59,4 +83,4 @@ all_plots <- list(
   #...
 )
 
-save_plots(all_plots)
+save_plots(all_plots, output_folder, output_file_prefix)

@@ -1,15 +1,61 @@
 dir.create(Sys.getenv("R_LIBS_USER"), recursive = TRUE) # create personal library
 .libPaths(Sys.getenv("R_LIBS_USER"))  # add to the path
 
-install.packages('stringr')
-install.packages('roxygen2')  # for documentation
-install.packages('ggplot2')
-install.packages('xts')
+# ----------------------------------------------------------------------------- libraries
 
-library('readr')
-library('stringr')
-library('ggplot2')
-library('xts')
+#' Taken from: https://stackoverflow.com/a/44660688
+using <- function(...) {
+  libs <- unlist(list(...))
+  req <- unlist(lapply(libs, require, character.only = TRUE))
+  need <- libs[req == FALSE]
+  if (length(need) > 0) {
+    install.packages(need)
+    lapply(need, require, character.only = TRUE)
+  }
+}
+
+# list of packages/libraries required
+using('readr',
+      'stringr',
+      'ggplot2',
+      'xts',
+      'roxygen2' # for documentation
+)
+
+# ----------------------------------------------------------------------------- utilitiy functions and constants
+
+DEBUG_ENABLED <- TRUE
+
+info <- function(...) {
+  texts <- c(...)
+  cat("[INFO]", texts, "\n")
+}
+
+debug <- function(...) {
+  if (DEBUG_ENABLED) {
+    texts <- c(...)
+    cat("[DEBUG]", texts, "\n")
+  }
+}
+
+error <- function(...) {
+  texts <- c(...)
+  cat("[ERROR]", texts, "\n")
+}
+
+valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_defaults_on_fail = TRUE) {
+  info("args provided:", args)
+  result <- do.call(validator, list(args))
+  debug(paste0("validator result: ", result))
+  if (result) {
+    return(args)
+  }
+  if (!is.null(defaults) && use_defaults_on_fail) {
+    info("using default args:", defaults)
+    return(defaults)
+  }
+  stop(failure_msg)
+}
 
 process_csv_file <- function(filepath, lambdas) {
   con <- file(filepath, "r")
@@ -102,11 +148,19 @@ plot_ts <- function(xts_data_list) {
 
 #' Saves plots as image files
 #' @param plot_list list of ggplot objects
-#' TODO: specifiy out path and image extension.
-save_plots <- function (plot_list) {
+save_plots <- function (plot_list, out_folder = NULL, out_file_prefix = NULL, image_extension = "png") {
+  if (is.na(out_folder)) {
+    out_folder <- NULL
+  }
+  if (is.na(out_file_prefix)) {
+    out_file_prefix <- NULL
+  }
+  info("saving plots in", out_folder)
   for (item in plot_list) {
     name <- item[[1]]
     plot <- item[[2]]
-    ggsave(paste0(name, ".png"), plot)
+    file_name <- paste0(out_file_prefix, name, ".", image_extension)
+    info("saving plot to:", file_name)
+    ggsave(file_name, plot, path = out_folder)
   }
 }

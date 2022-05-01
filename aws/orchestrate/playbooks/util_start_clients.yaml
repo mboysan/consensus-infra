@@ -4,10 +4,10 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts all clients
+- name: Starts client(s)
   hosts: clients
   tasks:
-    - name: Starting all clients (perf test)
+    - name: Starting client(s) (perf test)
       shell:
         cmd: |
           bash -ilc 'export JAVA_OPTS="-Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}}" && \
