@@ -79,6 +79,11 @@
         src: client.properties.j2
         dest: '{{ clients_GROUP_config_file }}'
 
+    - name: P2.3.6 - Copy workloads
+      copy:
+        src: ./workloads/
+        dest: '{{ clients_GROUP_workloads_dir }}'
+
 - name: P2.4 - Configure log4j and metrics on workers
   hosts: workers
   any_errors_fatal: true

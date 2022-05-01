@@ -13,7 +13,7 @@
 
 - ansible.builtin.import_playbook: util_start_clients.yaml
   vars:
-    cli_params: "workloads/workloada"
+    workload: "workload_sample"
 
 - ansible.builtin.import_playbook: util_stop_workers.yaml
 

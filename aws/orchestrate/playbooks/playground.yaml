@@ -4,12 +4,26 @@
 
 ---
 - name: Test play
-  hosts: stores
+  hosts: clients
 #  roles:
 #    - nodes
   tasks:
     - debug:
-        msg: "{{ stores_GROUP_current_node_name }}"
+        msg: "{{ test_params }}"
+      vars:
+        test_params: |
+          recordcount=1000
+          operationcount=1000
+          workload=site.ycsb.workloads.CoreWorkload
+
+          readallfields=true
+
+          readproportion=0.5
+          updateproportion=0.5
+          scanproportion=0
+          insertproportion=0
+
+          requestdistribution=zipfian
 
 
 

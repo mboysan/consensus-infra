@@ -5,6 +5,8 @@ clients_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/ycsb'
 clients_GROUP_config_dir: '{{ clients_GROUP_working_dir }}/conf'
 # configuration file for the clients
 clients_GROUP_config_file: '{{ clients_GROUP_config_dir }}/client.properties'
+# path to workloads directory
+clients_GROUP_workloads_dir: '{{ clients_GROUP_working_dir }}/workloads/my'
 
 # name of the current client taken from the 'clients' hosts
 clients_GROUP_current_client_name: "{{ group_names[0] }}"
