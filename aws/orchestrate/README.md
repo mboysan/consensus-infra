@@ -54,7 +54,7 @@ that you have successfully [provision](../provision)ed the aws stack.
 
 You can confirm if the inventory setup works properly by executing:
 ```
-ansible-inventory -i inventory/aws_ec2_static.yaml --graph
+ansible-inventory -i inventory/aws_ec2_static.ini --graph
 ```
 
 ## Information on Playbooks
@@ -84,18 +84,22 @@ ansible-inventory -i inventory/aws_ec2.yaml --list
 # see resources as graph
 ansible-inventory -i inventory/aws_ec2.yaml --graph
 
+# ping all
+ansible all -m ping
+
 # ping a group of nodes
-ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem
+ansible nodes -i inventory/aws_ec2_static.ini -m ping --private-key=~/.ssh/aws_instance_key.pem
 
 # ping a group of nodes as login user 'ubuntu'
-ansible nodes -i inventory/aws_ec2.yaml -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible nodes -i inventory/aws_ec2_static.ini -m ping --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 
 # running a playbook
 ansible-playbook play.yaml
 
 # run playbook
-ansible-playbook play.yaml -i inventory/aws_ec2.yaml --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
+ansible-playbook play.yaml -i inventory/aws_ec2_static.ini --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 
 # run playbook with extra vars (--extra-vars or -e param)
 ansible-playbook play.yaml -e "key=value"
+ansible-playbook playbooks/util_start_nodes.yaml -e 'cli_params="protocol=raft"'
 ```
