@@ -35,39 +35,6 @@ fi
 # switch to terraform working dir
 cd "$TERRAFORM_WORKING_DIR" || exit 1
 
-# a tmp variable for collector's private ip address used by workers
-collectorPrivateIpTmp=$tmpDir/cpit
-echo "" > $collectorPrivateIpTmp
-
-function populateCollectorsInventory() {
-    echo "[INFO] adding collectors"
-
-    # a temporary file for terraform output
-    local tmpJsonFile=$tmpDir/collectors.json
-
-    # get output from terraform
-    terraform output -json collector > $tmpJsonFile
-
-    # get inventory variables
-    name=$(jq -r '.ec2_instance[0] | (.tags.Name)' $tmpJsonFile)
-    publicIp=$(jq -r '.ec2_instance[0] | (.public_ip)' $tmpJsonFile)
-    privateIp=$(jq -r '.ec2_instance[0] | (.private_ip)' $tmpJsonFile)
-
-    echo "$privateIp" >> $collectorPrivateIpTmp
-
-    echo "[INFO] group=collectors, name=$name, public_ip=$publicIp, private_ip=$privateIp"
-
-    # populate collectors group
-    echo "[collector]" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "$publicIp" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "" >> "$ANSIBLE_INVENTORY_FILE"
-
-    # populate collectors children
-    echo "[collectors:children]" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "$name" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "" >> "$ANSIBLE_INVENTORY_FILE"
-}
-
 function populateClientsInventory() {
     echo "[INFO] adding clients"
 
@@ -180,14 +147,11 @@ function populateWorkersInventory() {
     echo "workers_GROUP_node_destinations=$nodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     storeDestinations="$(xargs printf ',%s' < "$storeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_store_destinations=$storeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
-    collectorPrivateIp="$(xargs printf ',%s' < "$collectorPrivateIpTmp" | cut -b 2-)"
-    echo "workers_GROUP_collector_private_ip=$collectorPrivateIp" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
-populateCollectorsInventory
 populateClientsInventory
 populateNodesInventory 0
 populateStoresInventory

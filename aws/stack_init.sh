@@ -28,7 +28,4 @@ ansible-playbook playbooks/P1_setup_vm.yaml
 echo "[INFO] setting up the workers..."
 ansible-playbook playbooks/P2_setup_workers.yaml
 
-echo "[INFO] setting up the collectors..."
-ansible-playbook playbooks/P3_setup_collectors.yaml
-
 echo "[INFO] stack ready!"
