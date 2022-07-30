@@ -7,9 +7,11 @@ cd ..
 source ./env_setup.sh
 
 function installJq() {
- # we need the jq library for parsing json outputs
- sudo apt-get update
- sudo apt-get install -y jq
+    echo "[INFO] super user permissions are required to install package 'jq'"
+    # we need the jq library for parsing json outputs
+    sudo apt-get update
+    echo "[INFO] installing package 'jq'..."
+    sudo apt-get install -y jq
 }
 installJq
 
