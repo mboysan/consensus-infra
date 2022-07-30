@@ -3,17 +3,12 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_nodes.yaml
+- ansible.builtin.import_playbook: util_start_workers.yaml
   vars:
-    cli_params: "protocol=raft"
-
-- ansible.builtin.import_playbook: util_start_stores.yaml
-  vars:
-    cli_params: "protocol=raft"
-
-- ansible.builtin.import_playbook: util_start_clients.yaml
-  vars:
-    workload: "workload_sample"
+    consensus_protocol: "raft"
+    node_cli_params: ""
+    store_cli_params: ""
+    test_workload: "workload_sample"
 
 - ansible.builtin.import_playbook: util_stop_workers.yaml
 
