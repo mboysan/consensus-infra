@@ -154,6 +154,6 @@ function populateWorkersInventory() {
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
 populateClientsInventory
-populateNodesInventory -1
+populateNodesInventory 2
 populateStoresInventory
 populateWorkersInventory

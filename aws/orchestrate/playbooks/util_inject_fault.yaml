@@ -64,10 +64,10 @@
           
             node0Follower=$(grep -c "FOLLOWER" node0_state.tmp)
             if [ $node0Follower -ge 1 ]; then
-              if [ "$SERVER_NAME" == "node0" ]; then
+              if [ "$SERVER_NAME" = "node0" ]; then
                 return 0
               fi
-            elif [ "$SERVER_NAME" == "node1" ]; then
+            elif [ "$SERVER_NAME" = "node1" ]; then
               # node-0 is the leader, so return node-1
               return 0
             fi
@@ -99,7 +99,7 @@
           
           elif [ $BIZUR -ge 1 ]; then
             echo "protocol is bizur"
-            if [ "$SERVER_NAME" == "node1" ]; then
+            if [ "$SERVER_NAME" = "node1" ]; then
               # always disconnect node-1
               disconnect
               exit 0

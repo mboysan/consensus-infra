@@ -12,8 +12,8 @@
     store_cli_params: ""
     # instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
     workload: |
-      recordcount=500
-      operationcount=500
+      recordcount=1000
+      operationcount=1000
       workload=site.ycsb.workloads.CoreWorkload
 
       readallfields=true
@@ -26,6 +26,6 @@
       requestdistribution=zipfian
 
     inject_fault:
-      condition: 'disconnect leader'
+      condition: 'disconnect follower'
       delay_sec: 10
       duration_sec: 60
