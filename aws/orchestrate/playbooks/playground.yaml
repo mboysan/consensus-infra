@@ -3,22 +3,28 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_inject_fault.yaml
+- ansible.builtin.import_playbook: util_start_clients.yaml
   vars:
-    condition: 'disconnect leader'
-    delay_sec: 5
-    duration_sec: 30
+    workload: |
+      threadcount=5
+      other stuff
 
-- name: Fault injection results1
-  hosts: nodes
-  tasks:
-    - name: Fault injection results
-      async_status:
-        jid: "{{ inject_fault_task.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 1000
-      delay: 10
+#- ansible.builtin.import_playbook: util_inject_fault.yaml
+#  vars:
+#    condition: 'disconnect leader'
+#    delay_sec: 5
+#    duration_sec: 30
+#
+#- name: Fault injection results1
+#  hosts: nodes
+#  tasks:
+#    - name: Fault injection results
+#      async_status:
+#        jid: "{{ inject_fault_task.ansible_job_id }}"
+#      register: job_result
+#      until: job_result.finished
+#      retries: 1000
+#      delay: 10
 
 #- name: Test play
 #  hosts: clients

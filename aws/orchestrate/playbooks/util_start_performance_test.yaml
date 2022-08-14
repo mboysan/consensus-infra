@@ -1,0 +1,12 @@
+#------------------------------------------------------------------------------------------------------------
+# Starts the performance test.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: util_start_workers.yaml
+
+- ansible.builtin.import_playbook: util_stop_workers.yaml
+
+- ansible.builtin.import_playbook: util_collect_metrics.yaml
+
+- ansible.builtin.import_playbook: util_cleanup_workers.yaml
