@@ -65,15 +65,15 @@ function populateClientsInventory() {
 
 # a tmp variable for node destinations used by workers
 nodeDestinationsTmp=$tmpDir/ndt
-echo "" > $nodeDestinationsTmp
+truncate -s 0 $nodeDestinationsTmp
 
 # a tmp variable for store destinations used by clients
 storeDestinationsTmp=$tmpDir/sdt
-echo "" > $storeDestinationsTmp
+truncate -s 0 $storeDestinationsTmp
 
 # a tmp variable for nodes that will act as key-value store
 storeNodesTmp=$tmpDir/snt
-echo "" > $storeNodesTmp
+truncate -s 0 $storeNodesTmp
 
 function populateNodesInventory() {
     echo "[INFO] adding nodes"
@@ -106,7 +106,7 @@ function populateNodesInventory() {
         echo "$nodeIndex-$nodePrivateIp:$NODE_SERVING_PORT" >> "$nodeDestinationsTmp"
 
         # append store destinations configuration
-        if [ "$nodeIndex" -eq "$nodeIdToUseAsStore" ]; then
+        if [ "$nodeIdToUseAsStore" -eq -1 ] || [ "$nodeIndex" -eq "$nodeIdToUseAsStore" ]; then
           echo "[INFO] using $nodeName as key-value store"
           echo "$nodeName" >> "$storeNodesTmp"
           echo "$nodeIndex-$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$storeDestinationsTmp"
@@ -130,8 +130,7 @@ function populateNodesInventory() {
 function populateStoresInventory() {
     echo "[INFO] adding key-value stores"
     echo "[stores:children]" >> "$ANSIBLE_INVENTORY_FILE"
-    storeNodes="$(xargs printf ',%s' < "$storeNodesTmp" | cut -b 2-)"
-    echo "$storeNodes" >> "$ANSIBLE_INVENTORY_FILE"
+    cat "$storeNodesTmp" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
@@ -155,6 +154,6 @@ function populateWorkersInventory() {
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
 populateClientsInventory
-populateNodesInventory 0
+populateNodesInventory -1
 populateStoresInventory
 populateWorkersInventory

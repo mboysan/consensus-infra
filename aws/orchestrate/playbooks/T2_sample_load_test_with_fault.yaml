@@ -1,23 +1,31 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test with a default workload
+# Performs a simple load test with a custom workload definition under faulty network conditions.
+# Note: Instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_workers.yaml
+- ansible.builtin.import_playbook: util_start_performance_test.yaml
   vars:
+    test_name: "T2"
     consensus_protocol: "raft"
     node_cli_params: ""
     store_cli_params: ""
-    workload: "workloada"
+    # instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
+    workload: |
+      recordcount=500
+      operationcount=500
+      workload=site.ycsb.workloads.CoreWorkload
+
+      readallfields=true
+
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+
+      requestdistribution=zipfian
+
     inject_fault:
       condition: 'disconnect leader'
       delay_sec: 10
       duration_sec: 60
-
-- ansible.builtin.import_playbook: util_stop_workers.yaml
-
-- ansible.builtin.import_playbook: util_collect_metrics.yaml
-  vars:
-    test_name: "T2"
-
-- ansible.builtin.import_playbook: util_cleanup_workers.yaml
