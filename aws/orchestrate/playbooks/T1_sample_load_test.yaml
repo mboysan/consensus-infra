@@ -1,0 +1,19 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test with a default workload
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: util_start_workers.yaml
+  vars:
+    consensus_protocol: "raft"
+    node_cli_params: ""
+    store_cli_params: ""
+    workload: "workload_sample"
+
+- ansible.builtin.import_playbook: util_stop_workers.yaml
+
+- ansible.builtin.import_playbook: util_collect_metrics.yaml
+  vars:
+    test_name: "T1"
+
+- ansible.builtin.import_playbook: util_cleanup_workers.yaml

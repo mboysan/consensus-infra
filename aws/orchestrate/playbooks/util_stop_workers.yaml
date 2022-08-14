@@ -10,12 +10,7 @@
     - name: Stopping worker processes
       shell:
         cmd: |
+          set -m
+          
           # kill java processes (errors ignored)
           bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
-
-    - name: Deleting worker logs
-      shell:
-        cmd: |
-          # clean up log files (errors ignored)
-          bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
-      when: delete_logs | default('true') | bool

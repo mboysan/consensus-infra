@@ -3,22 +3,21 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_nodes.yaml
+- ansible.builtin.import_playbook: util_start_workers.yaml
   vars:
-    cli_params: "protocol=raft"
-
-- ansible.builtin.import_playbook: util_start_stores.yaml
-  vars:
-    cli_params: "protocol=raft"
-
-- ansible.builtin.import_playbook: util_start_clients.yaml
-  vars:
-    workload: "workload_sample"
+    consensus_protocol: "raft"
+    node_cli_params: ""
+    store_cli_params: ""
+    workload: "workloada"
+    inject_fault:
+      condition: 'disconnect leader'
+      delay_sec: 10
+      duration_sec: 60
 
 - ansible.builtin.import_playbook: util_stop_workers.yaml
 
 - ansible.builtin.import_playbook: util_collect_metrics.yaml
   vars:
-    test_name: "T1"
+    test_name: "T2"
 
 - ansible.builtin.import_playbook: util_cleanup_workers.yaml

@@ -3,27 +3,44 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Test play
-  hosts: clients
-#  roles:
-#    - nodes
+- ansible.builtin.import_playbook: util_inject_fault.yaml
+  vars:
+    condition: 'disconnect leader'
+    delay_sec: 5
+    duration_sec: 30
+
+- name: Fault injection results1
+  hosts: nodes
   tasks:
-    - debug:
-        msg: "{{ test_params }}"
-      vars:
-        test_params: |
-          recordcount=1000
-          operationcount=1000
-          workload=site.ycsb.workloads.CoreWorkload
+    - name: Fault injection results
+      async_status:
+        jid: "{{ inject_fault_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 1000
+      delay: 10
 
-          readallfields=true
-
-          readproportion=0.5
-          updateproportion=0.5
-          scanproportion=0
-          insertproportion=0
-
-          requestdistribution=zipfian
+#- name: Test play
+#  hosts: clients
+##  roles:
+##    - nodes
+#  tasks:
+#    - debug:
+#        msg: "{{ test_params }}"
+#      vars:
+#        test_params: |
+#          recordcount=1000
+#          operationcount=1000
+#          workload=site.ycsb.workloads.CoreWorkload
+#
+#          readallfields=true
+#
+#          readproportion=0.5
+#          updateproportion=0.5
+#          scanproportion=0
+#          insertproportion=0
+#
+#          requestdistribution=zipfian
 
 
 
