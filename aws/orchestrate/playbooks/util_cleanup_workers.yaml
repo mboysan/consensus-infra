@@ -12,6 +12,7 @@
     - name: Deleting worker logs
       shell:
         cmd: |
+          set -m
           # clean up log files (errors ignored)
           bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
       when: delete_logs | default('true') | bool
@@ -19,6 +20,7 @@
     - name: Deleting worker metrics
       shell:
         cmd: |
+          set -m
           # clean up metrics files (errors ignored)
           bash -ilc 'rm {{ workers_GROUP_project_metrics_file }} || true'
       when: delete_metrics | default('true') | bool

@@ -8,10 +8,10 @@
   hosts: all
   any_errors_fatal: true
   tasks:
-    - name: P1.1.1 - Copy the VM setup script
+    - name: P1.1.1 - Copy the remote scripts
       copy:
-        src: ./remote_scripts/setup_vm.sh
-        dest: "{{ all_GROUP_home_dir }}/setup_vm.sh"
+        src: ./remote_scripts/
+        dest: "{{ all_GROUP_home_dir }}"
         mode: "0777"
 
     - name: P1.1.2 - Run the setup script (async)

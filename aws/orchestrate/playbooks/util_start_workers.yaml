@@ -11,6 +11,23 @@
   vars:
     cli_params: "protocol={{ consensus_protocol }} {{ store_cli_params | default('') }}"
 
-- ansible.builtin.import_playbook: util_start_clients.yaml
+- ansible.builtin.import_playbook: util_inject_fault.yaml
   vars:
-    workload: "{{ test_workload }}"
+    condition: "{{ inject_fault['condition'] }}"
+    delay_sec: "{{ inject_fault['delay_sec'] }}"
+    duration_sec: "{{ inject_fault['duration_sec'] }}"
+  when: inject_fault is defined
+
+- ansible.builtin.import_playbook: util_start_clients.yaml
+
+- name: Checks fault injection results
+  hosts: nodes
+  tasks:
+    - name: Checking fault injection results
+      async_status:
+        jid: "{{ inject_fault_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 1000
+      delay: 10
+      when: inject_fault is defined

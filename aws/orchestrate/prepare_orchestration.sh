@@ -54,7 +54,7 @@ function populateClientsInventory() {
 
     # populate clients group
     echo "[client]" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "$clientPublicIp" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "client ansible_host=$clientPublicIp" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 
     # populate clients children
@@ -114,7 +114,7 @@ function populateNodesInventory() {
 
         # write to inventory file
         echo "[$nodeName]" >> "$ANSIBLE_INVENTORY_FILE"
-        echo "$nodePublicIp" >> "$ANSIBLE_INVENTORY_FILE"
+        echo "$nodeName ansible_host=$nodePublicIp" >> "$ANSIBLE_INVENTORY_FILE"
     done
 
     echo "" >> "$ANSIBLE_INVENTORY_FILE"

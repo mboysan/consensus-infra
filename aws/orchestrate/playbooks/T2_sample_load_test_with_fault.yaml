@@ -8,12 +8,16 @@
     consensus_protocol: "raft"
     node_cli_params: ""
     store_cli_params: ""
-    test_workload: "workload_sample"
+    workload: "workloada"
+    inject_fault:
+      condition: 'disconnect leader'
+      delay_sec: 10
+      duration_sec: 60
 
 - ansible.builtin.import_playbook: util_stop_workers.yaml
 
 - ansible.builtin.import_playbook: util_collect_metrics.yaml
   vars:
-    test_name: "T1"
+    test_name: "T2"
 
 - ansible.builtin.import_playbook: util_cleanup_workers.yaml

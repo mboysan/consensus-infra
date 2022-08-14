@@ -9,6 +9,8 @@
     - name: Starting all nodes (async)
       shell:
         cmd: |
+          set -m
+          
           # run in background
           bash -ilc 'java \
                       -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
