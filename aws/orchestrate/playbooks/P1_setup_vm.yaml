@@ -8,13 +8,18 @@
   hosts: all
   any_errors_fatal: true
   tasks:
-    - name: P1.1.1 - Copy the remote scripts
+    - name: P1.1.1 - Changing hostname of the machine
+      shell:
+        cmd: |
+          bash -ilc 'sudo hostnamectl set-hostname {{ all_GROUP_current_server_name }}'
+
+    - name: P1.1.2 - Copy the remote scripts
       copy:
         src: ./remote_scripts/
         dest: "{{ all_GROUP_home_dir }}"
         mode: "0777"
 
-    - name: P1.1.2 - Run the setup script (async)
+    - name: P1.1.3 - Run the setup script (async)
       shell:
         cmd: |
           bash -ilc './setup_vm.sh'
