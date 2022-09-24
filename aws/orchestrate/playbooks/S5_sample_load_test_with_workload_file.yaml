@@ -5,6 +5,6 @@
 ---
 - ansible.builtin.import_playbook: util_start_load_test.yaml
   vars:
-    test_name: "T5"
+    test_name: "S5"
     consensus_protocol: "raft"
     workload: "workloada"
