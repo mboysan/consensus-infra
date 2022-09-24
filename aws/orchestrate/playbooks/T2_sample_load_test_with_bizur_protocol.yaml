@@ -1,16 +1,18 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test with a custom workload definition
-# Note: Instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
+# Performs a simple load test using bizur consensus protocol with a custom workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_performance_test.yaml
+- ansible.builtin.import_playbook: util_start_load_test.yaml
   vars:
-    test_name: "T1"
-    consensus_protocol: "raft"
-    node_cli_params: ""
-    store_cli_params: ""
-    # instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
+    test_name: "T2"
+    consensus_protocol: "bizur"
+    node_cli_params: >-
+      bizur.numPeers=3
+      bizur.numBuckets=3
+    store_cli_params: >-
+      bizur.numPeers=3
+      bizur.numBuckets=3
     workload: |
       recordcount=1000
       operationcount=1000

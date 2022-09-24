@@ -1,16 +1,14 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test with a custom workload definition under faulty network conditions.
-# Note: Instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
+# Performs a simple load test with failure injection.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_performance_test.yaml
+- ansible.builtin.import_playbook: util_start_load_test.yaml
   vars:
-    test_name: "T2"
+    test_name: "T4"
     consensus_protocol: "raft"
     node_cli_params: ""
     store_cli_params: ""
-    # instead of a custom workload definition like below, a workload file can also be defined, e.g. "workloada"
     workload: |
       recordcount=1000
       operationcount=1000
