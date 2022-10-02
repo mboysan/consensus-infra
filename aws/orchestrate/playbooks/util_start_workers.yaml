@@ -19,6 +19,8 @@
   when: inject_fault is defined
 
 - ansible.builtin.import_playbook: util_start_clients.yaml
+  vars:
+    cli_params: "{{ client_cli_params | default('') }}"
 
 - name: Checks fault injection results
   hosts: nodes

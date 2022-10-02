@@ -23,7 +23,7 @@
           fi
           
           bash -ilc 'export JAVA_OPTS="-Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}}" && \
-                      ./bin/ycsb.sh run consensus {{ _metrics_params }} {{ _client_params }} -P {{ clients_GROUP_workloads_dir }}/workload_file'
+                      ./bin/ycsb.sh run consensus {{ _metrics_params }} {{ _client_params }} {{ cli_params }} -P {{ clients_GROUP_workloads_dir }}/workload_file'
         chdir: "{{ clients_GROUP_working_dir }}"
       vars:
         _metrics_params: >-

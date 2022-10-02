@@ -62,6 +62,8 @@ ansible-inventory -i inventory/aws_ec2_static.ini --graph
 Following is the naming pattern used for the playbooks.
 - `P<X>_<name>`: Playbooks starting with this naming pattern is used to prepare the hosts by installing 
 necessary software and project dependencies, i.e. `P` stands for "Prepare".
+- `S<X>_<name>`: Playbooks starting with this naming pattern is used for reference purposes only, i.e. `S` stands
+for "Sample". We suggest using `T` playbooks (as described next) for performing the load tests.
 - `T<X>_<name>`: Playbooks starting with this naming pattern is used to perform the load tests, 
 i.e. `T` stands for "Test".
 - `util_<name>`: Playbooks starting with this naming pattern is used as utility tasks such as starting, 

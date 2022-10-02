@@ -32,19 +32,22 @@ millis_to_seconds <- function(timestamp) {
   as.numeric(timestamp) / 1000
 }
 
+us_to_ms <- function(value) {
+  as.numeric(value) / 1000
+}
+
 # col.names = name, value, timestamp
 latency_metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('name', 'value', 'timestamp'))
 latency_metrics_csv['timestamp'] <- lapply(latency_metrics_csv['timestamp'], FUN = millis_to_seconds)
 class(latency_metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
 
 operation_to_ts <- function(operation) {
-  extract_latencies <- function(csv_data, operation) {
-    csv_data[csv_data['name']$name == operation,]
-  }
-  us_to_ms <- function(a) {
-    as.numeric(a$value) / 1000
-  }
-  csv_to_ts(operation, latency_metrics_csv, extract_latencies, us_to_ms)
+  op_csv <- latency_metrics_csv[latency_metrics_csv['name']$name == operation,]
+  op_csv['value'] <- lapply(op_csv['value'], FUN = us_to_ms)
+  idx <- op_csv[, 'timestamp']
+  op_csv <- op_csv['value']
+  op_csv <- xts(op_csv, order.by = idx)
+  op_csv
 }
 
 read.latency <- operation_to_ts('read')
