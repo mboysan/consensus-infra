@@ -49,11 +49,11 @@ jvm.memory.max <- memory_to_ts('jvm.memory.max')
 jvm.memory.committed <- memory_to_ts('jvm.memory.committed')
 jvm.memory.used <- memory_to_ts('jvm.memory.used')
 
-jvm.memory.plot <- plot_ts(list(
+jvm.memory.plot <- plot_ts(
   jvm.memory.max,
   jvm.memory.committed,
   jvm.memory.used
-))
+)
 jvm.memory.plot
 
 # ----------------------------------------------------------------------------- process cpu data
@@ -73,15 +73,13 @@ system.load.average.1m <- cpu_to_ts('system.load.average.1m')
 system.cpu.usage <- cpu_to_ts('system.cpu.usage')
 process.cpu.usage <- cpu_to_ts('process.cpu.usage')
 
-cpu_load_plot <- plot_ts(list(
-  system.load.average.1m
-))
+cpu_load_plot <- plot_ts(system.load.average.1m)
 cpu_load_plot
 
-cpu_usage_plot <- plot_ts(list(
+cpu_usage_plot <- plot_ts(
   system.cpu.usage,
   process.cpu.usage
-))
+)
 cpu_usage_plot
 
 # ----------------------------------------------------------------------------- finalize

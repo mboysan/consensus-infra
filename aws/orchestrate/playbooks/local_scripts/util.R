@@ -105,16 +105,17 @@ csv_to_ts <- function(name, CSV_OBJ, EXTRACTOR, APPLY_FUNCTION) {
 #' Plot time series data
 #' @description
 #' Function that plots a list of compatible xts data.
-#' @param xts_data_list a list of 2D xts data object
+#' @param ... (xts_data_list) a list of 2D xts data object
 #' @examples
 #' Replaces the following call:
 #' p <- ggplot() +
 #'   geom_line(data = jvm.memory.committed.sum.ts, aes(x=Index, value)) +
 #'   geom_line(data = jvm.memory.used.sum.ts, aes(x=Index, value)) +
 #'   scale_x_datetime(date_labels = "%H:%M:%OS3")
-plot_ts <- function(xts_data_list) {
+plot_ts <- function(...) {
+  l <- list(...)
   p <- ggplot()
-  for (xts_data in xts_data_list) {
+  for (xts_data in l) {
     p <- p + geom_line(data = xts_data, aes(x = Index, value))
   }
   p <- p + scale_x_datetime(date_labels = "%H:%M:%OS3")
