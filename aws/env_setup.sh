@@ -26,6 +26,9 @@ export HISTCONTROL=ignorespace
  # reserve some more ports just in case
  export RESERVED_PORT_START=$NODE_SERVING_PORT
  export RESERVED_PORT_END=$((CLIENT_SERVING_PORT + 4))
+ # reserved node-id that will be used as the KV Store, other nodes will only be started as nodes that participate
+ # in consensus mechanism.
+ export NODE_ID_TO_USE_AS_STORE=2
 
 # AWS credentials and properties
  # the aws profile used in aws/credentials file.
