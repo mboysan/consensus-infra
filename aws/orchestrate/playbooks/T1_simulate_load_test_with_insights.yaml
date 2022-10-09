@@ -4,8 +4,12 @@
   vars:
     test_name: "T1_simulate"
     consensus_protocol: "simulate"
-    node_cli_params: "metrics.insights.enabled=true"
-    store_cli_params: "metrics.insights.enabled=true"
+    node_cli_params: >-
+      metrics.insights.enabled=true
+      simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
+    store_cli_params: >- 
+      metrics.insights.enabled=true
+      simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
     workload: |
       recordcount=1000
       operationcount=1000
