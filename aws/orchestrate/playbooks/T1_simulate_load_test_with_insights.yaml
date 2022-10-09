@@ -2,7 +2,7 @@
 ---
 - ansible.builtin.import_playbook: util_start_load_test.yaml
   vars:
-    test_name: "T1"
+    test_name: "T1_simulate"
     consensus_protocol: "simulate"
     node_cli_params: "metrics.insights.enabled=true"
     store_cli_params: "metrics.insights.enabled=true"
