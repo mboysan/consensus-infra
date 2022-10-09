@@ -74,12 +74,7 @@
         path: '{{ clients_GROUP_config_dir }}'
         state: directory
 
-    - name: P2.3.5 - Copy client config
-      template:
-        src: client.properties.j2
-        dest: '{{ clients_GROUP_config_file }}'
-
-    - name: P2.3.6 - Copy workloads
+    - name: P2.3.5 - Copy workloads
       copy:
         src: ./workloads/
         dest: '{{ clients_GROUP_workloads_dir }}'
@@ -102,13 +97,3 @@
       file:
         path: '{{ workers_GROUP_project_metrics_path }}'
         state: directory
-
-- name: P2.5 - Copy scripts to workers
-  hosts: workers
-  any_errors_fatal: true
-  tasks:
-    - name: P2.5.1 - Copy check_state.sh
-      template:
-        src: check_state.sh.j2
-        dest: '{{ workers_GROUP_project_dir }}/check_state.sh'
-        mode: '0777'

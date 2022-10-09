@@ -32,37 +32,64 @@ millis_to_seconds <- function(timestamp) {
   as.numeric(timestamp) / 1000
 }
 
+us_to_ms <- function(value) {
+  as.numeric(value) / 1000
+}
+
 # col.names = name, value, timestamp
 latency_metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('name', 'value', 'timestamp'))
 latency_metrics_csv['timestamp'] <- lapply(latency_metrics_csv['timestamp'], FUN = millis_to_seconds)
 class(latency_metrics_csv[, 'timestamp']) <- c('POSIXt', 'POSIXct')
 
-operation_to_ts <- function(operation) {
-  extract_latencies <- function(csv_data, operation) {
-    csv_data[csv_data['name']$name == operation,]
-  }
-  us_to_ms <- function(a) {
-    as.numeric(a$value) / 1000
-  }
-  csv_to_ts(operation, latency_metrics_csv, extract_latencies, us_to_ms)
+extract <- function(operation) {
+  op_csv <- latency_metrics_csv[latency_metrics_csv['name']$name == operation,]
+  op_csv['value'] <- lapply(op_csv['value'], FUN = us_to_ms)
+  op_csv
 }
 
-read.latency <- operation_to_ts('read')
-read.failed.latency <- operation_to_ts('read-failed')
-update.latency <- operation_to_ts('update')
-update.failed.latency <- operation_to_ts('update-failed')
-insert.latency <- operation_to_ts('insert')
-insert.failed.latency <- operation_to_ts('insert-failed')
-scan.latency <- operation_to_ts('scan')
-scan.failed.latency <- operation_to_ts('scan-failed')
-read.modify.write.latency <- operation_to_ts('read-modify-write')
-read.modify.write.failed.latency <- operation_to_ts('read-modify-write-failed')
+aggregate_latencies <- function(...) {
+  bound <- rbind(...)
+  aggregate(value~timestamp, bound, FUN=mean)
+}
 
-read.latency.plot <- plot_ts(list(read.latency))
+as_ts <- function(latency_data) {
+  idx <- latency_data[, 'timestamp']
+  latency_data <- latency_data['value']
+  latency_data <- xts(latency_data, order.by = idx)
+  latency_data
+}
+
+read.latency <- extract('read')
+read.failed.latency <- extract('read-failed')
+update.latency <- extract('update')
+update.failed.latency <- extract('update-failed')
+insert.latency <- extract('insert')
+insert.failed.latency <- extract('insert-failed')
+scan.latency <- extract('scan')
+scan.failed.latency <- extract('scan-failed')
+read.modify.write.latency <- extract('read-modify-write')
+read.modify.write.failed.latency <- extract('read-modify-write-failed')
+
+read.latency.plot <- plot_ts(as_ts(read.latency))
 read.latency.plot
 
-update.latency.plot <- plot_ts(list(update.latency))
+update.latency.plot <- plot_ts(as_ts(update.latency))
 update.latency.plot
+
+aggregated.latencies <- aggregate_latencies(
+  read.latency,
+  read.failed.latency,
+  update.latency,
+  update.failed.latency,
+  insert.latency,
+  insert.failed.latency,
+  scan.latency,
+  scan.failed.latency,
+  read.modify.write.latency,
+  read.modify.write.failed.latency
+)
+aggregated.latencies.plot <- plot_ts(as_ts(aggregated.latencies))
+aggregated.latencies.plot
 
 # ----------------------------------------------------------------------------- summary stats data
 
@@ -79,8 +106,9 @@ summary.stats
 
 all_plots <- list(
   list("read_latency", read.latency.plot),
-  list("update_latency", update.latency.plot)
+  list("update_latency", update.latency.plot),
   #...
+  list("merged_latencies", aggregated.latencies.plot)
 )
 
 save_plots(all_plots, output_folder, output_file_prefix)

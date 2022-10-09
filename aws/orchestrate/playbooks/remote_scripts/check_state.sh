@@ -2,10 +2,12 @@
 
 #----------------------------------------------------------------------------------------------------------
 # Script to check state of node/client/store. i.e, tries to find the given input from the log file
+# run it as:
+# ./check_state.sh "string-to-search" <file-to-search>
 #----------------------------------------------------------------------------------------------------------
 
-logFile={{ workers_GROUP_project_log_file }}
 checkString="$1"
+logFile="$2"
 started=0
 retries=10
 while [[ $started != 1 ]]; do

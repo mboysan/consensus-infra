@@ -90,60 +90,36 @@ create_csv_files <- function(operations) {
 #' @param csv_data csv data to convert
 #' @param apply_function function to apply (default -> to_numeric)
 to_ts <- function(csv_data, FUN, col_names = c('value')) {
-  out <- tryCatch(
-  {
-    idx <- csv_data[, 'timestamp']
-    data.ts <- xts(csv_data, order.by = idx)
-    data.ts <- period.apply(data.ts, endpoints(data.ts, on = "ms"), FUN = FUN)
-    # name the computed column as 'value'
-    names(data.ts) <- col_names
-    data.ts
-  },
-    error = function (cond) {
-      return(NA)
-    }
-  )
-  out
+  idx <- csv_data[, 'timestamp']
+  data.ts <- xts(csv_data, order.by = idx)
+  data.ts <- period.apply(data.ts, endpoints(data.ts, on = "ms"), FUN = FUN)
+  names(data.ts) <- col_names
+  data.ts
 }
 
 csv_to_ts <- function(name, CSV_OBJ, EXTRACTOR, APPLY_FUNCTION) {
-  out <- tryCatch(
-  {
-    extracted <- do.call(EXTRACTOR, list(CSV_OBJ, name))
-    to_ts(extracted, FUN = APPLY_FUNCTION)
-  },
-    error = function (cond) {
-      return(NA)
-    }
-  )
-  out
+  extracted <- do.call(EXTRACTOR, list(CSV_OBJ, name))
+  to_ts(extracted, FUN = APPLY_FUNCTION)
 }
 
 #' Plot time series data
 #' @description
 #' Function that plots a list of compatible xts data.
-#' @param xts_data_list a list of 2D xts data object
+#' @param ... (xts_data_list) a list of 2D xts data object
 #' @examples
 #' Replaces the following call:
 #' p <- ggplot() +
 #'   geom_line(data = jvm.memory.committed.sum.ts, aes(x=Index, value)) +
 #'   geom_line(data = jvm.memory.used.sum.ts, aes(x=Index, value)) +
 #'   scale_x_datetime(date_labels = "%H:%M:%OS3")
-plot_ts <- function(xts_data_list) {
-  out <- tryCatch(
-  {
-    p <- ggplot()
-    for (xts_data in xts_data_list) {
-      p <- p + geom_line(data = xts_data, aes(x = Index, value))
-    }
-    p <- p + scale_x_datetime(date_labels = "%H:%M:%OS3")
-    p
-  },
-    error = function (cond) {
-      return(NA)
-    }
-  )
-  out
+plot_ts <- function(...) {
+  l <- list(...)
+  p <- ggplot()
+  for (xts_data in l) {
+    p <- p + geom_line(data = xts_data, aes(x = Index, value))
+  }
+  p <- p + scale_x_datetime(date_labels = "%H:%M:%OS3")
+  p
 }
 
 #' Saves plots as image files

@@ -1,0 +1,28 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test using bizur consensus protocol with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: util_start_load_test.yaml
+  vars:
+    test_name: "S2"
+    consensus_protocol: "bizur"
+    node_cli_params: >-
+      bizur.numPeers=3
+      bizur.numBuckets=3
+    store_cli_params: >-
+      bizur.numPeers=3
+      bizur.numBuckets=3
+    workload: |
+      recordcount=1000
+      operationcount=1000
+      workload=site.ycsb.workloads.CoreWorkload
+      
+      readallfields=true
+      
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+      
+      requestdistribution=zipfian

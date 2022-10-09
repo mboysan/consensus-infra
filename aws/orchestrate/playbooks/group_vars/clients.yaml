@@ -3,8 +3,6 @@ clients_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/ycsb'
 
 # configuration directory for the clients
 clients_GROUP_config_dir: '{{ clients_GROUP_working_dir }}/conf'
-# configuration file for the clients
-clients_GROUP_config_file: '{{ clients_GROUP_config_dir }}/client.properties'
 # path to workloads directory
 clients_GROUP_workloads_dir: '{{ clients_GROUP_working_dir }}/workloads/my'
 
