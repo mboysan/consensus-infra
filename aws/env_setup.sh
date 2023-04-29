@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export LC_ALL="C.UTF-8";
+
 CURRENT_DIR=$(pwd)
 
 function checkExecutionDirectory() {
