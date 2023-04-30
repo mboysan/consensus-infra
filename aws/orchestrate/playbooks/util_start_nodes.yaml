@@ -21,7 +21,7 @@
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
         _metrics_params: >-
-          metrics.jvm.enabled=true
+          metrics.jvm.enabled={{ nodes_GROUP_jvm_metrics_enabled }}
           metrics metrics.exportfile={{ workers_GROUP_project_metrics_file }}
           metrics.separator=,
           metrics.step={{ nodes_GROUP_jvm_metrics_step }}

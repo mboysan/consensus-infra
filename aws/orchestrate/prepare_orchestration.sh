@@ -63,13 +63,21 @@ function populateClientsInventory() {
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
-# a tmp variable for node destinations used by workers
+# a tmp variable for node destinations used by workers (for consensus)
 nodeDestinationsTmp=$tmpDir/ndt
 truncate -s 0 $nodeDestinationsTmp
+
+# a tmp variable for node destinations used by workers (for etcd)
+etcdNodeDestinationsTmp=$tmpDir/endt
+truncate -s 0 $etcdNodeDestinationsTmp
 
 # a tmp variable for store destinations used by clients
 storeDestinationsTmp=$tmpDir/sdt
 truncate -s 0 $storeDestinationsTmp
+
+# a tmp variable for peer destinations used by etcd
+etcdStoreDestinationsTmp=$tmpDir/epdt
+truncate -s 0 $etcdStoreDestinationsTmp
 
 # a tmp variable for nodes that will act as key-value store
 storeNodesTmp=$tmpDir/snt
@@ -102,14 +110,22 @@ function populateNodesInventory() {
         # append node name to node children holder
         echo "$nodeName" >> "$nodesChildrenTmp"
 
-        # append node destinations configuration
+        # append node destinations configuration (for consensus project)
         echo "$nodeIndex-$nodePrivateIp:$NODE_SERVING_PORT" >> "$nodeDestinationsTmp"
+
+        # append node destinations configuration (for etcd project)
+        echo "$nodeName=http://$nodePrivateIp:$NODE_SERVING_PORT" >> "$etcdNodeDestinationsTmp"
 
         # append store destinations configuration
         if [ "$nodeIdToUseAsStore" -eq -1 ] || [ "$nodeIndex" -eq "$nodeIdToUseAsStore" ]; then
           echo "[INFO] using $nodeName as key-value store"
           echo "$nodeName" >> "$storeNodesTmp"
+
+          # append store destinations configuration (for consensus project)
           echo "$nodeIndex-$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$storeDestinationsTmp"
+
+          # append store destinations configuration (for etcd project)
+          echo "$nodeName=http://$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$etcdStoreDestinationsTmp"
         fi
 
         # write to inventory file
@@ -146,8 +162,12 @@ function populateWorkersInventory() {
     echo "[workers:vars]" >> "$ANSIBLE_INVENTORY_FILE"
     nodeDestinations="$(xargs printf ',%s' < "$nodeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_node_destinations=$nodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    etcdNodeDestinations="$(xargs printf ',%s' < "$etcdNodeDestinationsTmp" | cut -b 2-)"
+    echo "workers_GROUP_etcd_node_destinations=$etcdNodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     storeDestinations="$(xargs printf ',%s' < "$storeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_store_destinations=$storeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    etcdStoreDestinations="$(xargs printf ',%s' < "$etcdStoreDestinationsTmp" | cut -b 2-)"
+    echo "workers_GROUP_etcd_store_destinations=$etcdStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 

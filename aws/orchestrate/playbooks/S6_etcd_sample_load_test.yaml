@@ -1,0 +1,21 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test on etcd cluster with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: util_etcd_start_load_test.yaml
+  vars:
+    test_name: "S6"
+    workload: |
+      recordcount=1000
+      operationcount=1000
+      workload=site.ycsb.workloads.CoreWorkload
+      
+      readallfields=true
+      
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+      
+      requestdistribution=zipfian
