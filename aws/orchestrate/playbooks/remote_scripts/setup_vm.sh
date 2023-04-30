@@ -52,6 +52,22 @@ sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-
 sudo apt-get update
 sudo apt-get install -y r-base
 
+# -------------------------------------------------- etcd
+
+ETCD_VER=v3.5.8
+GITHUB_URL=https://github.com/etcd-io/etcd/releases/download
+DOWNLOAD_URL=${GITHUB_URL}
+INSTALL_DIR=~/project/etcd
+
+rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+rm -rf ${INSTALL_DIR} && mkdir -p ${INSTALL_DIR}
+
+curl -L ${DOWNLOAD_URL}/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -o /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C ${INSTALL_DIR} --strip-components=1
+rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+
+${INSTALL_DIR}/etcd --version
+
 # -------------------------------------------------- Further configuration
 # configure the firewall to allow everything
 sudo iptables -P INPUT ACCEPT
