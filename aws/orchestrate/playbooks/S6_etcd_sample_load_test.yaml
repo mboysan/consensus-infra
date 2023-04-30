@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test using raft consensus protocol with a custom workload definition.
+# Performs a simple load test on etcd cluster with a custom workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
