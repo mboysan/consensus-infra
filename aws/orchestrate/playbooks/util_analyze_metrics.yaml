@@ -4,11 +4,11 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Fetches metrics from workers to local controller
-  hosts: workers
+- name: Fetches metrics from clients to local controller
+  hosts: clients
   any_errors_fatal: true
   tasks:
-    - name: Fetching metrics
+    - name: Fetching client metrics
       fetch:
         src: "{{ workers_GROUP_project_metrics_file }}"
         dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.txt"
@@ -16,23 +16,19 @@
       vars:
         _server_name: "{{ group_names[0] }}"
 
-- name: Performs initial analysis on node metrics (using R on controller)
+- name: Fetches metrics from nodes to local controller
   hosts: nodes
   any_errors_fatal: true
   tasks:
-    - name: Plotting node resource usage metrics
-      delegate_to: 127.0.0.1
-      shell:
-        cmd: |
-          ./node_metrics_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ _output_file_prefix }}
-        chdir: "{{ _working_dir }}"
+    - name: Fetching node metrics
+      fetch:
+        src: "{{ workers_GROUP_project_metrics_file }}"
+        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.txt"
+        flat: yes
       vars:
-        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
-        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ nodes_GROUP_current_node_name }}"
-        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.txt"
-        _output_folder: "{{ _metrics_path }}"
-        _output_file_prefix: "{{ _server_name }}_"
+        _server_name: "{{ group_names[0] }}"
+      when:
+        "nodes_GROUP_jvm_metrics_enabled is true"
 
 - name: Performs initial analysis on perf test metrics (using R on controller)
   hosts: clients
@@ -51,3 +47,23 @@
         _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.txt"
         _output_folder: "{{ _metrics_path }}"
         _output_file_prefix: "{{ _server_name }}_"
+
+- name: Performs initial analysis on node metrics (using R on controller)
+  hosts: nodes
+  any_errors_fatal: true
+  tasks:
+    - name: Plotting node resource usage metrics
+      delegate_to: 127.0.0.1
+      shell:
+        cmd: |
+          ./node_metrics_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ _output_file_prefix }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
+        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
+        _server_name: "{{ nodes_GROUP_current_node_name }}"
+        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.txt"
+        _output_folder: "{{ _metrics_path }}"
+        _output_file_prefix: "{{ _server_name }}_"
+      when:
+        "nodes_GROUP_jvm_metrics_enabled is true"
