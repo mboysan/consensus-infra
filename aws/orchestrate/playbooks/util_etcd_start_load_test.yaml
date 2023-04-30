@@ -1,4 +1,12 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook that starts an etcd cluster and performs load tests on it with the provided params.
+# It then collects client (YCSB) metrics, analyzes them and cleans up the workers.
+#------------------------------------------------------------------------------------------------------------
+
 ---
+# ------------------------------------------------------------------------------------ Runtime configuration
+- ansible.builtin.import_playbook: util_runtime_config.yaml
+
 # ------------------------------------------------------------------------------------ Load test
 - name: Starts all etcd KV stores
   hosts: nodes
