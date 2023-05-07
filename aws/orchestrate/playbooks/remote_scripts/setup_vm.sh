@@ -57,7 +57,7 @@ sudo apt-get install -y r-base
 ETCD_VER=v3.5.8
 GITHUB_URL=https://github.com/etcd-io/etcd/releases/download
 DOWNLOAD_URL=${GITHUB_URL}
-INSTALL_DIR=~/project/etcd
+INSTALL_DIR=~/etcd
 
 rm -f /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
 rm -rf ${INSTALL_DIR} && mkdir -p ${INSTALL_DIR}
