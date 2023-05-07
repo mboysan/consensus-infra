@@ -26,11 +26,11 @@
                     --advertise-client-urls "http://$etcdMyPeerIp:{{ nodes_GROUP_client_serving_port }}" \
                     --initial-cluster-token my-etcd-cluster-1 \
                     --initial-cluster "{{ workers_GROUP_etcd_node_destinations }}" \
-                    --data-dir {{ workers_GROUP_project_dir }}/etcd/data \
+                    --data-dir {{ nodes_GROUP_etcd_working_dir }}/data \
                     --initial-cluster-state new &> {{ workers_GROUP_project_log_file }}' &
           
           bash -ilc 'sleep 1m'
-        chdir: "{{ workers_GROUP_project_dir }}/etcd"
+        chdir: "{{ nodes_GROUP_etcd_working_dir }}"
       async: 100
       poll: 0
       register: start_stores_task
