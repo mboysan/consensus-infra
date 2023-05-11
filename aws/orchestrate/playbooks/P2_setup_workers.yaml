@@ -43,8 +43,13 @@
         dest: '{{ nodes_GROUP_working_dir }}/lib/reload4j.jar'
         force: yes
 
-    - name: P2.2.4 - Rename consensus.jar
-      shell: "mv *.jar consensus.jar"
+    - name: P2.2.4 - Prepare consensus.jar
+      shell:
+        cmd: |
+          # rename the correct one.
+          mv *{{ workers_GROUP_dependency_consensus_version }}-jar-with-dependencies.jar consensus.jar
+          # remove others
+          rm *-jar-with-dependencies.jar
       args:
         chdir: '{{ nodes_GROUP_working_dir }}'
 
