@@ -66,6 +66,8 @@ necessary software and project dependencies, i.e. `P` stands for "Prepare".
 for "Sample". We suggest using `T` playbooks (as described next) for performing the load tests.
 - `T<X>_<name>`: Playbooks starting with this naming pattern is used to perform the load tests, 
 i.e. `T` stands for "Test".
+- `W<X>_<name>`: Playbooks starting with this naming pattern is used to work on the collected metrics,
+  i.e. `W` stands for "Work". They should be run after all the tests are completed.
 - `util_<name>`: Playbooks starting with this naming pattern is used as utility tasks such as starting, 
 stopping, cleanup etc. of hosts that are shared by all other playbooks.
 

@@ -19,7 +19,10 @@ using('readr',
       'stringr',
       'ggplot2',
       'xts',
-      'roxygen2' # for documentation
+      'roxygen2', # for documentation
+      'dplyr',
+      'tidyr'
+      # 'tidyverse'
 )
 
 # ----------------------------------------------------------------------------- utilitiy functions and constants
