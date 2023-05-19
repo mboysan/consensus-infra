@@ -19,8 +19,7 @@ args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
-    # defaults = c("collected_metrics/store_metrics_sample.txt", "collected_metrics/EX1", "EX1")
-    defaults = c("collected_metrics/S2/node2.txt", "collected_metrics/S2", "S2")
+    defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1")
 )
 
 metrics_file <- args[1]
@@ -93,7 +92,6 @@ memory_summary <- rbind(
 )
 
 memory_summary <- data.frame(category = "memory", memory_summary)
-# print(memory_summary)
 
 # ----------------------------------------------------------------------------- cpu data
 
@@ -109,7 +107,6 @@ cpu_summary <- rbind(
 )
 
 cpu_summary <- data.frame(category = "cpu", cpu_summary)
-# print(cpu_summary)
 
 # ----------------------------------------------------------------------------- collect summary data
 
@@ -118,7 +115,6 @@ all_summary <- rbind(
         cpu_summary
 )
 all_summary <- data.frame(nodeType = "store", testName = test_name, all_summary)
-print(all_summary)
 
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
@@ -141,7 +137,6 @@ all_raw <- rbind(
     cpu_raw
 )
 all_raw <- data.frame(nodeType = "store", testName = test_name, all_raw)
-print(all_raw)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")
@@ -151,5 +146,9 @@ write.csv(all_summary, out_file, row.names = FALSE)
 info("writing store raw data to csv file")
 out_file <- paste(output_folder, "store.raw.out.csv", sep = "/")
 write.csv(all_raw, out_file, row.names = FALSE)
+
+# debug
+# print(all_raw)
+print(all_summary)
 
 # TODO: check the timestamps. some of them have milliseconds scale (insights), some of them don't (jvm)
