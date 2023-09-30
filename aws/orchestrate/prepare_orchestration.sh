@@ -75,6 +75,9 @@ truncate -s 0 $etcdNodeDestinationsTmp
 storeDestinationsTmp=$tmpDir/sdt
 truncate -s 0 $storeDestinationsTmp
 
+storePrivateIpTmp=$tmpDir/spit
+truncate -s 0 $storePrivateIpTmp
+
 # a tmp variable for peer destinations used by etcd
 etcdStoreDestinationsTmp=$tmpDir/epdt
 truncate -s 0 $etcdStoreDestinationsTmp
@@ -121,6 +124,9 @@ function populateNodesInventory() {
           echo "[INFO] using $nodeName as key-value store"
           echo "$nodeName" >> "$storeNodesTmp"
 
+          # append store's private ip
+          echo "$nodePrivateIp" >> "$storePrivateIpTmp"
+
           # append store destinations configuration (for consensus project)
           echo "$nodeIndex-$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$storeDestinationsTmp"
 
@@ -166,6 +172,8 @@ function populateWorkersInventory() {
     echo "workers_GROUP_etcd_node_destinations=$etcdNodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     storeDestinations="$(xargs printf ',%s' < "$storeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_store_destinations=$storeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    storePrivateIp="$(xargs printf ',%s' < "$storePrivateIpTmp" | cut -b 2-)"
+    echo "workers_GROUP_store_privateIp=$storePrivateIp" >> "$ANSIBLE_INVENTORY_FILE"
     etcdStoreDestinations="$(xargs printf ',%s' < "$etcdStoreDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_etcd_store_destinations=$etcdStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"

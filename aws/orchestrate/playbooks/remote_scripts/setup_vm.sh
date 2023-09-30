@@ -3,9 +3,11 @@
 # -------------------------------------------------- already included
 # git
 
-# -------------------------------------------------- iperf (for network performance testing)
+# -------------------------------------------------- iperf & qperf (for network performance testing)
 sudo apt-get update
 sudo apt-get install -y iperf
+sudo apt-get install -y iperf3
+sudo apt-get install -y qperf
 
 # -------------------------------------------------- jdk-17
 # prepare
