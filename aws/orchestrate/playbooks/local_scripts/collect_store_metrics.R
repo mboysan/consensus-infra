@@ -19,7 +19,10 @@ args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
+    # raft
     defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1")
+    # bizur
+    # defaults = c("collected_metrics/EX2/node2.metrics.txt", "collected_metrics/EX2", "EX2")
 )
 
 metrics_file <- args[1]
@@ -108,6 +111,12 @@ cpu_summary <- rbind(
 
 cpu_summary <- data.frame(category = "cpu", cpu_summary)
 
+# ----------------------------------------------------------------------------- request/response (message) data
+messages_server_send <- extractInsights("insights.tcp.server.send")
+messages_server_receive <- extractInsights("insights.tcp.server.receive")
+messages_client_send <- extractInsights("insights.tcp.client.send")
+messages_client_receive <- extractInsights("insights.tcp.client.receive")
+
 # ----------------------------------------------------------------------------- collect summary data
 
 all_summary <- rbind(
@@ -132,9 +141,18 @@ cpu_raw <- rbind(
 )
 cpu_raw <- data.frame(category = "cpu", cpu_raw)
 
+messages_raw <- rbind(
+    messages_server_send,
+    messages_server_receive,
+    messages_client_send,
+    messages_client_receive
+)
+messages_raw <- data.frame(category = "messages", messages_raw)
+
 all_raw <- rbind(
     memory_raw,
-    cpu_raw
+    cpu_raw,
+    messages_raw
 )
 all_raw <- data.frame(nodeType = "store", testName = test_name, all_raw)
 
