@@ -19,7 +19,10 @@ args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
+    # raft
     defaults = c("collected_metrics/EX1/client.metrics.txt", "collected_metrics/EX1", "EX1")
+    # bizur
+    # defaults = c("collected_metrics/EX2/client.metrics.txt", "collected_metrics/EX2", "EX2")
 )
 
 metrics_file <- args[1]
@@ -123,7 +126,7 @@ all_raw <- rbind(
   read_modify_write_failed_latency
 )
 all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
-all_raw <- data.frame(nodeType = "client", testName = test_name, category = "latency", all_raw)
+all_raw <- data.frame(nodeType = "client", testName = test_name, consensusAlg = "N/A", category = "latency", all_raw)
 
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
@@ -172,7 +175,7 @@ all_summary <- rbind(
     overall_summary
 )
 all_summary <- all_summary %>% filter(mean > -1, na.rm=TRUE)   # sanitize
-all_summary <- data.frame(nodeType = "client", testName = test_name, all_summary)
+all_summary <- data.frame(nodeType = "client", testName = test_name, consensusAlg = "N/A", all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing client raw data to csv file")

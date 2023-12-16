@@ -8,8 +8,8 @@
 #' @param output_folder base folder to write output results
 #' @param test_name name of the test that was run (ideally should be same as the ansible playbook file that was executed.)
 #' @examples
-#' ./collect_store_metrics.R <metrics_file> <output_folder> <test_name>
-#' ./collect_store_metrics.R metrics.txt ./ S1
+#' ./collect_store_metrics.R <metrics_file> <output_folder> <test_name> <consensus_protocol>
+#' ./collect_store_metrics.R metrics.txt ./ S1 raft
 #'
 
 source("util.R")
@@ -20,14 +20,15 @@ args <- valiadate_args(
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1")
+    defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1", "raft")
     # bizur
-    # defaults = c("collected_metrics/EX2/node2.metrics.txt", "collected_metrics/EX2", "EX2")
+    # defaults = c("collected_metrics/EX2/node2.metrics.txt", "collected_metrics/EX2", "EX2", "bizur")
 )
 
 metrics_file <- args[1]
 output_folder <- args[2]
 test_name <- args[3]
+consensus_alg <- args[4]
 
 # ----------------------------------------------------------------------------- prepare metrics
 info("analyzing store metrics of:", metrics_file)
@@ -123,7 +124,7 @@ all_summary <- rbind(
         memory_summary,
         cpu_summary
 )
-all_summary <- data.frame(nodeType = "store", testName = test_name, all_summary)
+all_summary <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
@@ -154,7 +155,7 @@ all_raw <- rbind(
     cpu_raw,
     messages_raw
 )
-all_raw <- data.frame(nodeType = "store", testName = test_name, all_raw)
+all_raw <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_raw)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")
