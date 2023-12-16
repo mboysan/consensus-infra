@@ -3,82 +3,78 @@
 #' Analysis of consensus messaging.
 #' @description
 #' Analysis of consensus messaging.
-#' @param metrics_file path to metrics file
-#' @param output_folder base folder to write output results
-#' @param output_file_prefix file prefix for an individual result
-#' @examples
-#' ./<script>.R <metrics_file> <output_folder> <output_file_prefix>
 
 source("util.R")
+
+# To get rid of e notation in numbers
+# options(scipen = 999)
 
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 3,
-    failure_msg = "path to metrics file and/or output folder and/or output file prefix missing.",
-    # raft
-    # defaults = c("collected_metrics/EX1/node2.metrics.txt", NULL, NULL)
-
-    # bizur
-    # defaults = c("collected_metrics/EX2/node2.metrics.txt", NULL, NULL)
-
-    # MERGED
-    defaults = c("collected_metrics/MERGED/all.raw.merged.csv", NULL, NULL)
+    validator = \(x) length(x) > 2,
+    failure_msg = "required arguments are not provided.",
+    # use all.raw.merged.csv or store.raw.merged.csv
+    defaults = c("collected_metrics/MERGED/all.raw.merged.csv", "", "EX1", "EX2")
 )
 
-metrics_file <- args[1]
+input_file <- args[1]
 output_folder <- args[2]
-output_file_prefix <- args[3]
+test_names <- args[-c(1, 2)]
 
 # ----------------------------------------------------------------------------- prepare metrics
-info("analysing consensus messaging:", metrics_file)
+info("analysing consensus messaging:", input_file)
 
 # Read the CSV data
-data <- read.csv(metrics_file, header = FALSE, stringsAsFactors = FALSE)
+data <- read.csv(input_file, header = FALSE, stringsAsFactors = FALSE)
 
 # Rename the columns
-# names(data) <- c("metric_name", "metric_value", "timestamp")
-names(data) <- c("nodeType", "testName", "category", "metric_name", "metric_value", "timestamp")
+names(data) <- c("nodeType", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+data$testName_algorithm <- paste(data$testName, data$consensusAlg, sep = "_")
 
-# -------- Extract the message type
+# filter for store metrics and test names
+data <- data %>%
+    filter(nodeType == "store") %>%
+    filter(testName %in% test_names)
+
+# Extract the message type
 data$message_type <- sub(".*\\.", "", data$metric_name)
 
-# -------- Filter for consensus requests
-# raft
-consensus_requests <- c("AppendEntriesRequest", "RequestVoteRequest")
-raft_data <- data %>%
-    filter(message_type %in% consensus_requests)
-raft_data$consensus_alg <- "raft"
-raft_data$timestamp <- as.numeric(raft_data$timestamp)
-raftStartTime <- min(raft_data$timestamp)
-
-# bizur
+# filter for relevant data
 consensus_requests <- c(
+    # raft
+    'AppendEntriesRequest',
+    'RequestVoteRequest',
+
+    # bizur
     'PleaseVoteRequest',
     'ReplicaReadRequest',
     'ReplicaWriteRequest',
     'CollectKeysRequest',
     'HeartbeatRequest'
 )
-bizur_data <- data %>%
-    filter(message_type %in% consensus_requests)
-bizur_data$consensus_alg <- "bizur"
-bizur_data$timestamp <- as.numeric(bizur_data$timestamp)
-bizurStartTime <- min(bizur_data$timestamp)
 
-# scale timestamp origin
-if (raftStartTime < bizurStartTime) {
-    subtractTime <- bizurStartTime - raftStartTime
-    bizur_data$timestamp <- bizur_data$timestamp - subtractTime
-} else {
-    subtractTime <- raftStartTime - bizurStartTime
-    raft_data$timestamp <- raft_data$timestamp - subtractTime
+data <- data %>%
+    filter(message_type %in% consensus_requests)
+
+# Order by timestamp
+data$timestamp <- as.numeric(data$timestamp)
+data <- data %>% arrange(timestamp)
+
+adjust_start_times <- function() {
+    minStart <- min(data$timestamp)
+    testNames <- unique(data$testName)
+
+    for (testName in testNames) {
+        tmp <- data[data$testName == testName,]
+        minTestStart <- tmp[1,]$timestamp
+        diff <- minTestStart - minStart
+        data[data$testName == testName,]$timestamp <- data[data$testName == testName,]$timestamp - diff
+    }
+    data
 }
 
-# Merge all data
-data <- rbind(raft_data, bizur_data)
-data$timestamp <- as.numeric(data$timestamp)
-data$metric_value <- as.numeric(data$metric_value)
+data <- adjust_start_times()
 
 # Convert the timestamp from milliseconds to POSIXct date-time
 data$timestamp_sec <- as.POSIXct(data$timestamp / 1000, origin = "1970-01-01")
@@ -86,9 +82,10 @@ data$timestamp_sec <- as.POSIXct(data$timestamp / 1000, origin = "1970-01-01")
 data$timestamp_sec <- round(data$timestamp_sec)
 data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 
+data$metric_value <- as.numeric(data$metric_value)
 
 # Group the data
-grouped_data <- data %>% group_by(testName, consensus_alg, timestamp_sec)
+grouped_data <- data %>% group_by(testName_algorithm, consensusAlg, timestamp_sec)
 
 # Count the number of messages per group
 message_counts <- grouped_data %>% summarise(count = n())
@@ -96,18 +93,14 @@ message_counts <- grouped_data %>% summarise(count = n())
 # Sum the size of messages per group
 message_sizes <- grouped_data %>% summarise(sum = sum(metric_value / 1024))
 
-# Order the data based on timestamp_sec
-ordered_message_counts <- message_counts %>% arrange(timestamp_sec)
-ordered_message_sizes <- message_sizes %>% arrange(timestamp_sec)
-
-# Plot count of messages, grouped by consensus_alg & timestamp_sec
-ggplot(ordered_message_counts, aes(x = timestamp_sec, y = count, color = consensus_alg)) +
+# Plot count of messages, grouped by consensusAlg & timestamp_sec
+ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
 
-# Plot size of messages, grouped by consensus_alg & timestamp_sec
-ggplot(ordered_message_sizes, aes(x = timestamp_sec, y = sum, color = consensus_alg)) +
+# Plot size of messages, grouped by consensusAlg & timestamp_sec
+ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
