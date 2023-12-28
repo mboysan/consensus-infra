@@ -64,6 +64,20 @@ grouped_data <- data %>% group_by(testName_algorithm, consensusAlg, timestamp_se
 
 # ----------------------------------------------------------------------------- calculations
 
+# total memory consumption calculated with somes of both heap & non-heap spaces of:
+# jvm.memory.committed
+# jvm.memory.max
+# jvm.memory.used
+
+# system.cpu.count = number of cpu cores used
+# system.load.average.1m = 1 minute cpu load average, calculation of load = (loadAverage / cpuCount) * 100 (https://dzone.com/articles/what-is-load-average)
+# system.cpu.usage = What % load the overall system is at, from 0.0-1.0 (https://stackoverflow.com/a/27282046)
+# process.cpu.usage = What % CPU load this current JVM is taking, from 0.0-1.0 (https://stackoverflow.com/a/27282046)
+
+# For simplicity, we'll be using the following metrics:
+# jvm.memory.used
+# process.cpu.usage
+
 # jvm memory usage
 memory_data <- grouped_data %>%
   filter(metric_name == "jvm.memory.used")

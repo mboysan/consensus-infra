@@ -102,23 +102,24 @@
       vars:
         _server_name: "{{ group_names[0] }}"
 
-- name: Performs initial analysis on perf test metrics (using R on controller)
-  hosts: clients
-  any_errors_fatal: true
-  tasks:
-    - name: Plotting perf test metrics
-      delegate_to: 127.0.0.1
-      shell:
-        cmd: |
-          ./perftest_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ _output_file_prefix }}
-        chdir: "{{ _working_dir }}"
-      vars:
-        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
-        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ clients_GROUP_current_client_name }}"
-        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.txt"
-        _output_folder: "{{ _metrics_path }}"
-        _output_file_prefix: "{{ _server_name }}_"
+# TODO: remove/replace with proper analysis
+#- name: Performs initial analysis on perf test metrics (using R on controller)
+#  hosts: clients
+#  any_errors_fatal: true
+#  tasks:
+#    - name: Plotting perf test metrics
+#      delegate_to: 127.0.0.1
+#      shell:
+#        cmd: |
+#          ./perftest_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ _output_file_prefix }}
+#        chdir: "{{ _working_dir }}"
+#      vars:
+#        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
+#        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
+#        _server_name: "{{ clients_GROUP_current_client_name }}"
+#        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.txt"
+#        _output_folder: "{{ _metrics_path }}"
+#        _output_file_prefix: "{{ _server_name }}_"
 
 # ------------------------------------------------------------------------------------ Cleanup
 
