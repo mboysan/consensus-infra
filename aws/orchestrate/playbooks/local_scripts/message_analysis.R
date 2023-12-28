@@ -6,9 +6,6 @@
 
 source("util.R")
 
-# To get rid of e notation in numbers
-# options(scipen = 999)
-
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,

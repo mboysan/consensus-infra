@@ -27,6 +27,9 @@ using('readr',
 
 # ----------------------------------------------------------------------------- utilitiy functions and constants
 
+# To get rid of e notation in numbers
+# options(scipen = 999)
+
 DEBUG_ENABLED <- TRUE
 
 info <- function(...) {
