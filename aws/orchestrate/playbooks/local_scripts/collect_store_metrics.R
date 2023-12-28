@@ -157,6 +157,9 @@ all_raw <- rbind(
 )
 all_raw <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_raw)
 
+# finalize column order
+all_raw <- all_raw[,c('nodeType', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")
 out_file <- paste(output_folder, "store.summary.out.csv", sep = "/")

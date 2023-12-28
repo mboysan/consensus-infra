@@ -128,6 +128,9 @@ all_raw <- rbind(
 all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
 all_raw <- data.frame(nodeType = "client", testName = test_name, consensusAlg = "N/A", category = "latency", all_raw)
 
+# finalize column order
+all_raw <- all_raw[,c('nodeType', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
 insert_count <- count_as_df('insert_count', insert_latency)
