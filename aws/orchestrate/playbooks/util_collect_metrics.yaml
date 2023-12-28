@@ -33,7 +33,7 @@
       delegate_to: 127.0.0.1
       shell:
         cmd: |
-          ./collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }}
+          ./collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}
         chdir: "{{ _working_dir }}"
       vars:
         _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"

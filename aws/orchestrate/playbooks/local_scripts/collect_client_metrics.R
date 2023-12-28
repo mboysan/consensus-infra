@@ -20,14 +20,15 @@ args <- valiadate_args(
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("collected_metrics/EX1/client.metrics.txt", "collected_metrics/EX1", "EX1")
+    defaults = c("collected_metrics/EX1/client.metrics.txt", "collected_metrics/EX1", "EX1", "raft")
     # bizur
-    # defaults = c("collected_metrics/EX2/client.metrics.txt", "collected_metrics/EX2", "EX2")
+    # defaults = c("collected_metrics/EX2/client.metrics.txt", "collected_metrics/EX2", "EX2", "bizur")
 )
 
 metrics_file <- args[1]
 output_folder <- args[2]
 test_name <- args[3]
+consensus_alg <- args[4]
 
 # ----------------------------------------------------------------------------- prepare metrics
 
@@ -126,7 +127,7 @@ all_raw <- rbind(
   read_modify_write_failed_latency
 )
 all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
-all_raw <- data.frame(nodeType = "client", testName = test_name, consensusAlg = "N/A", category = "latency", all_raw)
+all_raw <- data.frame(nodeType = "client", testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
 
 # finalize column order
 all_raw <- all_raw[,c('nodeType', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
@@ -178,7 +179,7 @@ all_summary <- rbind(
     overall_summary
 )
 all_summary <- all_summary %>% filter(mean > -1, na.rm=TRUE)   # sanitize
-all_summary <- data.frame(nodeType = "client", testName = test_name, consensusAlg = "N/A", all_summary)
+all_summary <- data.frame(nodeType = "client", testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing client raw data to csv file")

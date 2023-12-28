@@ -28,7 +28,7 @@ using('readr',
 # ----------------------------------------------------------------------------- utilitiy functions and constants
 
 # To get rid of e notation in numbers
-# options(scipen = 999)
+options(scipen = 999)
 
 DEBUG_ENABLED <- TRUE
 
@@ -145,4 +145,18 @@ save_plots <- function (plot_list, out_folder = NULL, out_file_prefix = NULL, im
     info("saving plot to:", file_name)
     ggsave(file_name, plot, path = out_folder)
   }
+}
+
+remove_outliers <- function(data) {
+  df <- data
+  Q1 <- quantile(df$metric_value, 0.25)
+  Q3 <- quantile(df$metric_value, 0.75)
+  IQR <- Q3 - Q1
+
+  # Define lower and upper bounds
+  lower_bound <- Q1 - 1.5 * IQR
+  upper_bound <- Q3 + 1.5 * IQR
+
+  # Remove outliers
+  df <- df[df$metric_value > lower_bound & df$metric_value < upper_bound, ]
 }
