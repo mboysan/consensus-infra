@@ -8,8 +8,8 @@
 #' @param output_folder base folder to write output results
 #' @param test_name name of the test that was run (ideally should be same as the ansible playbook file that was executed.)
 #' @examples
-#' ./collect_store_metrics.R <metrics_file> <output_folder> <test_name>
-#' ./collect_store_metrics.R metrics.txt ./ S1
+#' ./collect_store_metrics.R <metrics_file> <output_folder> <test_name> <consensus_protocol>
+#' ./collect_store_metrics.R metrics.txt ./ S1 raft
 #'
 
 source("util.R")
@@ -19,12 +19,16 @@ args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
-    defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1")
+    # raft
+    defaults = c("collected_metrics/EX1/node2.metrics.txt", "collected_metrics/EX1", "EX1", "raft")
+    # bizur
+    # defaults = c("collected_metrics/EX2/node2.metrics.txt", "collected_metrics/EX2", "EX2", "bizur")
 )
 
 metrics_file <- args[1]
 output_folder <- args[2]
 test_name <- args[3]
+consensus_alg <- args[4]
 
 # ----------------------------------------------------------------------------- prepare metrics
 info("analyzing store metrics of:", metrics_file)
@@ -108,13 +112,19 @@ cpu_summary <- rbind(
 
 cpu_summary <- data.frame(category = "cpu", cpu_summary)
 
+# ----------------------------------------------------------------------------- request/response (message) data
+messages_server_send <- extractInsights("insights.tcp.server.send")
+messages_server_receive <- extractInsights("insights.tcp.server.receive")
+messages_client_send <- extractInsights("insights.tcp.client.send")
+messages_client_receive <- extractInsights("insights.tcp.client.receive")
+
 # ----------------------------------------------------------------------------- collect summary data
 
 all_summary <- rbind(
         memory_summary,
         cpu_summary
 )
-all_summary <- data.frame(nodeType = "store", testName = test_name, all_summary)
+all_summary <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
@@ -132,11 +142,20 @@ cpu_raw <- rbind(
 )
 cpu_raw <- data.frame(category = "cpu", cpu_raw)
 
+messages_raw <- rbind(
+    messages_server_send,
+    messages_server_receive,
+    messages_client_send,
+    messages_client_receive
+)
+messages_raw <- data.frame(category = "messages", messages_raw)
+
 all_raw <- rbind(
     memory_raw,
-    cpu_raw
+    cpu_raw,
+    messages_raw
 )
-all_raw <- data.frame(nodeType = "store", testName = test_name, all_raw)
+all_raw <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_raw)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")

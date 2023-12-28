@@ -1,14 +1,13 @@
 #!/usr/bin/env Rscript
 
-
 source("util.R")
 
 args <- commandArgs(trailingOnly=TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 2,
+    validator = \(x) length(x) > 2,
     failure_msg = "required arguments are not provided.",
-    defaults = c("collected_metrics", "collected_metrics/MERGED", "S1", "S2")
+    defaults = c("collected_metrics", "collected_metrics/MERGED", "EX1", "EX2")
 )
 
 input_folder <- args[1]
