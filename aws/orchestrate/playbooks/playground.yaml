@@ -73,8 +73,8 @@
 #- name: Test play
 #  hosts: nodes
 #  vars:
-#    nodeName: "{{ group_names[0] }}"
-#    nodeId: "{{ group_names[0] | regex_search('[0-9]')}}"
+#    nodeName: "{{ inventory_hostname }}"
+#    nodeId: "{{ inventory_hostname | regex_search('[0-9]')}}"
 #  tasks:
 #    - name: Shell test
 #      shell:

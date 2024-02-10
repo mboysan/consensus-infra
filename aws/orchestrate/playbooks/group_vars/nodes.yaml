@@ -5,9 +5,9 @@ nodes_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/consensus'
 nodes_GROUP_etcd_working_dir: '{{ all_GROUP_home_dir }}/etcd'
 
 # name of the current node (e.g. node0) taken from the 'nodes' hosts
-nodes_GROUP_current_node_name: "{{ group_names[0] }}"
+nodes_GROUP_current_node_name: "{{ inventory_hostname }}"
 # id of the current node (e.g. 0) taken from the 'nodes' hosts
-nodes_GROUP_current_node_id: "{{ group_names[0] | regex_search('[0-9]')}}"
+nodes_GROUP_current_node_id: "{{ inventory_hostname | regex_search('[0-9]')}}"
 
 # tcp port used to serve nodes
 nodes_GROUP_node_serving_port: "{{ lookup('env','NODE_SERVING_PORT') | mandatory }}"

@@ -111,7 +111,7 @@
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
         _mandatory_params: "destinations={{ workers_GROUP_store_destinations }} transport.message.callbackTimeoutMs=60000"
-        _server_name: "{{ group_names[0] }}"
+        _server_name: "{{ inventory_hostname }}"
         _home_dir: "{{ all_GROUP_home_dir }}"
         _condition: "{{ condition }}"
       async: "{{ duration_sec * 2 | default(500) }}"

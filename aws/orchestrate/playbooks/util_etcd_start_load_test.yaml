@@ -100,7 +100,7 @@
         dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.txt"
         flat: yes
       vars:
-        _server_name: "{{ group_names[0] }}"
+        _server_name: "{{ inventory_hostname }}"
 
 # TODO: remove/replace with proper analysis
 #- name: Performs initial analysis on perf test metrics (using R on controller)
