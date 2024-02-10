@@ -38,7 +38,7 @@
       vars:
         _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
         _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ clients_GROUP_current_client_name }}"
+        _server_name: "{{ inventory_hostname }}"
         _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
 
@@ -65,7 +65,7 @@
       vars:
         _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
         _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ nodes_GROUP_current_node_name }}"
+        _server_name: "{{ inventory_hostname }}"
         _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
       when:

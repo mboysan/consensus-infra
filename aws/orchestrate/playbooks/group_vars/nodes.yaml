@@ -4,8 +4,6 @@ nodes_GROUP_working_dir: '{{ workers_GROUP_project_dir }}/consensus'
 # working directory of etcd nodes
 nodes_GROUP_etcd_working_dir: '{{ all_GROUP_home_dir }}/etcd'
 
-# name of the current node (e.g. node0) taken from the 'nodes' hosts
-nodes_GROUP_current_node_name: "{{ inventory_hostname }}"
 # id of the current node (e.g. 0) taken from the 'nodes' hosts
 nodes_GROUP_current_node_id: "{{ inventory_hostname | regex_search('[0-9]')}}"
 

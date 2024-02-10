@@ -61,7 +61,7 @@
 #        cli_params: "hello there"
 #      shell:
 #        cmd: |
-#          bash -ilc 'echo {{ nodes_GROUP_current_node_name }}'
+#          bash -ilc 'echo {{ inventory_hostname }}'
 #          bash -ilc 'java \
 #                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
 #                      -cp "lib/*:*" \
