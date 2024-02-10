@@ -5,9 +5,11 @@
     test_name: "T1_simulate"
     consensus_protocol: "simulate"
     node_cli_params: >-
+      metrics.jvm.enabled=false
       metrics.insights.enabled=true
       simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
-    store_cli_params: >- 
+    store_cli_params: >-
+      metrics.jvm.enabled=false
       metrics.insights.enabled=true
       simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
     workload: |

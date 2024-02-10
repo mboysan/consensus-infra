@@ -10,10 +10,12 @@
     node_cli_params: >-
       bizur.numPeers=3
       bizur.numBuckets=3
+      metrics.jvm.enabled=true
       metrics.insights.enabled=true
     store_cli_params: >-
       bizur.numPeers=3
       bizur.numBuckets=3
+      metrics.jvm.enabled=true
       metrics.insights.enabled=true
     workload: |
       recordcount=1000
