@@ -37,6 +37,28 @@ fi
 # switch to terraform working dir
 cd "$TERRAFORM_WORKING_DIR" || exit 1
 
+function populateProcessorsInventory() {
+    # create clients group
+    echo "[INFO] creating 'processors' group"
+
+    echo "[processors]" >> "$ANSIBLE_INVENTORY_FILE"
+
+    # a temporary file for terraform output
+    local processorsTmpJsonFile=$tmpDir/processors.json
+
+    # get output from terraform
+    terraform output -json processor > $processorsTmpJsonFile
+
+    # get inventory variables
+    processorName=$(jq -r '.ec2_instance[0] | (.tags.Name)' $processorsTmpJsonFile)
+    processorPublicIp=$(jq -r '.ec2_instance[0] | (.public_ip)' $processorsTmpJsonFile)
+
+    # populate clients group
+    echo "[INFO] group=processors, name=$processorName, public_ip=$processorPublicIp"
+    echo "processor ansible_host=$processorPublicIp" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "" >> "$ANSIBLE_INVENTORY_FILE"
+}
+
 function populateClientsInventory() {
     # create clients group
     echo "[INFO] creating 'clients' group"
@@ -167,6 +189,7 @@ function populateWorkersInventory() {
 
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
+populateProcessorsInventory
 populateClientsInventory
 populateNodesInventory "$NODE_ID_TO_USE_AS_STORE"
 populateStoresInventory
