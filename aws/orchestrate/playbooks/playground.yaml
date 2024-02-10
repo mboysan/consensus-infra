@@ -61,7 +61,7 @@
 #        cli_params: "hello there"
 #      shell:
 #        cmd: |
-#          bash -ilc 'echo {{ nodes_GROUP_current_node_name }}'
+#          bash -ilc 'echo {{ inventory_hostname }}'
 #          bash -ilc 'java \
 #                      -Dlog4j.configuration=file:{{ workers_GROUP_project_log_config_file}} \
 #                      -cp "lib/*:*" \
@@ -73,8 +73,8 @@
 #- name: Test play
 #  hosts: nodes
 #  vars:
-#    nodeName: "{{ group_names[0] }}"
-#    nodeId: "{{ group_names[0] | regex_search('[0-9]')}}"
+#    nodeName: "{{ inventory_hostname }}"
+#    nodeId: "{{ inventory_hostname | regex_search('[0-9]')}}"
 #  tasks:
 #    - name: Shell test
 #      shell:

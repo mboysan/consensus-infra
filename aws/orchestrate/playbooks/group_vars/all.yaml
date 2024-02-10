@@ -1,6 +1,4 @@
 all_GROUP_aws_region: "{{ lookup('env','AWS_DEFAULT_REGION') | mandatory }}"
 
-all_GROUP_current_server_name: "{{ group_names[0] }}"
-
 # home directory of all instances
 all_GROUP_home_dir: /home/ubuntu

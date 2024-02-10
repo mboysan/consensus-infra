@@ -38,7 +38,10 @@ fi
 cd "$TERRAFORM_WORKING_DIR" || exit 1
 
 function populateClientsInventory() {
-    echo "[INFO] adding clients"
+    # create clients group
+    echo "[INFO] creating 'clients' group"
+
+    echo "[clients]" >> "$ANSIBLE_INVENTORY_FILE"
 
     # a temporary file for terraform output
     local clientsTmpJsonFile=$tmpDir/clients.json
@@ -50,16 +53,9 @@ function populateClientsInventory() {
     clientName=$(jq -r '.ec2_instance[0] | (.tags.Name)' $clientsTmpJsonFile)
     clientPublicIp=$(jq -r '.ec2_instance[0] | (.public_ip)' $clientsTmpJsonFile)
 
-    echo "[INFO] group=clients, name=$clientName, public_ip=$clientPublicIp"
-
     # populate clients group
-    echo "[client]" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "[INFO] group=clients, name=$clientName, public_ip=$clientPublicIp"
     echo "client ansible_host=$clientPublicIp" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "" >> "$ANSIBLE_INVENTORY_FILE"
-
-    # populate clients children
-    echo "[clients:children]" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "$clientName" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
@@ -84,7 +80,10 @@ storeNodesTmp=$tmpDir/snt
 truncate -s 0 $storeNodesTmp
 
 function populateNodesInventory() {
-    echo "[INFO] adding nodes"
+    # create nodes group
+    echo "[INFO] creating 'nodes' group"
+
+    echo "[nodes]" >> "$ANSIBLE_INVENTORY_FILE"
 
     nodeIdToUseAsStore=$1
 
@@ -129,29 +128,24 @@ function populateNodesInventory() {
         fi
 
         # write to inventory file
-        echo "[$nodeName]" >> "$ANSIBLE_INVENTORY_FILE"
         echo "$nodeName ansible_host=$nodePublicIp" >> "$ANSIBLE_INVENTORY_FILE"
     done
-
-    echo "" >> "$ANSIBLE_INVENTORY_FILE"
-
-    # populate nodes children
-    nodesChildren=$(tail -n +2 "$nodesChildrenTmp")
-    echo "[nodes:children]" >> "$ANSIBLE_INVENTORY_FILE"
-    echo "$nodesChildren" >> "$ANSIBLE_INVENTORY_FILE"
 
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
 function populateStoresInventory() {
-    echo "[INFO] adding key-value stores"
-    echo "[stores:children]" >> "$ANSIBLE_INVENTORY_FILE"
+    # create stores group
+    echo "[INFO] creating 'stores' group"
+
+    echo "[stores]" >> "$ANSIBLE_INVENTORY_FILE"
     cat "$storeNodesTmp" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
 function populateWorkersInventory() {
-    echo "[INFO] adding workers"
+    # create workers group
+    echo "[INFO] creating 'workers' group with children"
 
     echo "[workers:children]" >> "$ANSIBLE_INVENTORY_FILE"
     echo "nodes" >> "$ANSIBLE_INVENTORY_FILE"

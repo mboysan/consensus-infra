@@ -4,22 +4,22 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: P1.1 - Sets Up the VMs
+- name: P1 - Sets Up the VMs
   hosts: all
   any_errors_fatal: true
   tasks:
-    - name: P1.1.1 - Changing hostname of the machine
+    - name: P1.1 - Changing hostname of the machine
       shell:
         cmd: |
-          bash -ilc 'sudo hostnamectl set-hostname {{ all_GROUP_current_server_name }}'
+          bash -ilc 'sudo hostnamectl set-hostname {{ inventory_hostname }}'
 
-    - name: P1.1.2 - Copy the remote scripts
+    - name: P1.2 - Copy the remote scripts
       copy:
         src: ./remote_scripts/
         dest: "{{ all_GROUP_home_dir }}"
         mode: "0777"
 
-    - name: P1.1.3 - Run the setup script (async)
+    - name: P1.3 - Run the setup script (async)
       shell:
         cmd: |
           bash -ilc './setup_vm.sh'

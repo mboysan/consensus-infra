@@ -1,7 +1,7 @@
 # name of the current node (e.g. node0) taken from the 'stores' hosts
-stores_GROUP_current_node_name: "{{ group_names[0] }}"
+stores_GROUP_current_node_name: "{{ inventory_hostname }}"
 # id of the current node (e.g. 0) taken from the 'stores' hosts
-stores_GROUP_current_node_id: "{{ group_names[0] | regex_search('[0-9]')}}"
+stores_GROUP_current_node_id: "{{ inventory_hostname | regex_search('[0-9]')}}"
 
 # tcp port used to serve nodes
 stores_GROUP_node_serving_port: "{{ nodes_GROUP_node_serving_port }}"
