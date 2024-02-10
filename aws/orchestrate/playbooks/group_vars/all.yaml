@@ -2,3 +2,7 @@ all_GROUP_aws_region: "{{ lookup('env','AWS_DEFAULT_REGION') | mandatory }}"
 
 # home directory of all instances
 all_GROUP_home_dir: /home/ubuntu
+
+# the file to store the output of the ansible command. Some playbooks are using this for debugging purposes.
+# ssh into the machine that's running an ansible command and use tail -f to see the output
+all_GROUP_ansible_cmd_out: "/tmp/ansible_cmd_out.txt 2>&1"

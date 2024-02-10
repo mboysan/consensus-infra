@@ -1,59 +1,60 @@
 #------------------------------------------------------------------------------------------------------------
-# Collects metrics generated at workers to local controller and groups them into csv files
+# Collects metrics generated at workers and sends them to processors
 #------------------------------------------------------------------------------------------------------------
 
 ---
 
-- name: Collects metrics from clients into csv files
+- name: Configure R installation
+  hosts: all
+  any_errors_fatal: true
+  tasks:
+    - name: Configuring R installation (async)
+      shell:
+        cmd: |
+          bash -ilc './util.R' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      async: 600
+      poll: 0
+      register: setup_r
+
+    - name: Waiting all to finish R setup
+      async_status:
+        jid: "{{ setup_r.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 10
+      delay: 60
+
+- name: Collects client metrics into csv files
   hosts: clients
   any_errors_fatal: true
   tasks:
-    - name: Fetching client metrics
-      fetch:
-        src: "{{ workers_GROUP_project_metrics_file }}"
-        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.metrics.txt"
-        flat: yes
-      vars:
-        _server_name: "{{ inventory_hostname }}"
-
-    - name: Grouping client (perf test) metrics (using R on controller)
-      delegate_to: 127.0.0.1
+    - name: Grouping client (perf test) metrics
       shell:
         cmd: |
-          ./collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}
+          bash -ilc './collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ _working_dir }}"
       vars:
-        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
-        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ inventory_hostname }}"
-        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.metrics.txt"
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ workers_GROUP_project_metrics_path }}"
+        _metrics_file: "{{ workers_GROUP_project_metrics_file }}"
         _output_folder: "{{ _metrics_path }}"
 
-- name: Collects metrics from stores into csv files
+- name: Collects store metrics into csv files
   hosts: stores
   any_errors_fatal: true
   tasks:
-    - name: Fetching store metrics
-      fetch:
-        src: "{{ workers_GROUP_project_metrics_file }}"
-        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.metrics.txt"
-        flat: yes
-      vars:
-        _server_name: "{{ inventory_hostname }}"
-      when:
-        "nodes_GROUP_jvm_metrics_enabled is true"
-
-    - name: Grouping store metrics (using R on controller)
-      delegate_to: 127.0.0.1
+    - name: Grouping store metrics
       shell:
         cmd: |
-          ./collect_store_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}
+          bash -ilc './collect_store_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ _working_dir }}"
       vars:
-        _working_dir: "{{ lookup('env','LOCAL_SCRIPTS_PATH') | mandatory }}"
-        _metrics_path: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}"
-        _server_name: "{{ inventory_hostname }}"
-        _metrics_file: "{{ _metrics_path }}/{{ _server_name }}.metrics.txt"
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ workers_GROUP_project_metrics_path }}"
+        _metrics_file: "{{ workers_GROUP_project_metrics_file }}"
         _output_folder: "{{ _metrics_path }}"
-      when:
-        "nodes_GROUP_jvm_metrics_enabled is true"
+
+
+# TODO: file transfer using nc
+# https://superuser.com/questions/98089/sending-file-via-netcat
