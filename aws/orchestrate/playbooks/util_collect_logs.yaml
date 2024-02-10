@@ -1,0 +1,18 @@
+#------------------------------------------------------------------------------------------------------------
+# Collects logs generated at workers to local controller and groups them into csv files
+#------------------------------------------------------------------------------------------------------------
+
+---
+
+- name: Fetches logs from workers to local controller (if DEBUG)
+  hosts: workers
+  any_errors_fatal: true
+  tasks:
+    - name: Fetching worker logs
+      fetch:
+        src: "{{ workers_GROUP_project_log_file }}"
+        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.logs.log"
+        flat: yes
+      vars:
+        _server_name: "{{ inventory_hostname }}"
+      when: workers_GROUP_project_log_level is search("DEBUG")
