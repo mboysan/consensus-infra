@@ -11,7 +11,7 @@
     - name: Fetching worker logs
       fetch:
         src: "{{ workers_GROUP_project_log_file }}"
-        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.logs.log"
+        dest: "{{ lookup('env','COLLECTED_LOGS_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.log"
         flat: yes
       vars:
         _server_name: "{{ inventory_hostname }}"

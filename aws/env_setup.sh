@@ -68,6 +68,9 @@ export HISTCONTROL=ignorespace
  # to create key pairs for instances, see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
  export ANSIBLE_PRIVATE_KEY_FILE="~/.ssh/aws/aws_instance_key.pem"
  export ANSIBLE_INVENTORY_FILE=$ANSIBLE_WORKING_DIR/inventory/aws_ec2_static.ini
+
  # Controller specific environment variables
- export LOCAL_SCRIPTS_PATH=$ANSIBLE_WORKING_DIR/playbooks/local_scripts
- export METRICS_BASE_PATH=$LOCAL_SCRIPTS_PATH/collected_metrics
+ # The path where the collected data from instances will be stored.
+ export COLLECTED_DATA_PATH=$ANSIBLE_WORKING_DIR/playbooks/collected_data
+ export COLLECTED_LOGS_PATH=$COLLECTED_DATA_PATH/logs
+ export COLLECTED_METRICS_PATH=$COLLECTED_DATA_PATH/metrics

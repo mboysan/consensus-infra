@@ -7,7 +7,7 @@ args <- valiadate_args(
     args = args,
     validator = \(x) length(x) > 2,
     failure_msg = "required arguments are not provided.",
-    defaults = c("collected_metrics", "collected_metrics/MERGED", "EX1", "EX2")
+    defaults = c("samples", "samples/MERGED", "EX1", "EX2")
 )
 
 input_folder <- args[1]

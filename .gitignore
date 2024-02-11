@@ -1,5 +1,7 @@
 ### misc
 #playground.yaml
+*.csv
+*.log
 
 ### aws
 *.pem
