@@ -4,8 +4,8 @@
 
 ---
 
-- name: Configure R installation
-  hosts: all
+- name: Configure R installation on processors
+  hosts: processors
   any_errors_fatal: true
   tasks:
     - name: Configuring R installation (async)
@@ -25,8 +25,39 @@
       retries: 10
       delay: 60
 
-- name: Collects client metrics into csv files
+- name: Make metrics directory on processor for the test
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Creating metrics directory for the test
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/{{ test_name }}'
+        state: directory
+
+- name: Send client metrics to processor
   hosts: clients
+  any_errors_fatal: true
+  tasks:
+    - shell:
+        cmd: |
+          bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
+      vars:
+        _src_file: "{{ workers_GROUP_project_metrics_file }}"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/client.metrics.txt"
+
+- name: Send store metrics to processor
+  hosts: stores
+  any_errors_fatal: true
+  tasks:
+    - shell:
+        cmd: |
+          bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
+      vars:
+        _src_file: "{{ workers_GROUP_project_metrics_file }}"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/store.metrics.txt"
+
+- name: Collects metrics into csv files
+  hosts: processors
   any_errors_fatal: true
   tasks:
     - name: Grouping client (perf test) metrics
@@ -36,14 +67,10 @@
         chdir: "{{ _working_dir }}"
       vars:
         _working_dir: "{{ all_GROUP_home_dir }}"
-        _metrics_path: "{{ workers_GROUP_project_metrics_path }}"
-        _metrics_file: "{{ workers_GROUP_project_metrics_file }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
+        _metrics_file: "{{ _metrics_path }}/client.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
 
-- name: Collects store metrics into csv files
-  hosts: stores
-  any_errors_fatal: true
-  tasks:
     - name: Grouping store metrics
       shell:
         cmd: |
@@ -51,10 +78,6 @@
         chdir: "{{ _working_dir }}"
       vars:
         _working_dir: "{{ all_GROUP_home_dir }}"
-        _metrics_path: "{{ workers_GROUP_project_metrics_path }}"
-        _metrics_file: "{{ workers_GROUP_project_metrics_file }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
+        _metrics_file: "{{ _metrics_path }}/store.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
-
-
-# TODO: file transfer using nc
-# https://superuser.com/questions/98089/sending-file-via-netcat
