@@ -64,6 +64,9 @@ export HISTCONTROL=ignorespace
 # Ansible variables
  export ANSIBLE_WORKING_DIR=$CURRENT_DIR/orchestrate
  export ANSIBLE_CONFIG=$ANSIBLE_WORKING_DIR/ansible.cfg
+ # use the private key to allow ansible connect to ec2 instances.
+ # to create key pairs for instances, see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+ export ANSIBLE_PRIVATE_KEY_FILE="~/.ssh/aws/aws_instance_key.pem"
  export ANSIBLE_INVENTORY_FILE=$ANSIBLE_WORKING_DIR/inventory/aws_ec2_static.ini
  # Controller specific environment variables
  export LOCAL_SCRIPTS_PATH=$ANSIBLE_WORKING_DIR/playbooks/local_scripts

@@ -31,9 +31,13 @@ aws_secret_access_key==<your aws secret access key>
 ```
 
 After that, you should generate a public and private key for the aws ec2 machine instances. We recommend placing the
-private key in `~/.ssh/aws/aws_instance_key.pem`, which will be used by
-[ansible.cfg](./orchestrate/ansible.cfg) file. The public key should be placed in
-`./provision/access/aws_instance_key.pub`.
+private key in `~/.ssh/aws/aws_instance_key.pem`, which will be used by Ansible. If you use a different location,
+then make sure you edit the [env_setup.sh](env_setup.sh) file:
+```
+# find the following line and change the path to the private key.
+export ANSIBLE_PRIVATE_KEY_FILE=<path to the private key>
+```
+The public key should be placed in `./provision/access/aws_instance_key.pub`.
 
 Finally, review [env_setup.sh](env_setup.sh) and execute the following (NB! If you are running the setup for the first
 time, we recommend executing each line of the script line-by-line to detect possible issues you might encounter):

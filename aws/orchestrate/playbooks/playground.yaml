@@ -3,11 +3,25 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_clients.yaml
-  vars:
-    workload: |
-      threadcount=5
-      other stuff
+
+- name: Send test
+  hosts: clients
+  tasks:
+    - shell:
+        cmd: |
+          bash -ilc 'scp -oStrictHostKeyChecking=no ~/util.R {{ workers_GROUP_processor_destination }}:~/test/util.R.bak'
+
+#- name: Debug
+#  hosts: all
+#  tasks:
+#    - debug:
+#        msg: "{{ workers_GROUP_processor_destination }}"
+
+#- ansible.builtin.import_playbook: util_start_clients.yaml
+#  vars:
+#    workload: |
+#      threadcount=5
+#      other stuff
 
 #- ansible.builtin.import_playbook: util_inject_fault.yaml
 #  vars:
