@@ -1,0 +1,58 @@
+#------------------------------------------------------------------------------------------------------------
+# Analyzes the metrics collected on the processor
+#------------------------------------------------------------------------------------------------------------
+
+---
+
+- name: Make MERGED metrics directory on processor
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Creating MERGED metrics directory for the test
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/MERGED'
+        state: directory
+
+- name: Merges and analyzes metrics
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Merging metrics
+      shell:
+        cmd: |
+          bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}"
+        _output_folder: "{{ _metrics_path }}/MERGED"
+
+    - name: Doing performance analysis
+      shell:
+        cmd: |
+          bash -ilc './performance_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
+        _output_folder: "{{ _metrics_path }}/MERGED"
+
+    - name: Doing message analysis
+      shell:
+        cmd: |
+          bash -ilc './message_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ _metrics_path }}/MERGED"
+
+    - name: Doing resource usage analysis
+      shell:
+        cmd: |
+          bash -ilc './resource_usage_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ _metrics_path }}/MERGED"
