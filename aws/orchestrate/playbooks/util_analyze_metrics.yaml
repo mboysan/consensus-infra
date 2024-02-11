@@ -21,38 +21,47 @@
       shell:
         cmd: |
           bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}"
         _output_folder: "{{ _metrics_path }}/MERGED"
 
     - name: Doing performance analysis
       shell:
         cmd: |
-          bash -ilc './performance_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+          bash -ilc './performance_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
-        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
-        _output_folder: "{{ _metrics_path }}/MERGED"
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
 
     - name: Doing message analysis
       shell:
         cmd: |
-          bash -ilc './message_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+          bash -ilc './message_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
-        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
-        _output_folder: "{{ _metrics_path }}/MERGED"
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
 
     - name: Doing resource usage analysis
       shell:
         cmd: |
-          bash -ilc './resource_usage_analysis.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' >> {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+          bash -ilc './resource_usage_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
-        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
-        _output_folder: "{{ _metrics_path }}/MERGED"
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+
+- name: Fetches the results to controller
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Fetching the summary data
+      synchronize:
+        src: "{{ _metrics_file }}"
+        dest: "{{ _destination_on_controller }}"
+        mode: pull
+      vars:
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/all.summary.merged.csv"
+        _destination_on_controller: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
