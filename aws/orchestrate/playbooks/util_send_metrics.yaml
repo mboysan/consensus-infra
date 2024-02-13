@@ -17,7 +17,7 @@
       poll: 0
       register: setup_r
 
-    - name: Waiting all to finish R setup
+    - name: Waiting to finish R setup
       async_status:
         jid: "{{ setup_r.ansible_job_id }}"
       register: job_result
