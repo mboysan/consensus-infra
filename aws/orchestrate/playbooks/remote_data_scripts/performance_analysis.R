@@ -12,7 +12,7 @@ args <- valiadate_args(
   validator = \(x) length(x) > 2,
   failure_msg = "required arguments are not provided.",
   # use all.raw.merged.csv or client.raw.merged.csv
-  defaults = c("samples/MERGED/all.raw.merged.csv", "", "EX1", "EX2")
+  defaults = c("samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/EX1 EX2", "EX1", "EX2")
 )
 
 input_file <- args[1]
@@ -77,19 +77,24 @@ update_latency_data <- grouped_data %>%
 
 # ----------------------------------------------------------------------------- plots
 # Plot read latency, grouped by consensusAlg & timestamp_sec
-ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
   theme_minimal()
 
 # Plot update latency, grouped by consensusAlg & timestamp_sec
-ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
   theme_minimal()
 
 # Plot operation latency, grouped by consensusAlg & timestamp_sec
-ggplot(grouped_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+plot_operation_latency <- ggplot(grouped_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
   theme_minimal()
+
+columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
+savePlotData(plot_read_latency$data, columnNames, paste(output_folder, "plot_read_latency.dat", sep="/"))
+savePlotData(plot_update_latency$data, columnNames, paste(output_folder, "plot_update_latency.dat", sep="/"))
+savePlotData(plot_operation_latency$data, columnNames, paste(output_folder, "plot_operation_latency.dat", sep="/"))

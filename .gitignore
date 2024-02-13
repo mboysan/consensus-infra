@@ -2,6 +2,7 @@
 #playground.yaml
 *.csv
 *.log
+*.dat
 
 ### aws
 *.pem

@@ -12,7 +12,7 @@ args <- valiadate_args(
   validator = \(x) length(x) > 2,
   failure_msg = "required arguments are not provided.",
   # use all.raw.merged.csv or store.raw.merged.csv
-  defaults = c("samples/MERGED/all.raw.merged.csv", "", "EX1", "EX2")
+  defaults = c("samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/EX1 EX2", "EX1", "EX2")
 )
 
 input_file <- args[1]
@@ -89,13 +89,17 @@ process_cpu_data <- grouped_data %>%
   filter(metric_name == "process.cpu.usage")
 
 # Plot memory usage, grouped by consensusAlg & timestamp_sec
-ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
   theme_minimal()
 
 # Plot process cpu usage, grouped by consensusAlg & timestamp_sec
-ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
   theme_minimal()
+
+columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
+savePlotData(plot_memory$data, columnNames, paste(output_folder, "plot_memory.dat", sep="/"))
+savePlotData(plot_cpu$data, columnNames, paste(output_folder, "plot_cpu.dat", sep="/"))

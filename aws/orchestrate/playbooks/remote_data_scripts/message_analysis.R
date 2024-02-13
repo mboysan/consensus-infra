@@ -12,7 +12,7 @@ args <- valiadate_args(
     validator = \(x) length(x) > 2,
     failure_msg = "required arguments are not provided.",
     # use all.raw.merged.csv or store.raw.merged.csv
-    defaults = c("samples/MERGED/all.raw.merged.csv", "", "EX1", "EX2")
+    defaults = c("samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/EX1 EX2", "EX1", "EX2")
 )
 
 input_file <- args[1]
@@ -91,13 +91,19 @@ message_counts <- grouped_data %>% summarise(count = n())
 message_sizes <- grouped_data %>% summarise(sum = sum(metric_value / 1024))
 
 # Plot count of messages, grouped by consensusAlg & timestamp_sec
-ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
+plot_message_counts <- ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
-ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
+plot_message_sizes <- ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
+
+columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
+savePlotData(plot_message_counts$data, columns, paste(output_folder, "plot_message_counts.dat", sep="/"))
+
+columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
+savePlotData(plot_message_sizes$data, columns, paste(output_folder, "plot_message_sizes.dat", sep="/"))

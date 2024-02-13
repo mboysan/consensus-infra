@@ -60,6 +60,11 @@ valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_de
   stop(failure_msg)
 }
 
+savePlotData <- function (data, columnNamesToInclude, outputFile) {
+  data <- data[, names(data) %in% columnNamesToInclude]
+  write.csv(data, file = outputFile, row.names = FALSE)
+}
+
 remove_outliers <- function(data) {
   df <- data
   Q1 <- quantile(df$metric_value, 0.25)
