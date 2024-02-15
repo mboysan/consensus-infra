@@ -20,9 +20,9 @@ args <- valiadate_args(
     validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("samples/EX1/store.metrics.txt", "samples/EX1", "EX1", "raft")
+    defaults = c("../collected_data/metrics/samples/EX1/store.metrics.txt", "../collected_data/metrics/samples/EX1", "EX1", "raft")
     # bizur
-    # defaults = c("samples/EX2/store.metrics.txt", "samples/EX2", "EX2", "bizur")
+    # defaults = c("../collected_data/metrics/samples/EX2/store.metrics.txt", "../collected_data/metrics/samples/EX2", "EX2", "bizur")
 )
 
 metrics_file <- args[1]

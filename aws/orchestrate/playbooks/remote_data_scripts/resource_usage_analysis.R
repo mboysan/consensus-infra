@@ -12,7 +12,7 @@ args <- valiadate_args(
   validator = \(x) length(x) > 2,
   failure_msg = "required arguments are not provided.",
   # use all.raw.merged.csv or store.raw.merged.csv
-  defaults = c("samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/EX1 EX2", "EX1", "EX2")
+  defaults = c("../collected_data/metrics/samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/samples/EX1 EX2", "EX1", "EX2")
 )
 
 input_file <- args[1]
