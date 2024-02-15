@@ -57,38 +57,46 @@
   hosts: processors
   any_errors_fatal: true
   tasks:
-    - name: Fetching the summary data
-      synchronize:
-        src: "{{ _metrics_file }}"
-        dest: "{{ _destination_on_controller }}"
-        mode: pull
-      vars:
-        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/all.summary.merged.csv"
-        _destination_on_controller: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
+    - name: Creating sync directory for metrics data to be fetched
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/MERGED/sync'
+        state: directory
 
-    - name: Compressing raw plot data
+    - name: Moving the results to sync directory
       shell:
         cmd: |
-          tar -cvzf {{ _archive_name }} {{ _files }} > {{ all_GROUP_ansible_cmd_out }}
+          mv all.summary.merged.csv sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+
+    - name: Moving raw data to sync directory
+      shell:
+        cmd: |
+          mv *.dat sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+
+    - name: Compressing metrics data
+      shell:
+        cmd: |
+          tar -cvzf {{ _archive_name }} {{ _folder }} > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
       vars:
-        _files: "*.dat"
-        _archive_name: "plot_raw_data.tar.gz"
+        _folder: "sync/"
+        _archive_name: "sync.tar.gz"
 
-    - name: Fetching raw plot data
+    - name: Fetching metrics data
       synchronize:
         src: "{{ _archive_file }}"
         dest: "{{ _destination_on_controller }}"
         mode: pull
       vars:
-        _archive_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/plot_raw_data.tar.gz"
+        _archive_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/sync.tar.gz"
         _destination_on_controller: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
 
-    - name: Extracting raw plot data on controller
+    - name: Extracting metrics data on controller
       delegate_to: 127.0.0.1
       shell:
         cmd: |
-          tar -xvzf {{ _archive_name }}
+          tar -xvzf {{ _archive_name }} --strip-components=1
         chdir: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
       vars:
-        _archive_name: "plot_raw_data.tar.gz"
+        _archive_name: "sync.tar.gz"
