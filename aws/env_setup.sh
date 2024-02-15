@@ -39,9 +39,11 @@ export HISTCONTROL=ignorespace
  export AWS_REGION=eu-west-1
  export AWS_DEFAULT_REGION=$AWS_REGION
  # if you define a region parameter in aws/credentials file, this variable should align with that.
- export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1c
- # Ubuntu-20.04, note that Amazon might regularly update this id, so feel free to insert the most recent one.
- export AWS_AMI_ID="ami-08ca3fed11864d6bb"
+ export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1a
+ # Ubuntu-20.04, note that Amazon might regularly update this id, so feel free to insert the most recent one. But
+ # keep in mind that package manager and firewall alterations requires certain packages. So, we suggest you stick with
+ # this Ubuntu version for now.
+ export AWS_AMI_ID="ami-08031206a0ff5a6ac"
 
 # Terraform variables
  export TERRAFORM_WORKING_DIR=$CURRENT_DIR/provision
@@ -62,7 +64,13 @@ export HISTCONTROL=ignorespace
 # Ansible variables
  export ANSIBLE_WORKING_DIR=$CURRENT_DIR/orchestrate
  export ANSIBLE_CONFIG=$ANSIBLE_WORKING_DIR/ansible.cfg
+ # use the private key to allow ansible connect to ec2 instances.
+ # to create key pairs for instances, see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+ export ANSIBLE_PRIVATE_KEY_FILE="~/.ssh/aws/aws_instance_key.pem"
  export ANSIBLE_INVENTORY_FILE=$ANSIBLE_WORKING_DIR/inventory/aws_ec2_static.ini
+
  # Controller specific environment variables
- export LOCAL_SCRIPTS_PATH=$ANSIBLE_WORKING_DIR/playbooks/local_scripts
- export METRICS_BASE_PATH=$LOCAL_SCRIPTS_PATH/collected_metrics
+ # The path where the collected data from instances will be stored.
+ export COLLECTED_DATA_PATH=$ANSIBLE_WORKING_DIR/playbooks/collected_data
+ export COLLECTED_LOGS_PATH=$COLLECTED_DATA_PATH/logs
+ export COLLECTED_METRICS_PATH=$COLLECTED_DATA_PATH/metrics

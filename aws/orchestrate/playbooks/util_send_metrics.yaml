@@ -1,0 +1,83 @@
+#------------------------------------------------------------------------------------------------------------
+# Sends metrics generated at workers to processors
+#------------------------------------------------------------------------------------------------------------
+
+---
+
+- name: Configure R installation on processors
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Configuring R installation (async)
+      shell:
+        cmd: |
+          bash -ilc './util.R' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      async: 600
+      poll: 0
+      register: setup_r
+
+    - name: Waiting to finish R setup
+      async_status:
+        jid: "{{ setup_r.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 10
+      delay: 60
+
+- name: Make metrics directory on processor for the test
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Creating metrics directory for the test
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/{{ test_name }}'
+        state: directory
+
+- name: Send client metrics to processor
+  hosts: clients
+  any_errors_fatal: true
+  tasks:
+    - shell:
+        cmd: |
+          bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
+      vars:
+        _src_file: "{{ workers_GROUP_project_metrics_file }}"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/client.metrics.txt"
+
+- name: Send store metrics to processor
+  hosts: stores
+  any_errors_fatal: true
+  tasks:
+    - shell:
+        cmd: |
+          bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
+      vars:
+        _src_file: "{{ workers_GROUP_project_metrics_file }}"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/store.metrics.txt"
+
+- name: Collects metrics into csv files
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Grouping client (perf test) metrics
+      shell:
+        cmd: |
+          bash -ilc './collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
+        _metrics_file: "{{ _metrics_path }}/client.metrics.txt"
+        _output_folder: "{{ _metrics_path }}"
+
+    - name: Grouping store metrics
+      shell:
+        cmd: |
+          bash -ilc './collect_store_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ _working_dir }}"
+      vars:
+        _working_dir: "{{ all_GROUP_home_dir }}"
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
+        _metrics_file: "{{ _metrics_path }}/store.metrics.txt"
+        _output_folder: "{{ _metrics_path }}"

@@ -13,7 +13,7 @@ nodes_GROUP_node_serving_port: "{{ lookup('env','NODE_SERVING_PORT') | mandatory
 nodes_GROUP_client_serving_port: "{{ lookup('env','CLIENT_SERVING_PORT') | mandatory }}"
 
 # config for metrics
-# configure collection of jvm metrics.
-nodes_GROUP_jvm_metrics_enabled: true
+# configure metrics separator
+nodes_GROUP_jvm_metrics_separator: ','
 # configure interval for jvm metrics collection (in milliseconds)
 nodes_GROUP_jvm_metrics_step: '2000'

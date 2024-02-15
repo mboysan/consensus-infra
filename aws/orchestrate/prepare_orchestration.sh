@@ -37,6 +37,34 @@ fi
 # switch to terraform working dir
 cd "$TERRAFORM_WORKING_DIR" || exit 1
 
+processorPrivateIpTmp=$tmpDir/ppi
+truncate -s 0 $processorPrivateIpTmp
+
+function populateProcessorsInventory() {
+    # create clients group
+    echo "[INFO] creating 'processors' group"
+
+    echo "[processors]" >> "$ANSIBLE_INVENTORY_FILE"
+
+    # a temporary file for terraform output
+    local processorsTmpJsonFile=$tmpDir/processors.json
+
+    # get output from terraform
+    terraform output -json processor > $processorsTmpJsonFile
+
+    # get inventory variables
+    processorName=$(jq -r '.ec2_instance[0] | (.tags.Name)' $processorsTmpJsonFile)
+    processorPublicIp=$(jq -r '.ec2_instance[0] | (.public_ip)' $processorsTmpJsonFile)
+    processorPrivateIp=$(jq -r '.ec2_instance[0] | (.private_ip)' $processorsTmpJsonFile)
+
+    # populate clients group
+    echo "[INFO] group=processors, name=$processorName, public_ip=$processorPublicIp, private_ip=$processorPrivateIp"
+    echo "processor ansible_host=$processorPublicIp" >> "$ANSIBLE_INVENTORY_FILE"
+    echo "" >> "$ANSIBLE_INVENTORY_FILE"
+
+    echo "$processorPrivateIp" >> "$processorPrivateIpTmp"
+}
+
 function populateClientsInventory() {
     # create clients group
     echo "[INFO] creating 'clients' group"
@@ -162,11 +190,14 @@ function populateWorkersInventory() {
     echo "workers_GROUP_store_destinations=$storeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     etcdStoreDestinations="$(xargs printf ',%s' < "$etcdStoreDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_etcd_store_destinations=$etcdStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    processorPrivateIp="$(xargs printf ',%s' < "$processorPrivateIpTmp" | cut -b 2-)"
+    echo "workers_GROUP_processor_destination=$processorPrivateIp" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
 echo "[INFO] populating ansible inventory file"
 echo "" > "$ANSIBLE_INVENTORY_FILE"
+populateProcessorsInventory
 populateClientsInventory
 populateNodesInventory "$NODE_ID_TO_USE_AS_STORE"
 populateStoresInventory

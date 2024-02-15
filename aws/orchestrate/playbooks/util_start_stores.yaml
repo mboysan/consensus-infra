@@ -22,9 +22,8 @@
         chdir: "{{ nodes_GROUP_working_dir }}"
       vars:
         _metrics_params: >-
-          metrics.jvm.enabled={{ nodes_GROUP_jvm_metrics_enabled }}
-          metrics metrics.exportfile={{ workers_GROUP_project_metrics_file }}
-          metrics.separator=,
+          metrics.exportfile={{ workers_GROUP_project_metrics_file }}
+          metrics.separator={{ nodes_GROUP_jvm_metrics_separator }}
           metrics.step={{ nodes_GROUP_jvm_metrics_step }}
         _mandatory_params: >-
           --store port={{ stores_GROUP_client_serving_port }}

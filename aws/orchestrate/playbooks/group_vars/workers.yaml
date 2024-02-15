@@ -7,7 +7,7 @@ workers_GROUP_project_dir: '{{ all_GROUP_home_dir }}/project'
 workers_GROUP_project_log_path: '{{ workers_GROUP_project_dir }}/logs'
 workers_GROUP_project_log_file: '{{ workers_GROUP_project_log_path }}/logs.txt'
 workers_GROUP_project_log_config_file: '{{ workers_GROUP_project_log_path }}/log4j.properties'
-workers_GROUP_project_log_level: 'DEBUG'
+workers_GROUP_project_log_level: 'INFO'
 
 # configurations related to metrics
 workers_GROUP_project_metrics_path: '{{ workers_GROUP_project_dir }}/metrics'

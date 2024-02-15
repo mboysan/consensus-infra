@@ -7,8 +7,12 @@
   vars:
     test_name: "S1"
     consensus_protocol: "raft"
-    node_cli_params: "metrics.insights.enabled=true"
-    store_cli_params: "metrics.insights.enabled=true"
+    node_cli_params: >-
+      metrics.jvm.enabled=true
+      metrics.insights.enabled=true
+    store_cli_params: >-
+      metrics.jvm.enabled=true
+      metrics.insights.enabled=true
     workload: |
       recordcount=1000
       operationcount=1000

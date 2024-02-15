@@ -1,0 +1,114 @@
+#------------------------------------------------------------------------------------------------------------
+# Analyzes the metrics collected on the processor
+#------------------------------------------------------------------------------------------------------------
+
+---
+
+- name: Make MERGED metrics directory on processor
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Creating MERGED metrics directory for the test
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/MERGED'
+        state: directory
+
+- name: Merges and analyzes metrics
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Merging metrics
+      shell:
+        cmd: |
+          bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      vars:
+        _metrics_path: "{{ processors_GROUP_project_metrics_path }}"
+        _output_folder: "{{ _metrics_path }}/MERGED"
+
+    - name: Doing performance analysis
+      shell:
+        cmd: |
+          bash -ilc './performance_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      vars:
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: performance_analysis | default('true') | bool
+
+    - name: Doing message analysis
+      shell:
+        cmd: |
+          bash -ilc './message_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      vars:
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: message_analysis | default('true') | bool
+
+    - name: Doing resource usage analysis
+      shell:
+        cmd: |
+          bash -ilc './resource_usage_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
+      vars:
+        _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
+        _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: resource_usage_analysis | default('true') | bool
+
+- name: Fetches the results to controller
+  hosts: processors
+  any_errors_fatal: true
+  tasks:
+    - name: Creating sync directory for metrics data to be fetched
+      file:
+        path: '{{ processors_GROUP_project_metrics_path }}/MERGED/sync'
+        state: directory
+
+    - name: Moving the results to sync directory
+      shell:
+        cmd: |
+          mv all.summary.merged.csv sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+
+    - name: Moving the generated plot images to sync directory
+      shell:
+        cmd: |
+          mv *.out.* sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_plots | default('true') | bool
+
+    - name: Moving the raw plot data to sync directory
+      shell:
+        cmd: |
+          mv *.dat sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_raw_plot_data | default('true') | bool
+
+    - name: Compressing metrics data and deleting sync directory
+      shell:
+        cmd: |
+          tar -cvzf {{ _archive_name }} {{ _folder }} > {{ all_GROUP_ansible_cmd_out }}
+          rm -r {{ _folder }} >> {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      vars:
+        _folder: "sync/"
+        _archive_name: "sync.tar.gz"
+
+    - name: Fetching metrics data
+      synchronize:
+        src: "{{ _archive_file }}"
+        dest: "{{ _destination_on_controller }}"
+        mode: pull
+      vars:
+        _archive_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/sync.tar.gz"
+        _destination_on_controller: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
+
+    - name: Extracting metrics data on controller
+      delegate_to: 127.0.0.1
+      shell:
+        cmd: |
+          tar -xvzf {{ _archive_name }} --strip-components=1
+        chdir: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_names }}/"
+      vars:
+        _archive_name: "sync.tar.gz"

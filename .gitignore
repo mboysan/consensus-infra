@@ -1,5 +1,12 @@
 ### misc
 #playground.yaml
+*.csv
+*.log
+*.dat
+*.tar.gz
+*.out.png
+*.out.jpg
+*.out.pdf
 
 ### aws
 *.pem
