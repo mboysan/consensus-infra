@@ -71,12 +71,19 @@
           mv all.summary.merged.csv sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
 
-    - name: Moving raw data to sync directory
+    - name: Moving the generated plot images to sync directory
+      shell:
+        cmd: |
+          mv *.out.* sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_plots | default('true') | bool
+
+    - name: Moving the raw plot data to sync directory
       shell:
         cmd: |
           mv *.dat sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_raw_data | default('true') | bool
+      when: collect_raw_plot_data | default('true') | bool
 
     - name: Compressing metrics data and deleting sync directory
       shell:
