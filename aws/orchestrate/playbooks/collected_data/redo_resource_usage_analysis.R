@@ -20,7 +20,7 @@ ggplot(plot_memory_data, aes(x = timestamp_sec, y = metric_value, color = testNa
     geom_line() +
     labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
     theme_minimal()
-savePlot(io_folder, "plot_memory_data")
+exportPlot(io_folder, "plot_memory_data", source="controller")
 
 plot_process_cpu_data <- read.csv(paste(io_folder, "plot_cpu.dat", sep="/"), header = TRUE)
 plot_process_cpu_data$timestamp_sec <- as.POSIXct(plot_process_cpu_data$timestamp_sec, origin = "1970-01-01")
@@ -30,4 +30,4 @@ ggplot(plot_process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = t
     geom_line() +
     labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
     theme_minimal()
-savePlot(io_folder, "plot_process_cpu_data")
+exportPlot(io_folder, "plot_process_cpu_data", source="controller")

@@ -65,9 +65,9 @@ savePlotData <- function (data, columnNamesToInclude, outputFile) {
   write.csv(data, file = outputFile, row.names = FALSE)
 }
 
-savePlot <- function(folder, fileName, extension="png", ggPlot=last_plot()) {
+exportPlot <- function(folder, fileName, source, extension="png", ggPlot=last_plot()) {
   # TODO: define size and resolution
-  fileName <- paste(fileName, "out", extension, sep=".")
+  fileName <- paste(fileName, source, "out", extension, sep=".")
   fileName <- paste(folder, fileName, sep="/")
   ggsave(fileName, plot=ggPlot)
 }

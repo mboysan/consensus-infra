@@ -20,7 +20,7 @@ ggplot(plot_message_counts, aes(x = timestamp_sec, y = count, color = testName_a
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
-savePlot(io_folder, "plot_message_counts")
+exportPlot(io_folder, "plot_message_counts", source="controller")
 
 plot_message_sizes <- read.csv(paste(io_folder, "plot_message_sizes.dat", sep="/"), header = TRUE)
 plot_message_sizes$timestamp_sec <- as.POSIXct(plot_message_sizes$timestamp_sec, origin = "1970-01-01")
@@ -30,4 +30,4 @@ ggplot(plot_message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algo
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
-savePlot(io_folder, "plot_message_sizes")
+exportPlot(io_folder, "plot_message_sizes", source="controller")
