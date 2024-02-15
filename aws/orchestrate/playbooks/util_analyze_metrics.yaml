@@ -34,6 +34,7 @@
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: performance_analysis | default('true') | bool
 
     - name: Doing message analysis
       shell:
@@ -43,6 +44,7 @@
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: message_analysis | default('true') | bool
 
     - name: Doing resource usage analysis
       shell:
@@ -52,6 +54,7 @@
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
+      when: resource_usage_analysis | default('true') | bool
 
 - name: Fetches the results to controller
   hosts: processors
@@ -73,11 +76,13 @@
         cmd: |
           mv *.dat sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_raw_data | default('true') | bool
 
-    - name: Compressing metrics data
+    - name: Compressing metrics data and deleting sync directory
       shell:
         cmd: |
           tar -cvzf {{ _archive_name }} {{ _folder }} > {{ all_GROUP_ansible_cmd_out }}
+          rm -r {{ _folder }} >> {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
       vars:
         _folder: "sync/"
