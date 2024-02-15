@@ -81,18 +81,21 @@ plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
   theme_minimal()
+exportPlot(output_folder, "plot_read_latency", source="processor")
 
 # Plot update latency, grouped by consensusAlg & timestamp_sec
 plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
   theme_minimal()
+exportPlot(output_folder, "plot_update_latency", source="processor")
 
 # Plot operation latency, grouped by consensusAlg & timestamp_sec
 plot_operation_latency <- ggplot(grouped_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
   theme_minimal()
+exportPlot(output_folder, "plot_operation_latency", source="processor")
 
 columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
 savePlotData(plot_read_latency$data, columnNames, paste(output_folder, "plot_read_latency.dat", sep="/"))

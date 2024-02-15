@@ -93,12 +93,14 @@ plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, colo
   geom_line() +
   labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
   theme_minimal()
+exportPlot(output_folder, "plot_memory_data", source="processor")
 
 # Plot process cpu usage, grouped by consensusAlg & timestamp_sec
 plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
   theme_minimal()
+exportPlot(output_folder, "plot_process_cpu_data", source="processor")
 
 columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
 savePlotData(plot_memory$data, columnNames, paste(output_folder, "plot_memory.dat", sep="/"))
