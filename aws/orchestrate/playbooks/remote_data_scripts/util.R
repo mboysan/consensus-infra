@@ -65,6 +65,13 @@ savePlotData <- function (data, columnNamesToInclude, outputFile) {
   write.csv(data, file = outputFile, row.names = FALSE)
 }
 
+savePlot <- function(folder, fileName, extension="png", ggPlot=last_plot()) {
+  # TODO: define size and resolution
+  fileName <- paste(fileName, "out", extension, sep=".")
+  fileName <- paste(folder, fileName, sep="/")
+  ggsave(fileName, plot=ggPlot)
+}
+
 remove_outliers <- function(data) {
   df <- data
   Q1 <- quantile(df$metric_value, 0.25)
