@@ -38,7 +38,8 @@
   hosts: clients
   any_errors_fatal: true
   tasks:
-    - shell:
+    - name: Sending client metrics
+      shell:
         cmd: |
           bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
       vars:
@@ -49,12 +50,14 @@
   hosts: stores
   any_errors_fatal: true
   tasks:
-    - shell:
+    - name: Sending store metrics
+      shell:
         cmd: |
           bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
       vars:
         _src_file: "{{ workers_GROUP_project_metrics_file }}"
         _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/store.metrics.txt"
+      when: resource_usage_analysis or message_analysis | default('true') | bool
 
 - name: Collects metrics into csv files
   hosts: processors
@@ -81,3 +84,4 @@
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
         _metrics_file: "{{ _metrics_path }}/store.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
+      when: resource_usage_analysis or message_analysis | default('true') | bool

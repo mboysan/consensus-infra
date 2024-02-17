@@ -20,9 +20,11 @@
     - name: Merging metrics
       shell:
         cmd: |
-          bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ _merge_client_metrics }} {{ _merge_store_metrics }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
+        _merge_client_metrics: "merge_client_metrics={{ performance_analysis | default('true') | bool}}"
+        _merge_store_metrics: "merge_store_metrics={{ message_analysis or resource_usage_analysis | default('true') | bool}}"
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}"
         _output_folder: "{{ _metrics_path }}/MERGED"
 
@@ -65,7 +67,7 @@
         path: '{{ processors_GROUP_project_metrics_path }}/MERGED/sync'
         state: directory
 
-    - name: Moving the results to sync directory
+    - name: Moving all summary results to sync directory
       shell:
         cmd: |
           mv all.summary.merged.csv sync/
@@ -83,7 +85,28 @@
         cmd: |
           mv *.dat sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_raw_plot_data | default('true') | bool
+      when: collect_plot_raw_data | default('true') | bool
+
+    - name: Moving CLIENT raw data to sync directory
+      shell:
+        cmd: |
+          mv client.raw.merged.csv sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_client_raw_data | default('false') | bool
+
+    - name: Moving STORE raw data to sync directory
+      shell:
+        cmd: |
+          mv store.raw.merged.csv sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_store_raw_data | default('false') | bool
+
+    - name: Moving ALL raw data to sync directory
+      shell:
+        cmd: |
+          mv all.raw.merged.csv sync/
+        chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
+      when: collect_all_raw_data | default('false') | bool
 
     - name: Compressing metrics data and deleting sync directory
       shell:
