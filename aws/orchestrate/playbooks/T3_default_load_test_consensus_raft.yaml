@@ -1,0 +1,14 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test using raft consensus protocol with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- ansible.builtin.import_playbook: util_start_load_test.yaml
+  vars:
+    test_name: "T3"
+    consensus_protocol: "raft"
+    node_cli_params:
+    store_cli_params:
+    resource_usage_analysis: false
+    message_analysis: false
+    workload: "{{ workload_file | default('workload_read_write_proportional') | string }}"

@@ -1,0 +1,26 @@
+#------------------------------------------------------------------------------------------------------------
+# Runs the tests and analyzes metrics from the tests run.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: T1_client_server_comm_consensus_simulate.yaml
+  vars:
+    workload_file: "workload_read_write_proportional"
+
+- import_playbook: T2_default_load_test_consensus_simulate.yaml
+  vars:
+    workload_file: "workload_read_write_proportional"
+
+- import_playbook: T3_default_load_test_consensus_raft.yaml
+  vars:
+    workload_file: "workload_read_write_proportional"
+
+- import_playbook: util_analyze_metrics.yaml
+  vars:
+    test_names: "T1 T2 T3"
+    performance_analysis: true
+    resource_usage_analysis: false
+    message_analysis: false
+    collect_client_raw_data: true
+
+- import_playbook: util_cleanup_processors.yaml
