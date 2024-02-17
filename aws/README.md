@@ -8,6 +8,9 @@ Amazon Web Services (aws).
 - Make sure you have an [AWS](https://aws.amazon.com/) account and configured according to amazon's best practices and 
 recommendations. Also make sure you are eligible for using aws free-tier and/or you can pay for the resources you use.
 - Install [aws cli](https://aws.amazon.com/cli/).
+- Install [terraform](https://developer.hashicorp.com/terraform/install).
+- Install [ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html).
+- (Optional) Install [R](https://www.r-project.org/) to regenerate the plots for the performance tests on your machine.
 
 ## IAM Policy Information
 
@@ -39,8 +42,7 @@ export ANSIBLE_PRIVATE_KEY_FILE=<path to the private key>
 ```
 The public key should be placed in `./provision/access/aws_instance_key.pub`.
 
-Finally, review [env_setup.sh](env_setup.sh) and execute the following (NB! If you are running the setup for the first
-time, we recommend executing each line of the script line-by-line to detect possible issues you might encounter):
+Finally, review [env_setup.sh](env_setup.sh) and execute the following:
 ```
 chmod +x env_setup.sh
 source env_setup.sh
@@ -54,7 +56,9 @@ After preparing your aws credentials appropriately, you can check out the guides
 ### Convenience Scripts
 
 You can find two scripts to conveniently initialize ([stack_init.sh](./stack_init.sh)) and destroy 
-([stack_destroy.sh](./stack_destroy.sh)) the aws environment. You can use them like the following:
+([stack_destroy.sh](./stack_destroy.sh)) the aws environment. You can use them like the following (NB! If you are running the setup
+for the first time, we recommend executing each line of the script line-by-line to detect possible
+issues you might encounter):
 ```
 # make the scripts executable.
 chmod +x *.sh
