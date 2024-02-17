@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------------------------------------
 # Playbook that starts an etcd cluster and performs load tests on it with the provided params.
-# It then collects client (YCSB) metrics, analyzes them and cleans up the workers.
+# It then sends client (YCSB) metrics to processors and cleans up the workers.
 #------------------------------------------------------------------------------------------------------------
 
 ---
@@ -74,44 +74,12 @@
         _client_params: >-
           -p cluster.members={{ workers_GROUP_etcd_store_destinations }}
 
-- name: Stops workers
-  hosts: workers
-  tasks:
-    - name: Stopping worker processes
-      shell:
-        cmd: |
-          set -m
-          
-          # kill etcd processes (errors ignored)
-          bash -ilc 'kill $(ps -A | grep etcd | awk "{print $1}") || true'
+- import_playbook: util_stop_workers.yaml
 
-          # kill any java processes (errors ignored)
-          bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
+- import_playbook: util_send_metrics.yaml
+  vars:
+    consensus_protocol: "etcd_raft"
+    resource_usage_analysis: false
+    message_analysis: false
 
-# ------------------------------------------------------------------------------------ Metric collection & analysis
-
-# TODO: Fix the following
-
-- name: Fetches metrics from clients to local controller
-  hosts: clients
-  any_errors_fatal: true
-  tasks:
-    - name: Fetching metrics
-      fetch:
-        src: "{{ workers_GROUP_project_metrics_file }}"
-        dest: "{{ lookup('env','METRICS_BASE_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.txt"
-        flat: yes
-      vars:
-        _server_name: "{{ inventory_hostname }}"
-
-- name: Cleans up workers
-  hosts: workers
-
-  tasks:
-    - name: Deleting worker logs
-      shell:
-        cmd: |
-          set -m
-          # clean up log files (errors ignored)
-          bash -ilc 'rm {{ workers_GROUP_project_log_file }} || true'
-      when: delete_logs | default('true') | bool
+- import_playbook: util_cleanup_workers.yaml

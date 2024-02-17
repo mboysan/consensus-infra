@@ -14,3 +14,6 @@
           
           # kill java processes (errors ignored)
           bash -ilc 'kill $(ps -A | grep java | awk "{print $1}") || true'
+          
+          # kill etcd processes (errors ignored)
+          bash -ilc 'kill $(ps -A | grep etcd | awk "{print $1}") || true'

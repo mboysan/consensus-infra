@@ -15,9 +15,13 @@
   vars:
     workload_file: "workload_read_write_proportional"
 
+- import_playbook: T4_default_load_test_etcd_raft.yaml
+  vars:
+    workload_file: "workload_read_write_proportional"
+
 - import_playbook: util_analyze_metrics.yaml
   vars:
-    test_names: "T1 T2 T3"
+    test_names: "T1 T2 T3 T4"
     performance_analysis: true
     resource_usage_analysis: false
     message_analysis: false
