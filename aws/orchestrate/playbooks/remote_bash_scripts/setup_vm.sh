@@ -54,7 +54,7 @@ sudo apt-get install -y r-base
 
 # -------------------------------------------------- etcd
 
-ETCD_VER=v3.5.8
+ETCD_VER=v3.5.12
 GITHUB_URL=https://github.com/etcd-io/etcd/releases/download
 DOWNLOAD_URL=${GITHUB_URL}
 INSTALL_DIR=~/etcd
