@@ -13,7 +13,7 @@ recommendations. Also make sure you are eligible for using aws free-tier and/or 
 
 Although, in theory you can create an aws user with unbounded permissions, we highly suggest you assign a policy with 
 the least number of privileges required to run the aws api calls for the user. We have created an 
-[example IAM policy](./iam_example_policy.json) for which you can use to run packer and terraform commands configured 
+[example IAM policy](./iam_example_policy.json) for which you can use to run terraform commands configured 
 for this project.
 
 ## Preparing AWS credentials

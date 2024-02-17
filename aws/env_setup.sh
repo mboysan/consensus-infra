@@ -55,12 +55,6 @@ export HISTCONTROL=ignorespace
  export TF_VAR_aws_ec2_ami_id=$AWS_AMI_ID
  export TF_VAR_aws_ec2_ssh_public_key_path=$TERRAFORM_WORKING_DIR/access/aws_instance_key.pub
 
-# Packer variables
- export PKR_VAR_aws_profile=$AWS_PROFILE
- export PKR_VAR_aws_region=$AWS_REGION
- export PKR_VAR_aws_availability_zone=$AWS_DEFAULT_AVAILABILITY_ZONE
- export PKR_VAR_aws_ec2_ami_name=$AWS_AMI_NAME
-
 # Ansible variables
  export ANSIBLE_WORKING_DIR=$CURRENT_DIR/orchestrate
  export ANSIBLE_CONFIG=$ANSIBLE_WORKING_DIR/ansible.cfg
