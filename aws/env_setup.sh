@@ -42,7 +42,7 @@ export HISTCONTROL=ignorespace
  export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1a
  # Ubuntu-20.04, note that Amazon might regularly update this id, so feel free to insert the most recent one. But
  # keep in mind that package manager and firewall alterations requires certain packages. So, we suggest you stick with
- # this Ubuntu version for now.
+ # this Ubuntu version for now. Also note that ami ids depend on the aws region as well.
  export AWS_AMI_ID="ami-08031206a0ff5a6ac"
 
 # Terraform variables
