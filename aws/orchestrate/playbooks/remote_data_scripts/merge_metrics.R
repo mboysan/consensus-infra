@@ -5,14 +5,22 @@ source("util.R")
 args <- commandArgs(trailingOnly=TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) > 2,
+    validator = \(x) length(x) >= 5,
     failure_msg = "required arguments are not provided.",
-    defaults = c("../collected_data/metrics/samples", "../collected_data/metrics/samples/MERGED", "EX1", "EX2")
+    defaults = c(
+        "../collected_data/metrics/samples",
+        "../collected_data/metrics/samples/MERGED",
+        "merge_client_metrics=true",
+        "merge_store_metrics=false",
+        "EX1",
+        "EX2")
 )
 
 input_folder <- args[1]
 output_folder <- args[2]
-test_names <- args[-c(1, 2)]
+merge_client_metrics <- grepl("true", args[3], ignore.case = TRUE)
+merge_store_metrics <- grepl("true", args[4], ignore.case = TRUE)
+test_names <- args[-c(1:4)]
 
 # ----------------------------------------------------------------------------- helper functions
 
@@ -39,24 +47,42 @@ writeCsv <- function(fileName, data) {
 # ----------------------------------------------------------------- merge metrics from provided tests and write to csv
 
 # summary metrics
-client_summary_metrics <- mergeMetrics("client", "summary")
-writeCsv("client.summary.merged.csv", client_summary_metrics)
+client_summary_metrics <- NULL
+store_summary_metrics <- NULL
 
-store_summary_metrics <- mergeMetrics("store", "summary")
-writeCsv("store.summary.merged.csv", store_summary_metrics)
+if (merge_client_metrics) {
+    client_summary_metrics <- mergeMetrics("client", "summary")
+    writeCsv("client.summary.merged.csv", client_summary_metrics)
+}
 
-all_summary_metrics <- rbind(client_summary_metrics, store_summary_metrics)
-writeCsv("all.summary.merged.csv", all_summary_metrics)
+if (merge_store_metrics) {
+    store_summary_metrics <- mergeMetrics("store", "summary")
+    writeCsv("store.summary.merged.csv", store_summary_metrics)
+}
+
+if (merge_client_metrics || merge_store_metrics) {
+    all_summary_metrics <- rbind(client_summary_metrics, store_summary_metrics)
+    writeCsv("all.summary.merged.csv", all_summary_metrics)
+}
 
 # raw metrics
-client_raw_metrics <- mergeMetrics("client", "raw")
-writeCsv("client.raw.merged.csv", client_raw_metrics)
+client_raw_metrics <- NULL
+store_raw_metrics <- NULL
 
-store_raw_metrics <- mergeMetrics("store", "raw")
-writeCsv("store.raw.merged.csv", store_raw_metrics)
+if (merge_client_metrics) {
+    client_raw_metrics <- mergeMetrics("client", "raw")
+    writeCsv("client.raw.merged.csv", client_raw_metrics)
+}
 
-all_raw_metrics <- rbind(client_raw_metrics, store_raw_metrics)
-writeCsv("all.raw.merged.csv", all_raw_metrics)
+if (merge_store_metrics) {
+    store_raw_metrics <- mergeMetrics("store", "raw")
+    writeCsv("store.raw.merged.csv", store_raw_metrics)
+}
+
+if (merge_client_metrics || merge_store_metrics) {
+    all_raw_metrics <- rbind(client_raw_metrics, store_raw_metrics)
+    writeCsv("all.raw.merged.csv", all_raw_metrics)
+}
 
 all_raw_metrics <- NULL
 all_summary_metrics <- NULL
