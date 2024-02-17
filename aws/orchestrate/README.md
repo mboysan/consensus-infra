@@ -61,13 +61,15 @@ ansible-inventory -i inventory/aws_ec2_static.ini --graph
 
 Following is the naming pattern used for the playbooks.
 - `P<X>_<name>`: Playbooks starting with this naming pattern is used to prepare the hosts by installing 
-necessary software and project dependencies, i.e. `P` stands for "Prepare".
+necessary software and project dependencies, i.e. `P` stands for "Prepare". These playbooks should be executed only 
+once.
 - `S<X>_<name>`: Playbooks starting with this naming pattern is used for reference purposes only, i.e. `S` stands
 for "Sample". We suggest using `T` playbooks (as described next) for performing the load tests.
 - `T<X>_<name>`: Playbooks starting with this naming pattern is used to perform the load tests, 
 i.e. `T` stands for "Test".
-- `W<X>_<name>`: Playbooks starting with this naming pattern is used to work on the collected metrics,
-  i.e. `W` stands for "Work". They should be run after all the tests are completed.
+- `W<X>_<name>`: Playbooks starting with this naming pattern is used to run a group of workloads, collect results and
+  analyze metrics,
+  i.e. `W` stands for "Workload". They run a group of `S` and `T` type playbooks in a sequence and analyzes metrics.
 - `util_<name>`: Playbooks starting with this naming pattern is used as utility tasks such as starting, 
 stopping, cleanup etc. of hosts that are shared by all other playbooks.
 
@@ -80,7 +82,16 @@ Once you have prepared the ansible inventory, playbooks can be executed like:
 ansible-playbook playbooks/<playbook-name>
 ```
 
-# Useful commands
+## Running a Workload and Collecting Results
+
+After making sure that all `P` playbooks are executed, you can run the `W` playbooks. For example:
+```
+ansible-playbook playbooks/W1_run_and_analyze_S1_S2.yaml
+```
+When this completes, you can find the results in the [./playbooks/collected_data/metrics/S1 S2](./playbooks/collected_data/metrics)
+directory. See [README](./playbooks/collected_data/README.md) of that directory for more information.
+
+# Useful ansible Commands
 ```
 # see resources as list
 ansible-inventory -i inventory/aws_ec2.yaml --list
@@ -100,7 +111,10 @@ ansible nodes -i inventory/aws_ec2_static.ini -m ping --private-key=~/.ssh/aws_i
 # running a playbook
 ansible-playbook play.yaml
 
-# run playbook
+# running a playbook with verbose output (useful for debugging)
+ansible-playbook -vvv play.yaml
+
+# run playbook with inventory file, private key and user
 ansible-playbook play.yaml -i inventory/aws_ec2_static.ini --private-key=~/.ssh/aws_instance_key.pem -u ubuntu
 
 # run playbook with extra vars (--extra-vars or -e param)

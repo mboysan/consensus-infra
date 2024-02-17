@@ -107,6 +107,10 @@ truncate -s 0 $etcdStoreDestinationsTmp
 storeNodesTmp=$tmpDir/snt
 truncate -s 0 $storeNodesTmp
 
+totalNodeCount=0
+totalNodeCountTmp=$tmpDir/tnc
+truncate -s 0 $totalNodeCountTmp
+
 function populateNodesInventory() {
     # create nodes group
     echo "[INFO] creating 'nodes' group"
@@ -157,8 +161,12 @@ function populateNodesInventory() {
 
         # write to inventory file
         echo "$nodeName ansible_host=$nodePublicIp" >> "$ANSIBLE_INVENTORY_FILE"
+
+        totalNodeCount=$((totalNodeCount+1))
+        echo "$totalNodeCount" > "$totalNodeCountTmp"
     done
 
+    echo "[INFO] total node count = $(xargs printf ',%s' < "$totalNodeCountTmp" | cut -b 2-)"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 
@@ -192,6 +200,8 @@ function populateWorkersInventory() {
     echo "workers_GROUP_etcd_store_destinations=$etcdStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     processorPrivateIp="$(xargs printf ',%s' < "$processorPrivateIpTmp" | cut -b 2-)"
     echo "workers_GROUP_processor_destination=$processorPrivateIp" >> "$ANSIBLE_INVENTORY_FILE"
+    totalNodeCount=$(xargs printf ',%s' < "$totalNodeCountTmp" | cut -b 2-)
+    echo "workers_GROUP_total_node_count=$totalNodeCount" >> "$ANSIBLE_INVENTORY_FILE"
     echo "" >> "$ANSIBLE_INVENTORY_FILE"
 }
 

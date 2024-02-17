@@ -42,7 +42,7 @@ export HISTCONTROL=ignorespace
  export AWS_DEFAULT_AVAILABILITY_ZONE=eu-west-1a
  # Ubuntu-20.04, note that Amazon might regularly update this id, so feel free to insert the most recent one. But
  # keep in mind that package manager and firewall alterations requires certain packages. So, we suggest you stick with
- # this Ubuntu version for now.
+ # this Ubuntu version for now. Also note that ami ids depend on the aws region as well.
  export AWS_AMI_ID="ami-08031206a0ff5a6ac"
 
 # Terraform variables
@@ -54,12 +54,6 @@ export HISTCONTROL=ignorespace
  export TF_VAR_aws_availability_zone=$AWS_DEFAULT_AVAILABILITY_ZONE
  export TF_VAR_aws_ec2_ami_id=$AWS_AMI_ID
  export TF_VAR_aws_ec2_ssh_public_key_path=$TERRAFORM_WORKING_DIR/access/aws_instance_key.pub
-
-# Packer variables
- export PKR_VAR_aws_profile=$AWS_PROFILE
- export PKR_VAR_aws_region=$AWS_REGION
- export PKR_VAR_aws_availability_zone=$AWS_DEFAULT_AVAILABILITY_ZONE
- export PKR_VAR_aws_ec2_ami_name=$AWS_AMI_NAME
 
 # Ansible variables
  export ANSIBLE_WORKING_DIR=$CURRENT_DIR/orchestrate
