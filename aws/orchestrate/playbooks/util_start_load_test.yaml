@@ -3,14 +3,14 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_runtime_config.yaml
+- import_playbook: util_runtime_config.yaml
 
-- ansible.builtin.import_playbook: util_start_workers.yaml
+- import_playbook: util_start_workers.yaml
 
-- ansible.builtin.import_playbook: util_stop_workers.yaml
+- import_playbook: util_stop_workers.yaml
 
-- ansible.builtin.import_playbook: util_collect_logs.yaml
+- import_playbook: util_collect_logs.yaml
 
-- ansible.builtin.import_playbook: util_send_metrics.yaml
+- import_playbook: util_send_metrics.yaml
 
-- ansible.builtin.import_playbook: util_cleanup_workers.yaml
+- import_playbook: util_cleanup_workers.yaml

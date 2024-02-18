@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_stop_workers.yaml
+- import_playbook: util_stop_workers.yaml
 
 - name: Cleans up workers
   hosts: workers

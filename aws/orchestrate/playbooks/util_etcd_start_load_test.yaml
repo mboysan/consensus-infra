@@ -5,7 +5,7 @@
 
 ---
 # ------------------------------------------------------------------------------------ Runtime configuration
-- ansible.builtin.import_playbook: util_runtime_config.yaml
+- import_playbook: util_runtime_config.yaml
 
 # ------------------------------------------------------------------------------------ Load test
 - name: Starts all etcd KV stores

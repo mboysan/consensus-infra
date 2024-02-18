@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_load_test.yaml
+- import_playbook: util_start_load_test.yaml
   vars:
     test_name: "S1"
     consensus_protocol: "raft"
