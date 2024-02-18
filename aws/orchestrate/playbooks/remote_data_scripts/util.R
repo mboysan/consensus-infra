@@ -84,4 +84,5 @@ remove_outliers <- function(data) {
 
   # Remove outliers
   df <- df[df$metric_value > lower_bound & df$metric_value < upper_bound, ]
+  df
 }
