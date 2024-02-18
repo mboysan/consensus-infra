@@ -9,6 +9,5 @@
 - import_playbook: util_analyze_metrics.yaml
   vars:
     test_names: "S1 S2"
-    collect_all_raw_data: true
 
 - import_playbook: util_cleanup_processors.yaml
