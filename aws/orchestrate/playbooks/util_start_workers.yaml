@@ -3,22 +3,22 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- ansible.builtin.import_playbook: util_start_nodes.yaml
+- import_playbook: util_start_nodes.yaml
   vars:
     cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }}"
 
-- ansible.builtin.import_playbook: util_start_stores.yaml
+- import_playbook: util_start_stores.yaml
   vars:
     cli_params: "protocol={{ consensus_protocol }} {{ store_cli_params | default('') }}"
 
-- ansible.builtin.import_playbook: util_inject_fault.yaml
+- import_playbook: util_inject_fault.yaml
   vars:
     condition: "{{ inject_fault['condition'] }}"
     delay_sec: "{{ inject_fault['delay_sec'] }}"
     duration_sec: "{{ inject_fault['duration_sec'] }}"
   when: inject_fault is defined
 
-- ansible.builtin.import_playbook: util_start_clients.yaml
+- import_playbook: util_start_clients.yaml
   vars:
     cli_params: "{{ client_cli_params | default('') }}"
 

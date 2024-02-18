@@ -15,7 +15,7 @@
         state: absent
 
     - name: P2.1.2 - Clone project repository
-      ansible.builtin.git:
+      git:
         repo: '{{ workers_GROUP_project_repo_url }}'
         dest: '{{ workers_GROUP_project_dir }}'
         single_branch: yes
