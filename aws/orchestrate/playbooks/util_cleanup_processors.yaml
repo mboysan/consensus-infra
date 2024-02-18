@@ -13,4 +13,4 @@
           set -m
           # clean up metrics files (errors ignored)
           bash -ilc 'rm -r {{ processors_GROUP_project_metrics_path }} || true'
-      when: cleanup_processor | default('true') | bool
+      when: cleanup_processor | default(true)
