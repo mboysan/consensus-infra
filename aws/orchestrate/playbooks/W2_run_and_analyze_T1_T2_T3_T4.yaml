@@ -25,6 +25,5 @@
     performance_analysis: true
     resource_usage_analysis: false
     message_analysis: false
-    collect_client_raw_data: true
 
 - import_playbook: util_cleanup_processors.yaml

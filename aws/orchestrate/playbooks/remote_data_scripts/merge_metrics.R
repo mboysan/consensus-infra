@@ -11,7 +11,7 @@ args <- valiadate_args(
         "../collected_data/metrics/samples",
         "../collected_data/metrics/samples/MERGED",
         "merge_client_metrics=true",
-        "merge_store_metrics=false",
+        "merge_store_metrics=true",
         "EX1",
         "EX2")
 )

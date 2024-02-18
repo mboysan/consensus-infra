@@ -72,10 +72,13 @@ exportPlot <- function(folder, fileName, source, extension="png", ggPlot=last_pl
   ggsave(fileName, plot=ggPlot)
 }
 
+remove_outliers_from_metric_value <- function(data) {
+  data[remove_outliers(data$metric_value),]
+}
+
 remove_outliers <- function(data) {
-  df <- data
-  Q1 <- quantile(df$metric_value, 0.25)
-  Q3 <- quantile(df$metric_value, 0.75)
+  Q1 <- quantile(data, 0.25)
+  Q3 <- quantile(data, 0.75)
   IQR <- Q3 - Q1
 
   # Define lower and upper bounds
@@ -83,5 +86,5 @@ remove_outliers <- function(data) {
   upper_bound <- Q3 + 1.5 * IQR
 
   # Remove outliers
-  df <- df[df$metric_value > lower_bound & df$metric_value < upper_bound, ]
+  data > lower_bound & data < upper_bound
 }

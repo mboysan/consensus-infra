@@ -57,7 +57,7 @@
       vars:
         _src_file: "{{ workers_GROUP_project_metrics_file }}"
         _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/store.metrics.txt"
-      when: resource_usage_analysis or message_analysis | default('true') | bool
+      when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))
 
 - name: Collects metrics into csv files
   hosts: processors
@@ -66,22 +66,22 @@
     - name: Grouping client (perf test) metrics
       shell:
         cmd: |
-          bash -ilc './collect_client_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+          bash -ilc './collect_client_metrics.R {{ _args }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
         _metrics_file: "{{ _metrics_path }}/client.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
+        _args: "{{ _metrics_file }} {{ _output_folder }}"
 
     - name: Grouping store metrics
       shell:
         cmd: |
-          bash -ilc './collect_store_metrics.R {{ _metrics_file }} {{ _output_folder }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
-        chdir: "{{ _working_dir }}"
+          bash -ilc './collect_store_metrics.R {{ _args }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+        chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _working_dir: "{{ all_GROUP_home_dir }}"
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
         _metrics_file: "{{ _metrics_path }}/store.metrics.txt"
         _output_folder: "{{ _metrics_path }}"
-      when: resource_usage_analysis or message_analysis | default('true') | bool
+        _args: "{{ _metrics_file }} {{ _output_folder }}"
+      when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))
