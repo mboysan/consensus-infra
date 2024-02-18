@@ -9,15 +9,22 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) > 2,
+    validator = \(x) length(x) > 3,
     failure_msg = "required arguments are not provided.",
     # use all.raw.merged.csv or store.raw.merged.csv
-    defaults = c("../collected_data/metrics/samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/samples/EX1 EX2", "EX1", "EX2")
+    defaults = c(
+        "../collected_data/metrics/samples/MERGED/all.raw.merged.csv",
+        "../collected_data/metrics/samples/EX1 EX2",
+        "collect_plot_raw_data=true",
+        "EX1",
+        "EX2"
+    )
 )
 
 input_file <- args[1]
 output_folder <- args[2]
-test_names <- args[-c(1, 2)]
+collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
+test_names <- args[-c(1:3)]
 
 # ----------------------------------------------------------------------------- prepare metrics
 info("analysing consensus messaging:", input_file)
@@ -82,7 +89,7 @@ data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 data$metric_value <- as.numeric(data$metric_value)
 
 # Group the data
-grouped_data <- data %>% group_by(testName_algorithm, consensusAlg, timestamp_sec)
+grouped_data <- data %>% group_by(testName_algorithm, timestamp_sec)
 
 # Count the number of messages per group
 message_counts <- grouped_data %>% summarise(count = n())
@@ -104,8 +111,10 @@ plot_message_sizes <- ggplot(message_sizes, aes(x = timestamp_sec, y = sum, colo
     theme_minimal()
 exportPlot(output_folder, "plot_message_sizes", source="processor")
 
-columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
-savePlotData(plot_message_counts$data, columns, paste(output_folder, "plot_message_counts.dat", sep="/"))
+if (collect_plot_raw_data) {
+    columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
+    savePlotData(plot_message_counts$data, columns, paste(output_folder, "plot_message_counts.dat", sep="/"))
 
-columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
-savePlotData(plot_message_sizes$data, columns, paste(output_folder, "plot_message_sizes.dat", sep="/"))
+    columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
+    savePlotData(plot_message_sizes$data, columns, paste(output_folder, "plot_message_sizes.dat", sep="/"))
+}

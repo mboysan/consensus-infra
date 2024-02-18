@@ -20,43 +20,52 @@
     - name: Merging metrics
       shell:
         cmd: |
-          bash -ilc './merge_metrics.R {{ _metrics_path }} {{ _output_folder }} {{ _merge_client_metrics }} {{ _merge_store_metrics }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './merge_metrics.R {{ _args }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _merge_client_metrics: "merge_client_metrics={{ performance_analysis | default('true') | bool}}"
-        _merge_store_metrics: "merge_store_metrics={{ message_analysis or resource_usage_analysis | default('true') | bool}}"
         _metrics_path: "{{ processors_GROUP_project_metrics_path }}"
         _output_folder: "{{ _metrics_path }}/MERGED"
+        _merge_client_metrics: "merge_client_metrics={{ performance_analysis | default(true)}}"
+        _merge_store_metrics: "merge_store_metrics={{ (message_analysis | default(true)) or (resource_usage_analysis | default(true))}}"
+        _args: "{{ _metrics_path }} {{ _output_folder }} {{ _merge_client_metrics }} {{ _merge_store_metrics }}"
 
     - name: Doing performance analysis
       shell:
         cmd: |
-          bash -ilc './performance_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './performance_analysis.R {{ _args }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/client.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
-      when: performance_analysis | default('true') | bool
+        _remove_outliers_per_test: "remove_outliers_per_test={{ remove_outliers_per_test | default(true) }}"
+        _timescale_in_milliseconds: "timescale_in_milliseconds={{ timescale_in_milliseconds | default(true) }}"
+        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
+        _args: "{{ _metrics_file }} {{ _output_folder }} {{ _remove_outliers_per_test }} {{ _timescale_in_milliseconds }} {{ _collect_plot_raw_data }}"
+      when: performance_analysis | default(true)
 
     - name: Doing message analysis
       shell:
         cmd: |
-          bash -ilc './message_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './message_analysis.R {{ _args }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
-      when: message_analysis | default('true') | bool
+        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
+        _args: "{{ _metrics_file }} {{ _output_folder }} {{ _collect_plot_raw_data }}"
+      when: message_analysis | default(true)
 
     - name: Doing resource usage analysis
       shell:
         cmd: |
-          bash -ilc './resource_usage_analysis.R {{ _metrics_file }} {{ _output_folder }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './resource_usage_analysis.R {{ _args }} {{ test_names }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
         _metrics_file: "{{ processors_GROUP_project_metrics_path }}/MERGED/store.raw.merged.csv"
         _output_folder: "{{ processors_GROUP_project_metrics_path }}/MERGED"
-      when: resource_usage_analysis | default('true') | bool
+        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
+        _args: "{{ _metrics_file }} {{ _output_folder }} {{ _collect_plot_raw_data }}"
+      when: resource_usage_analysis | default(true)
 
 - name: Fetches the results to controller
   hosts: processors
@@ -78,35 +87,35 @@
         cmd: |
           mv *.out.* sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_plots | default('true') | bool
+      when: collect_plots | default(true)
 
     - name: Moving the raw plot data to sync directory
       shell:
         cmd: |
           mv *.dat sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_plot_raw_data | default('true') | bool
+      when: collect_plot_raw_data | default(true)
 
     - name: Moving CLIENT raw data to sync directory
       shell:
         cmd: |
           mv client.raw.merged.csv sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_client_raw_data | default('false') | bool
+      when: collect_client_raw_data | default(false)
 
     - name: Moving STORE raw data to sync directory
       shell:
         cmd: |
           mv store.raw.merged.csv sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_store_raw_data | default('false') | bool
+      when: collect_store_raw_data | default(false)
 
     - name: Moving ALL raw data to sync directory
       shell:
         cmd: |
           mv all.raw.merged.csv sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/MERGED/"
-      when: collect_all_raw_data | default('false') | bool
+      when: collect_all_raw_data | default(false)
 
     - name: Compressing metrics data and deleting sync directory
       shell:

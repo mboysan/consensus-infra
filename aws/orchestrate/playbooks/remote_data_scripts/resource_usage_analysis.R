@@ -9,15 +9,22 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
   args = args,
-  validator = \(x) length(x) > 2,
+  validator = \(x) length(x) > 3,
   failure_msg = "required arguments are not provided.",
   # use all.raw.merged.csv or store.raw.merged.csv
-  defaults = c("../collected_data/metrics/samples/MERGED/all.raw.merged.csv", "../collected_data/metrics/samples/EX1 EX2", "EX1", "EX2")
+  defaults = c(
+      "../collected_data/metrics/samples/MERGED/all.raw.merged.csv",
+      "../collected_data/metrics/samples/EX1 EX2",
+      "collect_plot_raw_data=true",
+      "EX1",
+      "EX2"
+  )
 )
 
 input_file <- args[1]
 output_folder <- args[2]
-test_names <- args[-c(1, 2)]
+collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
+test_names <- args[-c(1:3)]
 
 # ----------------------------------------------------------------------------- prepare metrics
 # Read the CSV data
@@ -60,7 +67,7 @@ data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 data$metric_value <- as.numeric(data$metric_value)
 
 # Group the data
-grouped_data <- data %>% group_by(testName_algorithm, consensusAlg, timestamp_sec)
+grouped_data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec)
 
 # ----------------------------------------------------------------------------- calculations
 
@@ -88,20 +95,22 @@ memory_data$metric_value <- memory_data$metric_value / 1000 / 1000
 process_cpu_data <- grouped_data %>%
   filter(metric_name == "process.cpu.usage")
 
-# Plot memory usage, grouped by consensusAlg & timestamp_sec
+# Plot memory usage, grouped by consensusAlg, metric_name & timestamp_sec
 plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
   theme_minimal()
 exportPlot(output_folder, "plot_memory_data", source="processor")
 
-# Plot process cpu usage, grouped by consensusAlg & timestamp_sec
+# Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
 plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
   theme_minimal()
 exportPlot(output_folder, "plot_process_cpu_data", source="processor")
 
-columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-savePlotData(plot_memory$data, columnNames, paste(output_folder, "plot_memory.dat", sep="/"))
-savePlotData(plot_cpu$data, columnNames, paste(output_folder, "plot_cpu.dat", sep="/"))
+if (collect_plot_raw_data) {
+  columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
+  savePlotData(plot_memory$data, columnNames, paste(output_folder, "plot_memory.dat", sep="/"))
+  savePlotData(plot_cpu$data, columnNames, paste(output_folder, "plot_cpu.dat", sep="/"))
+}
