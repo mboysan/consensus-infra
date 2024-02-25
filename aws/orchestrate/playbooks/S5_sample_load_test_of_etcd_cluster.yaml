@@ -3,10 +3,10 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_etcd_start_load_test.yaml
+- import_playbook: T_load_test_etcd_raft.yaml
   vars:
     test_name: "S5"
-    workload: |
+    workload_definition: |
       recordcount=1000
       operationcount=1000
       workload=site.ycsb.workloads.CoreWorkload
@@ -19,3 +19,6 @@
       insertproportion=0
       
       requestdistribution=zipfian
+    performance_analysis: true
+    resource_usage_analysis: false
+    message_analysis: false

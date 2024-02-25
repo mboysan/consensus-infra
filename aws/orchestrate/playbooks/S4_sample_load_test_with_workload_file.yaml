@@ -3,8 +3,10 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_load_test.yaml
+- import_playbook: T_load_test_consensus_raft.yaml
   vars:
     test_name: "S4"
-    consensus_protocol: "raft"
-    workload: "workloada"
+    workload_definition: "workloada"
+    performance_analysis: true
+    resource_usage_analysis: true
+    message_analysis: true
