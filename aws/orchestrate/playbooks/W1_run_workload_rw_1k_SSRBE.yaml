@@ -1,0 +1,54 @@
+#------------------------------------------------------------------------------------------------------------
+# Runs the tests and analyzes metrics from the tests run.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- hosts: all, localhost
+  tasks:
+    - name: Setting global variables
+      set_fact:
+        test_group: "W1"
+        performance_analysis: true
+        resource_usage_analysis: false
+        message_analysis: false
+        workload_definition: "workload_rw_1k"
+
+#---------------------------------------------------------------
+
+# client to server raw communication test
+- import_playbook: T_load_test_consensus_simulate.yaml
+  vars:
+    test_name: "T1"
+    broadcast_to_followers: false
+    forward_to_leader: false
+
+# consensus simulation test
+- import_playbook: T_load_test_consensus_simulate.yaml
+  vars:
+    test_name: "T2"
+    broadcast_to_followers: true
+    forward_to_leader: true
+
+# raft consensus test
+- import_playbook: T_load_test_consensus_raft.yaml
+  vars:
+    test_name: "T3"
+
+# bizur consensus test
+- import_playbook: T_load_test_consensus_bizur.yaml
+  vars:
+    test_name: "T4"
+    bizur_num_buckets: 1000
+
+# raft consensus on etcd test
+- import_playbook: T_load_test_etcd_raft.yaml
+  vars:
+    test_name: "T5"
+
+#---------------------------------------------------------------
+
+- import_playbook: util_analyze_metrics.yaml
+  vars:
+    collect_client_raw_data: true
+
+- import_playbook: util_cleanup_processors.yaml

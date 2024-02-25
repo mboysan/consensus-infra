@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------------------------------------
+# Dumps ansible variables into a file.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Dump ansible variables
+  hosts: localhost
+  tasks:
+    - name: Dumping ansible variables (as json) per host
+      copy:
+        content: "{{ vars }}"
+        dest: "{{ _base_path }}/{{ _file_name }}"
+      vars:
+        _base_path: "{{ lookup('env','COLLECTED_VARS_PATH') | mandatory }}"
+        _file_name: "{{ test_group }}{{ test_name }}_ansible_vars.json"

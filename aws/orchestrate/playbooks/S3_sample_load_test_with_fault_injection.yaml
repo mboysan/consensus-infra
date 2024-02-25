@@ -1,27 +1,28 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test with failure injection.
+# Performs a simple load test with failure injection (using raft consensus).
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_load_test.yaml
+- import_playbook: T_load_test_consensus_raft.yaml
   vars:
+    test_group: "S"
     test_name: "S3"
-    consensus_protocol: "raft"
-    node_cli_params: ""
-    store_cli_params: ""
-    workload: |
+    workload_definition: |
       recordcount=1000
       operationcount=1000
       workload=site.ycsb.workloads.CoreWorkload
-
+      
       readallfields=true
-
+      
       readproportion=0.5
       updateproportion=0.5
       scanproportion=0
       insertproportion=0
-
+      
       requestdistribution=zipfian
+    performance_analysis: true
+    resource_usage_analysis: true
+    message_analysis: true
 
     inject_fault:
       condition: 'disconnect follower'

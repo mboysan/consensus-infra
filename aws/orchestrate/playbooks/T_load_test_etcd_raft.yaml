@@ -5,5 +5,4 @@
 ---
 - import_playbook: util_etcd_start_load_test.yaml
   vars:
-    test_name: "T4"
-    workload: "{{ workload_file | default('workload_read_write_proportional') | string }}"
+    workload: "{{ workload_definition }}"

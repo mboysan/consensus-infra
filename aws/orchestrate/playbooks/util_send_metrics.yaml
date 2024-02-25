@@ -31,7 +31,7 @@
   tasks:
     - name: Creating metrics directory for the test
       file:
-        path: '{{ processors_GROUP_project_metrics_path }}/{{ test_name }}'
+        path: '{{ processors_GROUP_project_metrics_path }}/{{ test_group }}/{{ test_name }}'
         state: directory
 
 - name: Send client metrics to processor
@@ -44,7 +44,7 @@
           bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
       vars:
         _src_file: "{{ workers_GROUP_project_metrics_file }}"
-        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/client.metrics.txt"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_group }}/{{ test_name }}/client.metrics.txt"
 
 - name: Send store metrics to processor
   hosts: stores
@@ -56,7 +56,7 @@
           bash -ilc 'scp -oStrictHostKeyChecking=no {{ _src_file }} {{ workers_GROUP_processor_destination }}:{{ _dest_file }}'
       vars:
         _src_file: "{{ workers_GROUP_project_metrics_file }}"
-        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_name }}/store.metrics.txt"
+        _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_group }}/{{ test_name }}/store.metrics.txt"
       when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))
 
 - name: Collects metrics into csv files
@@ -66,22 +66,16 @@
     - name: Grouping client (perf test) metrics
       shell:
         cmd: |
-          bash -ilc './collect_client_metrics.R {{ _args }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './collect_client_metrics.R {{ _args }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
-        _metrics_file: "{{ _metrics_path }}/client.metrics.txt"
-        _output_folder: "{{ _metrics_path }}"
-        _args: "{{ _metrics_file }} {{ _output_folder }}"
+        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ consensus_protocol }}"
 
     - name: Grouping store metrics
       shell:
         cmd: |
-          bash -ilc './collect_store_metrics.R {{ _args }} {{ test_name }} {{ consensus_protocol }}' > {{ all_GROUP_ansible_cmd_out }}
+          bash -ilc './collect_store_metrics.R {{ _args }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _metrics_path: "{{ processors_GROUP_project_metrics_path }}/{{ test_name }}"
-        _metrics_file: "{{ _metrics_path }}/store.metrics.txt"
-        _output_folder: "{{ _metrics_path }}"
-        _args: "{{ _metrics_file }} {{ _output_folder }}"
+        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ consensus_protocol }}"
       when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))

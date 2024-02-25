@@ -5,10 +5,11 @@
 ---
 - import_playbook: util_start_load_test.yaml
   vars:
-    test_name: "T3"
     consensus_protocol: "raft"
-    node_cli_params:
-    store_cli_params:
-    resource_usage_analysis: false
-    message_analysis: false
-    workload: "{{ workload_file | default('workload_read_write_proportional') | string }}"
+    node_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+    store_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+    workload: "{{ workload_definition }}"

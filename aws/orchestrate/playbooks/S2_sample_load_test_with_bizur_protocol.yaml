@@ -3,21 +3,11 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_load_test.yaml
+- import_playbook: T_load_test_consensus_bizur.yaml
   vars:
+    test_group: "S"
     test_name: "S2"
-    consensus_protocol: "bizur"
-    node_cli_params: >-
-      bizur.numPeers={{ workers_GROUP_total_node_count }}
-      bizur.numBuckets=3
-      metrics.jvm.enabled=true
-      metrics.insights.enabled=true
-    store_cli_params: >-
-      bizur.numPeers={{ workers_GROUP_total_node_count }}
-      bizur.numBuckets=3
-      metrics.jvm.enabled=true
-      metrics.insights.enabled=true
-    workload: |
+    workload_definition: |
       recordcount=1000
       operationcount=1000
       workload=site.ycsb.workloads.CoreWorkload
@@ -30,3 +20,7 @@
       insertproportion=0
       
       requestdistribution=zipfian
+    performance_analysis: true
+    resource_usage_analysis: true
+    message_analysis: true
+    bizur_num_buckets: 1000

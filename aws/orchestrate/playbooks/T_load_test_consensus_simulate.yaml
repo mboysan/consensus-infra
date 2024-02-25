@@ -1,0 +1,18 @@
+
+---
+- import_playbook: util_start_load_test.yaml
+  vars:
+    consensus_protocol: "simulate"
+    node_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+      simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
+      simulate.leader.broadcastToFollowers={{ broadcast_to_followers | default(false) }}
+      simulate.follower.forwardToLeader={{ forward_to_leader | default(false) }}
+    store_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+      simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
+      simulate.leader.broadcastToFollowers={{ broadcast_to_followers | default(false) }}
+      simulate.follower.forwardToLeader={{ forward_to_leader | default(false) }}
+    workload: "{{ workload_definition }}"

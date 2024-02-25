@@ -9,35 +9,33 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
   args = args,
-  validator = \(x) length(x) > 3,
+  validator = \(x) length(x) == 3,
   failure_msg = "required arguments are not provided.",
-  # use all.raw.merged.csv or store.raw.merged.csv
   defaults = c(
-      "../collected_data/metrics/samples/MERGED/all.raw.merged.csv",
-      "../collected_data/metrics/samples/EX1 EX2",
-      "collect_plot_raw_data=true",
-      "EX1",
-      "EX2"
+      "../collected_data/metrics/samples/EX",
+      # use all.raw.merged.csv or store.raw.merged.csv
+      "all.raw.merged.csv",
+      "collect_plot_raw_data=true"
   )
 )
 
-input_file <- args[1]
-output_folder <- args[2]
+io_folder <- args[1]
+input_file <- args[2]
 collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
-test_names <- args[-c(1:3)]
+
+input_file <- paste(io_folder, input_file, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 # Read the CSV data
 data <- read.csv(input_file, header = FALSE, stringsAsFactors = FALSE)
 
 # Rename the columns
-names(data) <- c("nodeType", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
-data$testName_algorithm <- paste(data$testName, data$consensusAlg, sep = "_")
+names(data) <- c("nodeType", "testGroup", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+data$testName_algorithm <- paste0(data$testGroup, data$testName)    # EXEX1
+data$testName_algorithm <- paste(data$testName_algorithm, data$consensusAlg, sep = "_")   # EXEX1_raft
 
 # filter for store metrics and test names
-data <- data %>%
-  filter(nodeType == "store") %>%
-  filter(testName %in% test_names)
+data <- data %>% filter(nodeType == "store")
 
 # Order by timestamp
 data$timestamp <- as.numeric(data$timestamp)
@@ -100,17 +98,17 @@ plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, colo
   geom_line() +
   labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
   theme_minimal()
-exportPlot(output_folder, "plot_memory_data", source="processor")
+exportPlot(io_folder, "plot_memory_data", source="processor")
 
 # Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
 plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   geom_line() +
   labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
   theme_minimal()
-exportPlot(output_folder, "plot_process_cpu_data", source="processor")
+exportPlot(io_folder, "plot_process_cpu_data", source="processor")
 
 if (collect_plot_raw_data) {
   columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-  savePlotData(plot_memory$data, columnNames, paste(output_folder, "plot_memory.dat", sep="/"))
-  savePlotData(plot_cpu$data, columnNames, paste(output_folder, "plot_cpu.dat", sep="/"))
+  savePlotData(plot_memory$data, columnNames, paste(io_folder, "plot_memory.dat", sep="/"))
+  savePlotData(plot_cpu$data, columnNames, paste(io_folder, "plot_cpu.dat", sep="/"))
 }

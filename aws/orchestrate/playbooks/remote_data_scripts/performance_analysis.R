@@ -9,39 +9,39 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
   args = args,
-  validator = \(x) length(x) > 5,
+  validator = \(x) length(x) == 5,
   failure_msg = "required arguments are not provided.",
-  # use all.raw.merged.csv or client.raw.merged.csv
   defaults = c(
-      "../collected_data/metrics/samples/MERGED/all.raw.merged.csv",
-      "../collected_data/metrics/samples/EX1 EX2",
+      "../collected_data/metrics/samples/EX",
+      # use all.raw.merged.csv or client.raw.merged.csv
+      "all.raw.merged.csv",
       "remove_outliers_per_test=true",
       "timescale_in_milliseconds=true",
-      "collect_plot_raw_data=true",
-      "EX1",
-      "EX2"
+      "collect_plot_raw_data=true"
   )
 )
 
-input_file <- args[1]
-output_folder <- args[2]
+io_folder <- args[1]
+input_file <- args[2]
 remove_outliers_per_test <- grepl("true", args[3], ignore.case = TRUE)
 timescale_in_milliseconds <- grepl("true", args[4], ignore.case = TRUE)
 collect_plot_raw_data <- grepl("true", args[5], ignore.case = TRUE)
-test_names <- args[-c(1:5)]
+
+input_file <- paste(io_folder, input_file, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 # Read the CSV data
 data <- read.csv(input_file, header = FALSE, stringsAsFactors = FALSE)
 
 # Rename the columns
-names(data) <- c("nodeType", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
-data$testName_algorithm <- paste(data$testName, data$consensusAlg, sep = "_")
+names(data) <- c("nodeType", "testGroup", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+data$testName_algorithm <- paste0(data$testGroup, data$testName)    # EXEX1
+data$testName_algorithm <- paste(data$testName_algorithm, data$consensusAlg, sep = "_")   # EXEX1_raft
 
-# filter for store metrics and test names
-data <- data %>%
-  filter(nodeType == "client") %>%
-  filter(testName %in% test_names)
+# filter for client metrics
+data <- data %>% filter(nodeType == "client")
+
+testNames <- unique(data$testName)
 
 # Order by timestamp
 data$timestamp <- as.numeric(data$timestamp)
@@ -49,7 +49,7 @@ data <- data %>% arrange(timestamp)
 
 adjust_start_times <- function() {
   minStart <- min(data$timestamp)
-  for (testName in test_names) {
+  for (testName in testNames) {
     tmp <- data[data$testName == testName,]
     minTestStart <- tmp[1,]$timestamp
     diff <- minTestStart - minStart
@@ -82,7 +82,7 @@ removeOutliersPerTest <- function (data) {
     # Remove outliers per test
     info("Removing outliers per test")
     newData <- data.frame()
-    for (test in test_names) {
+    for (test in testNames) {
         test_data <- data[data$testName == test,]
         test_data <- test_data[remove_outliers(test_data$metric_value),]
         newData <- rbind(newData, test_data)
@@ -124,25 +124,25 @@ plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
   theme_minimal()
-exportPlot(output_folder, "plot_read_latency", source="processor")
+exportPlot(io_folder, "plot_read_latency", source="processor")
 
 # Plot update latency, grouped by consensusAlg, metric & timestamp_sec
 plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
   theme_minimal()
-exportPlot(output_folder, "plot_update_latency", source="processor")
+exportPlot(io_folder, "plot_update_latency", source="processor")
 
 # Plot operation latency, grouped by consensusAlg, metric & timestamp_sec
 plot_operation_latency <- ggplot(grouped_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
   theme_minimal()
-exportPlot(output_folder, "plot_operation_latency", source="processor")
+exportPlot(io_folder, "plot_operation_latency", source="processor")
 
 if (collect_plot_raw_data) {
     columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-    savePlotData(plot_read_latency$data, columnNames, paste(output_folder, "plot_read_latency.dat", sep="/"))
-    savePlotData(plot_update_latency$data, columnNames, paste(output_folder, "plot_update_latency.dat", sep="/"))
-    savePlotData(plot_operation_latency$data, columnNames, paste(output_folder, "plot_operation_latency.dat", sep="/"))
+    savePlotData(plot_read_latency$data, columnNames, paste(io_folder, "plot_read_latency.dat", sep="/"))
+    savePlotData(plot_update_latency$data, columnNames, paste(io_folder, "plot_update_latency.dat", sep="/"))
+    savePlotData(plot_operation_latency$data, columnNames, paste(io_folder, "plot_operation_latency.dat", sep="/"))
 }

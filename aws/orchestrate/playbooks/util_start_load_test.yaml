@@ -3,6 +3,8 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
+- import_playbook: util_dump_ansible_vars.yaml
+
 - import_playbook: util_runtime_config.yaml
 
 - import_playbook: util_start_workers.yaml
