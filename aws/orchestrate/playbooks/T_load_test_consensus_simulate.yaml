@@ -15,4 +15,4 @@
       simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
       simulate.leader.broadcastToFollowers={{ broadcast_to_followers | default(false) }}
       simulate.follower.forwardToLeader={{ forward_to_leader | default(false) }}
-    workload: "{{ workload_definition | default('workload_read_write_proportional') | string }}"
+    workload: "{{ workload_definition }}"

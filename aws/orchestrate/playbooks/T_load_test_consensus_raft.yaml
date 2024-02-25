@@ -12,4 +12,4 @@
     store_cli_params: >-
       metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
       metrics.insights.enabled={{ message_analysis | default(false) }}
-    workload: "{{ workload_definition | default('workload_read_write_proportional') | string }}"
+    workload: "{{ workload_definition }}"
