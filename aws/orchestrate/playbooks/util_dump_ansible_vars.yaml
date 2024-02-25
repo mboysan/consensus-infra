@@ -12,4 +12,4 @@
         dest: "{{ _base_path }}/{{ _file_name }}"
       vars:
         _base_path: "{{ lookup('env','COLLECTED_VARS_PATH') | mandatory }}"
-        _file_name: "{{ test_name }}_ansible_vars.json"
+        _file_name: "{{ test_group }}{{ test_name }}_ansible_vars.json"

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------------------------------
-# Collects logs generated at workers to local controller and groups them into csv files
+# Collects logs generated at workers to local controller
 #------------------------------------------------------------------------------------------------------------
 
 ---
@@ -11,8 +11,9 @@
     - name: Fetching worker logs
       fetch:
         src: "{{ workers_GROUP_project_log_file }}"
-        dest: "{{ lookup('env','COLLECTED_LOGS_PATH') | mandatory }}/{{ test_name }}/{{ _server_name }}.log"
+        dest: "{{ _base_path }}/{{ _file_name }}"
         flat: yes
       vars:
-        _server_name: "{{ inventory_hostname }}"
+        _base_path: "{{ lookup('env','COLLECTED_LOGS_PATH') | mandatory }}"
+        _file_name: "{{ test_group }}{{ test_name }}_{{ inventory_hostname }}.log"
       when: workers_GROUP_project_log_level is search("DEBUG")

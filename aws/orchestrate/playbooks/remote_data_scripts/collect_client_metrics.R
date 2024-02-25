@@ -3,13 +3,14 @@
 #' For summarizing client metrics.
 #' @description
 #' Summarizes the metrics collected from clients (i.e. performance tests) and dumps them to csv files as summary 
-#' and raw (with timestamps) formats.
-#' @param metrics_file path to metrics file
-#' @param output_folder base folder to write output results
-#' @param test_name name of the test that was run (ideally should be same as the ansible playbook file that was executed.)
+#' and raw formats.
+#' @param io_folder path to base metrics path (e.g. ../collected_data/metrics/samples)
+#' @param test_group the test group that was run (e.g. S)
+#' @param test_name name of the test that was run
+#' @param consensus_protocol the consensus protocol used in the test
 #' @examples
-#' ./collect_client_metrics.R <metrics_file> <output_folder> <test_name> <consensus_protocol>
-#' ./collect_client_metrics.R metrics.txt ./ S1 "raft"
+#' ./collect_client_metrics.R <io_folder> <test_group> <test_name> <consensus_protocol>
+#' ./collect_client_metrics.R ../collected_data/metrics/samples ./ EX EX1 "raft"
 #'
 
 source("util.R")
@@ -20,15 +21,20 @@ args <- valiadate_args(
     validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("../collected_data/metrics/samples/EX1/client.metrics.txt", "../collected_data/metrics/samples/EX1", "EX1", "raft")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
     # bizur
-    # defaults = c("../collected_data/metrics/samples/EX2/client.metrics.txt", "../collected_data/metrics/samples/EX2", "EX2", "bizur")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
 )
 
-metrics_file <- args[1]
-output_folder <- args[2]
+METRICS_FILE_NAME <- "client.metrics.txt"
+
+io_folder <- args[1]
+test_group <- args[2]
 test_name <- args[3]
 consensus_alg <- args[4]
+
+metrics_file <- paste(io_folder, test_group, test_name, METRICS_FILE_NAME, sep = "/")
+output_folder <- paste(io_folder, test_group, test_name, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 
@@ -127,10 +133,10 @@ all_raw <- rbind(
   read_modify_write_failed_latency
 )
 all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
-all_raw <- data.frame(nodeType = "client", testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
+all_raw <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
 
 # finalize column order
-all_raw <- all_raw[,c('nodeType', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[,c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
@@ -179,7 +185,7 @@ all_summary <- rbind(
     overall_summary
 )
 all_summary <- all_summary %>% filter(mean > -1, na.rm=TRUE)   # sanitize
-all_summary <- data.frame(nodeType = "client", testName = test_name, consensusAlg = consensus_alg, all_summary)
+all_summary <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing client raw data to csv file")

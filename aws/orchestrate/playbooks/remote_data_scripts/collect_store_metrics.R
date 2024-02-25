@@ -2,14 +2,14 @@
 
 #' For summarizing store metrics.
 #' @description
-#' Summarizes the metrics collected from stores and dumps them to csv files as summary and raw (with timestamps) 
-#' formats.
-#' @param metrics_file path to metrics file
-#' @param output_folder base folder to write output results
-#' @param test_name name of the test that was run (ideally should be same as the ansible playbook file that was executed.)
+#' Summarizes the metrics collected from stores and dumps them to csv files as summary and raw formats.
+#' @param io_folder path to base metrics path (e.g. ../collected_data/metrics/samples)
+#' @param test_group the test group that was run (e.g. S)
+#' @param test_name name of the test that was run
+#' @param consensus_protocol the consensus protocol used in the test
 #' @examples
-#' ./collect_store_metrics.R <metrics_file> <output_folder> <test_name> <consensus_protocol>
-#' ./collect_store_metrics.R metrics.txt ./ S1 raft
+#' ./collect_store_metrics.R <io_folder> <test_group> <test_name> <consensus_protocol>
+#' ./collect_store_metrics.R ../collected_data/metrics/samples ./ EX EX1 "raft"
 #'
 
 source("util.R")
@@ -20,15 +20,20 @@ args <- valiadate_args(
     validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("../collected_data/metrics/samples/EX1/store.metrics.txt", "../collected_data/metrics/samples/EX1", "EX1", "raft")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
     # bizur
-    # defaults = c("../collected_data/metrics/samples/EX2/store.metrics.txt", "../collected_data/metrics/samples/EX2", "EX2", "bizur")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
 )
 
-metrics_file <- args[1]
-output_folder <- args[2]
+METRICS_FILE_NAME <- "store.metrics.txt"
+
+io_folder <- args[1]
+test_group <- args[2]
 test_name <- args[3]
 consensus_alg <- args[4]
+
+metrics_file <- paste(io_folder, test_group, test_name, METRICS_FILE_NAME, sep = "/")
+output_folder <- paste(io_folder, test_group, test_name, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 info("analyzing store metrics of:", metrics_file)
@@ -124,7 +129,7 @@ all_summary <- rbind(
         memory_summary,
         cpu_summary
 )
-all_summary <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_summary)
+all_summary <- data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
@@ -155,10 +160,10 @@ all_raw <- rbind(
     cpu_raw,
     messages_raw
 )
-all_raw <- data.frame(nodeType = "store", testName = test_name, consensusAlg = consensus_alg, all_raw)
+all_raw <- data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_raw)
 
 # finalize column order
-all_raw <- all_raw[,c('nodeType', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[,c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")

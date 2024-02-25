@@ -9,22 +9,21 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) > 3,
+    validator = \(x) length(x) == 3,
     failure_msg = "required arguments are not provided.",
-    # use all.raw.merged.csv or store.raw.merged.csv
     defaults = c(
-        "../collected_data/metrics/samples/MERGED/all.raw.merged.csv",
-        "../collected_data/metrics/samples/EX1 EX2",
-        "collect_plot_raw_data=true",
-        "EX1",
-        "EX2"
+        "../collected_data/metrics/samples/EX",
+        # use all.raw.merged.csv or store.raw.merged.csv
+        "all.raw.merged.csv",
+        "collect_plot_raw_data=true"
     )
 )
 
-input_file <- args[1]
-output_folder <- args[2]
+io_folder <- args[1]
+input_file <- args[2]
 collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
-test_names <- args[-c(1:3)]
+
+input_file <- paste(io_folder, input_file, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 info("analysing consensus messaging:", input_file)
@@ -33,13 +32,12 @@ info("analysing consensus messaging:", input_file)
 data <- read.csv(input_file, header = FALSE, stringsAsFactors = FALSE)
 
 # Rename the columns
-names(data) <- c("nodeType", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
-data$testName_algorithm <- paste(data$testName, data$consensusAlg, sep = "_")
+names(data) <- c("nodeType", "testGroup", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+data$testName_algorithm <- paste0(data$testGroup, data$testName)    # EXEX1
+data$testName_algorithm <- paste(data$testName_algorithm, data$consensusAlg, sep = "_")   # EXEX1_raft
 
-# filter for store metrics and test names
-data <- data %>%
-    filter(nodeType == "store") %>%
-    filter(testName %in% test_names)
+# filter for store metrics
+data <- data %>% filter(nodeType == "store")
 
 # Extract the message type
 data$message_type <- sub(".*\\.", "", data$metric_name)
@@ -102,19 +100,19 @@ plot_message_counts <- ggplot(message_counts, aes(x = timestamp_sec, y = count, 
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
-exportPlot(output_folder, "plot_message_counts", source="processor")
+exportPlot(io_folder, "plot_message_counts", source="processor")
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
 plot_message_sizes <- ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
-exportPlot(output_folder, "plot_message_sizes", source="processor")
+exportPlot(io_folder, "plot_message_sizes", source="processor")
 
 if (collect_plot_raw_data) {
     columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
-    savePlotData(plot_message_counts$data, columns, paste(output_folder, "plot_message_counts.dat", sep="/"))
+    savePlotData(plot_message_counts$data, columns, paste(io_folder, "plot_message_counts.dat", sep="/"))
 
     columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
-    savePlotData(plot_message_sizes$data, columns, paste(output_folder, "plot_message_sizes.dat", sep="/"))
+    savePlotData(plot_message_sizes$data, columns, paste(io_folder, "plot_message_sizes.dat", sep="/"))
 }

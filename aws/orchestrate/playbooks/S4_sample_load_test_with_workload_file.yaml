@@ -5,6 +5,7 @@
 ---
 - import_playbook: T_load_test_consensus_raft.yaml
   vars:
+    test_group: "S"
     test_name: "S4"
     workload_definition: "workloada"
     performance_analysis: true
