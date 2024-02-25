@@ -7,6 +7,8 @@ This is the directory where all the results of the load tests are stored. There 
   subdirectories named after the workload playbook that was run. For example, if you run the 
   [`W1_run_and_analyze_S1_S2.yaml`](../W1_run_and_analyze_S1_S2.yaml) playbook, the results will be stored in the
   [metrics/S1 S2](metrics/S1%20S2) directory.
+- [vars](vars): This directory contains the variables used in the load tests. All ansible variables (including
+  user defined variables) are dumped in this directory for debug/verification purposes.
 
 There are also some other scripts in this directory.
 - R scripts: These scripts are used to replot the metrics graphs based on the collected raw data. The idea is to
