@@ -48,7 +48,7 @@
 - import_playbook: T_load_test_consensus_bizur.yaml
   vars:
     test_name: "W1T4"
-    num_buckets: 1000
+    bizur_num_buckets: 1000
 
 # raft consensus on etcd test
 - import_playbook: T_load_test_etcd_raft.yaml
