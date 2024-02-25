@@ -64,12 +64,13 @@ Following is the naming pattern used for the playbooks.
 necessary software and project dependencies, i.e. `P` stands for "Prepare". These playbooks should be executed only 
 once.
 - `S<X>_<name>`: Playbooks starting with this naming pattern is used for reference purposes only, i.e. `S` stands
-for "Sample". We suggest using `T` playbooks (as described next) for performing the load tests.
-- `T<X>_<name>`: Playbooks starting with this naming pattern is used to perform the load tests, 
-i.e. `T` stands for "Test".
+for "Sample". These are self-contained load test definitions that can be used as a reference to create new load tests.
+When executed, the results are sent to the `processor` node.
+- `T_<name>`: Playbooks starting with this naming pattern are used to define load testing configuration/template for 
+a specific algorithm (raft, bizur etc.) or application (consensus, etcd etc.), i.e. `T` stands for "Test Template".
 - `W<X>_<name>`: Playbooks starting with this naming pattern is used to run a group of workloads, collect results and
-  analyze metrics,
-  i.e. `W` stands for "Workload". They run a group of `S` and `T` type playbooks in a sequence and analyzes metrics.
+analyze metrics,
+i.e. `W` stands for "Workload". They run a group of `S` and `T` type playbooks in a sequence and analyzes metrics.
 - `util_<name>`: Playbooks starting with this naming pattern is used as utility tasks such as starting, 
 stopping, cleanup etc. of hosts that are shared by all other playbooks.
 
@@ -86,9 +87,9 @@ ansible-playbook playbooks/<playbook-name>
 
 After making sure that all `P` playbooks are executed, you can run the `W` playbooks. For example:
 ```
-ansible-playbook playbooks/W1_run_and_analyze_S1_S2.yaml
+ansible-playbook playbooks/W1_run_readWriteProp_SSRBE.yaml
 ```
-When this completes, you can find the results in the [./playbooks/collected_data/metrics/S1 S2](./playbooks/collected_data/metrics)
+When this completes, you can find the results in the [./playbooks/collected_data/metrics](./playbooks/collected_data/metrics)
 directory. See [README](./playbooks/collected_data/README.md) of that directory for more information.
 
 # Useful ansible Commands
