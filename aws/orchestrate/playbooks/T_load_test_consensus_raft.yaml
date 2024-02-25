@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test using raft consensus protocol with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: util_start_load_test.yaml
+  vars:
+    consensus_protocol: "raft"
+    node_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+    store_cli_params: >-
+      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
+      metrics.insights.enabled={{ message_analysis | default(false) }}
+    workload: "{{ workload_definition | default('workload_read_write_proportional') | string }}"

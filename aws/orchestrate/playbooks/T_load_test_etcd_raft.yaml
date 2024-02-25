@@ -1,0 +1,8 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a load test of the etcd cluster with an optionally provided workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: util_etcd_start_load_test.yaml
+  vars:
+    workload: "{{ workload_definition | default('workload_read_write_proportional') | string }}"

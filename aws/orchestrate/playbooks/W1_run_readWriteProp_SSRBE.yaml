@@ -1,0 +1,65 @@
+#------------------------------------------------------------------------------------------------------------
+# Runs the tests and analyzes metrics from the tests run.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- hosts: all
+  tasks:
+    - set_fact:
+        performance_analysis: true
+        resource_usage_analysis: false
+        message_analysis: false
+        workload_definition: |
+          recordcount=1000
+          operationcount=1000
+          workload=site.ycsb.workloads.CoreWorkload
+          
+          readallfields=true
+          
+          readproportion=0.5
+          updateproportion=0.5
+          scanproportion=0
+          insertproportion=0
+          
+          requestdistribution=zipfian
+
+#---------------------------------------------------------------
+
+# client to server raw communication test
+- import_playbook: T_load_test_consensus_simulate.yaml
+  vars:
+    test_name: "W1T1"
+    broadcast_to_followers: false
+    forward_to_leader: false
+
+# consensus simulation test
+- import_playbook: T_load_test_consensus_simulate.yaml
+  vars:
+    test_name: "W1T2"
+    broadcast_to_followers: true
+    forward_to_leader: true
+
+# raft consensus test
+- import_playbook: T_load_test_consensus_raft.yaml
+  vars:
+    test_name: "W1T3"
+
+# bizur consensus test
+- import_playbook: T_load_test_consensus_bizur.yaml
+  vars:
+    test_name: "W1T4"
+    num_buckets: 1000
+
+# raft consensus on etcd test
+- import_playbook: T_load_test_etcd_raft.yaml
+  vars:
+    test_name: "W1T5"
+
+#---------------------------------------------------------------
+
+- import_playbook: util_analyze_metrics.yaml
+  vars:
+    test_names: "W1T1 W1T2 W1T3 W1T4 W1T5"
+    collect_client_raw_data: true
+
+- import_playbook: util_cleanup_processors.yaml
