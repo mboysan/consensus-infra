@@ -8,17 +8,17 @@ source("util.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
-  args = args,
-  validator = \(x) length(x) == 5,
-  failure_msg = "required arguments are not provided.",
-  defaults = c(
-      "../collected_data/metrics/samples/EX",
-      # use all.raw.merged.csv or client.raw.merged.csv
-      "all.raw.merged.csv",
-      "remove_outliers_per_test=true",
-      "timescale_in_milliseconds=true",
-      "collect_plot_raw_data=true"
-  )
+    args = args,
+    validator = \(x) length(x) == 5,
+    failure_msg = "required arguments are not provided.",
+    defaults = c(
+        "../collected_data/metrics/samples/EX",
+        # use all.raw.merged.csv or client.raw.merged.csv
+        "all.raw.merged.csv",
+        "remove_outliers_per_test=true",
+        "timescale_in_milliseconds=true",
+        "collect_plot_raw_data=true"
+    )
 )
 
 io_folder <- args[1]
