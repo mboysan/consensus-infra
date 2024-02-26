@@ -48,22 +48,22 @@ data$timestamp <- as.numeric(data$timestamp)
 data <- data %>% arrange(timestamp)
 
 adjust_start_times <- function() {
-  minStart <- min(data$timestamp)
-  for (testName in testNames) {
-    tmp <- data[data$testName == testName,]
-    minTestStart <- tmp[1,]$timestamp
-    diff <- minTestStart - minStart
-    data[data$testName == testName,]$timestamp <- data[data$testName == testName,]$timestamp - diff
-  }
-  data
+    minStart <- min(data$timestamp)
+    for (testName in testNames) {
+        tmp <- data[data$testName == testName,]
+        minTestStart <- tmp[1,]$timestamp
+        diff <- minTestStart - minStart
+        data[data$testName == testName,]$timestamp <- data[data$testName == testName,]$timestamp - diff
+    }
+    data
 }
 
 data <- adjust_start_times()
 
 # Convert the timestamp from "milliseconds to seconds" to POSIXct date-time
-data$timestamp_sec <- as.POSIXct(data$timestamp/1000, origin = "1970-01-01")
+data$timestamp_sec <- as.POSIXct(data$timestamp / 1000, origin = "1970-01-01")
 
-roundToNearestSecond <- function (data) {
+roundToNearestSecond <- function(data) {
     info("Rounding the timestamp to the nearest second")
     data$timestamp_sec <- round(data$timestamp_sec)
     data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
@@ -78,7 +78,7 @@ if (!timescale_in_milliseconds) {
 
 data$metric_value <- as.numeric(data$metric_value)
 
-removeOutliersPerTest <- function (data) {
+removeOutliersPerTest <- function(data) {
     info("Removing outliers per test")
     newData <- data.frame()
     for (test in testNames) {
@@ -88,6 +88,7 @@ removeOutliersPerTest <- function (data) {
     }
     newData
 }
+
 if (remove_outliers_per_test) {
     data <- removeOutliersPerTest(data)
 }
@@ -112,29 +113,29 @@ update_latency_data <- data %>% filter(metric_name == "update")
 # ----------------------------------------------------------------------------- plots
 info("Plotting read latency")
 plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
-  stat_summary(fun=mean, geom="line") +
-  labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
-  theme_minimal()
-exportPlot(io_folder, "plot_read_latency", source="processor")
+    stat_summary(fun = mean, geom = "line") +
+    labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
+    theme_minimal()
+exportPlot(io_folder, "plot_read_latency", source = "processor")
 
 info("Plotting update latency")
 plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
-  stat_summary(fun=mean, geom="line") +
-  labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
-  theme_minimal()
-exportPlot(io_folder, "plot_update_latency", source="processor")
+    stat_summary(fun = mean, geom = "line") +
+    labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
+    theme_minimal()
+exportPlot(io_folder, "plot_update_latency", source = "processor")
 
 # Plot operation latency, grouped by consensusAlg, metric & timestamp_sec
 info("Plotting operation latency")
 plot_operation_latency <- ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
-  stat_summary(fun=mean, geom="line") +
-  labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
-  theme_minimal()
-exportPlot(io_folder, "plot_operation_latency", source="processor")
+    stat_summary(fun = mean, geom = "line") +
+    labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
+    theme_minimal()
+exportPlot(io_folder, "plot_operation_latency", source = "processor")
 
 if (collect_plot_raw_data) {
     columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-    savePlotData(plot_read_latency$data, columnNames, paste(io_folder, "plot_read_latency.dat", sep="/"))
-    savePlotData(plot_update_latency$data, columnNames, paste(io_folder, "plot_update_latency.dat", sep="/"))
-    savePlotData(plot_operation_latency$data, columnNames, paste(io_folder, "plot_operation_latency.dat", sep="/"))
+    savePlotData(plot_read_latency$data, columnNames, paste(io_folder, "plot_read_latency.dat", sep = "/"))
+    savePlotData(plot_update_latency$data, columnNames, paste(io_folder, "plot_update_latency.dat", sep = "/"))
+    savePlotData(plot_operation_latency$data, columnNames, paste(io_folder, "plot_operation_latency.dat", sep = "/"))
 }
