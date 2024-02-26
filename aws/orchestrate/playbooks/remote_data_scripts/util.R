@@ -28,22 +28,33 @@ using(
 options(scipen = 999)
 
 DEBUG_ENABLED <- TRUE
+START_TIME <- Sys.time()
+
+elapsed <- function(start_time = START_TIME) {
+  end_time <- Sys.time()
+  elapsedTime <- end_time - start_time
+  paste0("elapsed:[", elapsedTime, "]")
+}
+
+currTime <- function() {
+  format(Sys.time(), "%H:%M:%OS3", digits = 3L)
+}
 
 info <- function(...) {
   texts <- c(...)
-  cat("[INFO]", texts, "\n")
+  cat(paste0(currTime(), " [INFO]"), texts, "\n")
 }
 
 debug <- function(...) {
   if (DEBUG_ENABLED) {
     texts <- c(...)
-    cat("[DEBUG]", texts, "\n")
+    cat(paste0(currTime(), " [DEBUG]"), texts, "\n")
   }
 }
 
 error <- function(...) {
   texts <- c(...)
-  cat("[ERROR]", texts, "\n")
+  cat(paste0(currTime(), " [ERROR]"), texts, "\n")
 }
 
 valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_defaults_on_fail = TRUE) {
@@ -61,6 +72,7 @@ valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_de
 }
 
 savePlotData <- function (data, columnNamesToInclude, outputFile) {
+  info("saving plot data to file:", outputFile)
   data <- data[, names(data) %in% columnNamesToInclude]
   write.csv(data, file = outputFile, row.names = FALSE)
 }
@@ -69,6 +81,7 @@ exportPlot <- function(folder, fileName, source, extension="png", ggPlot=last_pl
   # TODO: define size and resolution
   fileName <- paste(fileName, source, "out", extension, sep=".")
   fileName <- paste(folder, fileName, sep="/")
+  info("exporting plot to file:", fileName)
   ggsave(fileName, plot=ggPlot)
 }
 

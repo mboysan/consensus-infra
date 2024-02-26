@@ -64,7 +64,7 @@ data <- adjust_start_times()
 data$timestamp_sec <- as.POSIXct(data$timestamp/1000, origin = "1970-01-01")
 
 roundToNearestSecond <- function (data) {
-    # Round the timestamp to the nearest second
+    info("Rounding the timestamp to the nearest second")
     data$timestamp_sec <- round(data$timestamp_sec)
     data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
     data
@@ -79,7 +79,6 @@ if (!timescale_in_milliseconds) {
 data$metric_value <- as.numeric(data$metric_value)
 
 removeOutliersPerTest <- function (data) {
-    # Remove outliers per test
     info("Removing outliers per test")
     newData <- data.frame()
     for (test in testNames) {
@@ -94,39 +93,31 @@ if (remove_outliers_per_test) {
 }
 
 # Group the data
-grouped_data <- data
-
 if (timescale_in_milliseconds) {
-    grouped_data <- data %>%
+    data <- data %>%
         group_by(testName_algorithm, metric_name, timestamp_sec)
 } else {
-    grouped_data <- data %>%
+    data <- data %>%
         group_by(testName_algorithm, metric_name, timestamp_sec) %>%
         mutate(metric_value = mean(metric_value)) %>%
         distinct(testName_algorithm, metric_name, metric_value, timestamp_sec, .keep_all = TRUE)
 }
 
-# convert us to ms
-grouped_data$metric_value <- grouped_data$metric_value / 1000
+info("Converting metric_value from microseconds to milliseconds")
+data$metric_value <- data$metric_value / 1000
 
-# client read latency
-read_latency_data <- grouped_data %>%
-  filter(metric_name == "read")
-
-
-# client update latency
-update_latency_data <- grouped_data %>%
-  filter(metric_name == "update")
+read_latency_data <- data %>% filter(metric_name == "read")
+update_latency_data <- data %>% filter(metric_name == "update")
 
 # ----------------------------------------------------------------------------- plots
-# Plot read latency, grouped by consensusAlg, metric & timestamp_sec
+info("Plotting read latency")
 plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
   theme_minimal()
 exportPlot(io_folder, "plot_read_latency", source="processor")
 
-# Plot update latency, grouped by consensusAlg, metric & timestamp_sec
+info("Plotting update latency")
 plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
@@ -134,7 +125,8 @@ plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = me
 exportPlot(io_folder, "plot_update_latency", source="processor")
 
 # Plot operation latency, grouped by consensusAlg, metric & timestamp_sec
-plot_operation_latency <- ggplot(grouped_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+info("Plotting operation latency")
+plot_operation_latency <- ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
   stat_summary(fun=mean, geom="line") +
   labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
   theme_minimal()
