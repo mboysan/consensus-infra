@@ -4,15 +4,6 @@
 
 ---
 
-- name: Make MERGED metrics directory on processor
-  hosts: processors
-  any_errors_fatal: true
-  tasks:
-    - name: Creating MERGED metrics directory for the test
-      file:
-        path: '{{ processors_GROUP_project_metrics_path }}/MERGED'
-        state: directory
-
 - name: Merges and analyzes metrics
   hosts: processors
   any_errors_fatal: true
@@ -37,9 +28,8 @@
         _io_folder: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}"
         _input_file: "client.raw.merged.csv"
         _remove_outliers_per_test: "remove_outliers_per_test={{ remove_outliers_per_test | default(true) }}"
-        _timescale_in_milliseconds: "timescale_in_milliseconds={{ timescale_in_milliseconds | default(true) }}"
-        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
-        _args: "{{ _io_folder }} {{ _input_file }} {{ _remove_outliers_per_test }} {{ _timescale_in_milliseconds }} {{ _collect_plot_raw_data }}"
+        _timescale_in_milliseconds: "timescale_in_milliseconds={{ timescale_in_milliseconds | default(false) }}"
+        _args: "{{ _io_folder }} {{ _input_file }} {{ _remove_outliers_per_test }} {{ _timescale_in_milliseconds }}"
       when: performance_analysis | default(true)
 
     - name: Doing message analysis
@@ -50,8 +40,7 @@
       vars:
         _io_folder: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}"
         _input_file: "store.raw.merged.csv"
-        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
-        _args: "{{ _io_folder }} {{ _input_file }} {{ _collect_plot_raw_data }}"
+        _args: "{{ _io_folder }} {{ _input_file }}"
       when: message_analysis | default(true)
 
     - name: Doing resource usage analysis
@@ -62,8 +51,7 @@
       vars:
         _io_folder: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}"
         _input_file: "store.raw.merged.csv"
-        _collect_plot_raw_data: "collect_plot_raw_data={{ collect_plot_raw_data | default(true) }}"
-        _args: "{{ _io_folder }} {{ _input_file }} {{ _collect_plot_raw_data }}"
+        _args: "{{ _io_folder }} {{ _input_file }}"
       when: resource_usage_analysis | default(true)
 
 - name: Fetches the results to controller
@@ -87,13 +75,6 @@
           mv *.out.* sync/
         chdir: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}/"
       when: collect_plots | default(true)
-
-    - name: Moving the raw plot data to sync directory
-      shell:
-        cmd: |
-          mv *.dat sync/
-        chdir: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}/"
-      when: collect_plot_raw_data | default(true)
 
     - name: Moving CLIENT raw data to sync directory
       shell:
