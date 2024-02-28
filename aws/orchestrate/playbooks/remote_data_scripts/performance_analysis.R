@@ -9,15 +9,14 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 5,
+    validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     defaults = c(
         "../collected_data/metrics/samples/EX",
         # use all.raw.merged.csv or client.raw.merged.csv
         "all.raw.merged.csv",
         "remove_outliers_per_test=true",
-        "timescale_in_milliseconds=true",
-        "collect_plot_raw_data=true"
+        "timescale_in_milliseconds=false"
     )
 )
 
@@ -25,7 +24,6 @@ io_folder <- args[1]
 input_file <- args[2]
 remove_outliers_per_test <- grepl("true", args[3], ignore.case = TRUE)
 timescale_in_milliseconds <- grepl("true", args[4], ignore.case = TRUE)
-collect_plot_raw_data <- grepl("true", args[5], ignore.case = TRUE)
 
 input_file <- paste(io_folder, input_file, sep = "/")
 
@@ -112,30 +110,22 @@ update_latency_data <- data %>% filter(metric_name == "update")
 
 # ----------------------------------------------------------------------------- plots
 info("Plotting read latency")
-plot_read_latency <- ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     stat_summary(fun = mean, geom = "line") +
     labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_read_latency", source = "processor")
 
 info("Plotting update latency")
-plot_update_latency <- ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     stat_summary(fun = mean, geom = "line") +
     labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_update_latency", source = "processor")
 
-# Plot operation latency, grouped by consensusAlg, metric & timestamp_sec
 info("Plotting operation latency")
-plot_operation_latency <- ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     stat_summary(fun = mean, geom = "line") +
     labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_operation_latency", source = "processor")
-
-if (collect_plot_raw_data) {
-    columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-    savePlotData(plot_read_latency$data, columnNames, paste(io_folder, "plot_read_latency.dat", sep = "/"))
-    savePlotData(plot_update_latency$data, columnNames, paste(io_folder, "plot_update_latency.dat", sep = "/"))
-    savePlotData(plot_operation_latency$data, columnNames, paste(io_folder, "plot_operation_latency.dat", sep = "/"))
-}
