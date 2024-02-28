@@ -8,15 +8,15 @@ source("util.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
-  args = args,
-  validator = \(x) length(x) == 3,
-  failure_msg = "required arguments are not provided.",
-  defaults = c(
-      "../collected_data/metrics/samples/EX",
-      # use all.raw.merged.csv or store.raw.merged.csv
-      "all.raw.merged.csv",
-      "collect_plot_raw_data=true"
-  )
+    args = args,
+    validator = \(x) length(x) == 3,
+    failure_msg = "required arguments are not provided.",
+    defaults = c(
+        "../collected_data/metrics/samples/EX",
+        # use all.raw.merged.csv or store.raw.merged.csv
+        "all.raw.merged.csv",
+        "collect_plot_raw_data=true"
+    )
 )
 
 io_folder <- args[1]
@@ -42,16 +42,16 @@ data$timestamp <- as.numeric(data$timestamp)
 data <- data %>% arrange(timestamp)
 
 adjust_start_times <- function() {
-  minStart <- min(data$timestamp)
-  testNames <- unique(data$testName)
+    minStart <- min(data$timestamp)
+    testNames <- unique(data$testName)
 
-  for (testName in testNames) {
-    tmp <- data[data$testName == testName,]
-    minTestStart <- tmp[1,]$timestamp
-    diff <- minTestStart - minStart
-    data[data$testName == testName,]$timestamp <- data[data$testName == testName,]$timestamp - diff
-  }
-  data
+    for (testName in testNames) {
+        tmp <- data[data$testName == testName,]
+        minTestStart <- tmp[1,]$timestamp
+        diff <- minTestStart - minStart
+        data[data$testName == testName,]$timestamp <- data[data$testName == testName,]$timestamp - diff
+    }
+    data
 }
 
 data <- adjust_start_times()
@@ -85,30 +85,30 @@ grouped_data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec
 
 # jvm memory usage
 memory_data <- grouped_data %>%
-  filter(metric_name == "jvm.memory.used")
+    filter(metric_name == "jvm.memory.used")
 # convert to MB
 memory_data$metric_value <- memory_data$metric_value / 1000 / 1000
 
 # process cpu usage
 process_cpu_data <- grouped_data %>%
-  filter(metric_name == "process.cpu.usage")
+    filter(metric_name == "process.cpu.usage")
 
 # Plot memory usage, grouped by consensusAlg, metric_name & timestamp_sec
 plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
-  geom_line() +
-  labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
-  theme_minimal()
-exportPlot(io_folder, "plot_memory_data", source="processor")
+    geom_line() +
+    labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
+    theme_minimal()
+exportPlot(io_folder, "plot_memory_data", source = "processor")
 
 # Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
 plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
-  geom_line() +
-  labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
-  theme_minimal()
-exportPlot(io_folder, "plot_process_cpu_data", source="processor")
+    geom_line() +
+    labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
+    theme_minimal()
+exportPlot(io_folder, "plot_process_cpu_data", source = "processor")
 
 if (collect_plot_raw_data) {
-  columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-  savePlotData(plot_memory$data, columnNames, paste(io_folder, "plot_memory.dat", sep="/"))
-  savePlotData(plot_cpu$data, columnNames, paste(io_folder, "plot_cpu.dat", sep="/"))
+    columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
+    savePlotData(plot_memory$data, columnNames, paste(io_folder, "plot_memory.dat", sep = "/"))
+    savePlotData(plot_cpu$data, columnNames, paste(io_folder, "plot_cpu.dat", sep = "/"))
 }
