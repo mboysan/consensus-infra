@@ -15,7 +15,7 @@
 
 source("util.R")
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 4,
@@ -73,7 +73,7 @@ summary <- function(csv) {
             p99 = quantile(value, 0.99),
             p99.9 = quantile(value, 0.999),
             p99.99 = quantile(value, 0.9999))
-        # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
+    # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
     data <- as.data.frame(data)
     # add 'metric' column
     data.frame(metric = metricName, data)
@@ -97,10 +97,10 @@ calc_runtime <- function(csv) {
 }
 
 calc_throughput <- function(csv) {
-    csv <- csv %>% filter(value > -1, na.rm=TRUE)
+    csv <- csv %>% filter(value > -1, na.rm = TRUE)
     runtime <- calc_runtime(csv)
     opCount <- nrow(csv)
-    throughput <- (opCount/runtime)
+    throughput <- (opCount / runtime)
     debug("runtime (sec)=[", runtime, "],", "total op count=[", opCount, "],", "throughput (ops/sec)=[", throughput, "]")
     throughput
 }
@@ -121,22 +121,22 @@ read_modify_write_failed_latency <- extract('read-modify-write-failed')
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
 all_raw <- rbind(
-  read_latency,
-  read_failed_latency,
-  update_latency,
-  update_failed_latency,
-  insert_latency,
-  insert_failed_latency,
-  scan_latency,
-  scan_failed_latency,
-  read_modify_write_latency,
-  read_modify_write_failed_latency
+    read_latency,
+    read_failed_latency,
+    update_latency,
+    update_failed_latency,
+    insert_latency,
+    insert_failed_latency,
+    scan_latency,
+    scan_failed_latency,
+    read_modify_write_latency,
+    read_modify_write_failed_latency
 )
-all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
+all_raw <- all_raw %>% filter(value > -1, na.rm = TRUE)   # sanitize
 all_raw <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
 
 # finalize column order
-all_raw <- all_raw[,c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[, c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
@@ -177,14 +177,14 @@ overall_summary <- rbind(
     summary(runtime),
     summary(throughput)
 )
-overall_summary <- overall_summary %>% filter(mean > 0, na.rm=TRUE)   # sanitize
+overall_summary <- overall_summary %>% filter(mean > 0, na.rm = TRUE)   # sanitize
 overall_summary <- data.frame(category = 'overall', overall_summary)
 
 all_summary <- rbind(
     latency_summary,
     overall_summary
 )
-all_summary <- all_summary %>% filter(mean > -1, na.rm=TRUE)   # sanitize
+all_summary <- all_summary %>% filter(mean > -1, na.rm = TRUE)   # sanitize
 all_summary <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files

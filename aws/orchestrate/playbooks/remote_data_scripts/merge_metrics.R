@@ -2,7 +2,7 @@
 
 source("util.R")
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 3,
@@ -17,7 +17,7 @@ io_folder <- args[1]
 merge_client_metrics <- grepl("true", args[2], ignore.case = TRUE)
 merge_store_metrics <- grepl("true", args[3], ignore.case = TRUE)
 
-test_folders <- list.dirs(io_folder, recursive=FALSE)
+test_folders <- list.dirs(io_folder, recursive = FALSE)
 
 # ----------------------------------------------------------------------------- helper functions
 
@@ -27,7 +27,7 @@ mergeMetrics <- function(nodeType, metricsType) {
         # e.g. store.summary.out.csv
         metrics_file <- paste(nodeType, metricsType, "out.csv", sep = ".")
         metrics_file <- paste(folder, metrics_file, sep = "/")
-        
+
         info("merging metrics from", metrics_file)
         metrics_csv <- read.csv(metrics_file, header = TRUE)
         merged_metrics_csv <- rbind(merged_metrics_csv, metrics_csv)

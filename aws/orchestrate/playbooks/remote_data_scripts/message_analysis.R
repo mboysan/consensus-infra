@@ -100,19 +100,19 @@ plot_message_counts <- ggplot(message_counts, aes(x = timestamp_sec, y = count, 
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
-exportPlot(io_folder, "plot_message_counts", source="processor")
+exportPlot(io_folder, "plot_message_counts", source = "processor")
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
 plot_message_sizes <- ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
-exportPlot(io_folder, "plot_message_sizes", source="processor")
+exportPlot(io_folder, "plot_message_sizes", source = "processor")
 
 if (collect_plot_raw_data) {
     columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
-    savePlotData(plot_message_counts$data, columns, paste(io_folder, "plot_message_counts.dat", sep="/"))
+    savePlotData(plot_message_counts$data, columns, paste(io_folder, "plot_message_counts.dat", sep = "/"))
 
     columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
-    savePlotData(plot_message_sizes$data, columns, paste(io_folder, "plot_message_sizes.dat", sep="/"))
+    savePlotData(plot_message_sizes$data, columns, paste(io_folder, "plot_message_sizes.dat", sep = "/"))
 }

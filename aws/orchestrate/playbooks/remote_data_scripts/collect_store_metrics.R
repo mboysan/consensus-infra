@@ -14,7 +14,7 @@
 
 source("util.R")
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 4,
@@ -75,7 +75,7 @@ summary <- function(csv) {
             p99 = quantile(value, 0.99),
             p99.9 = quantile(value, 0.999),
             p99.99 = quantile(value, 0.9999))
-        # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
+    # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
     data <- as.data.frame(data)
     # add 'metric' column
     data.frame(metric = metricName, data)
@@ -94,10 +94,10 @@ values_total_summary <- summary(values_total)
 store_total_summary <- summary(store_total)
 
 memory_summary <- rbind(
-        jvm_memory_used_summary,
-        keys_total_summary,
-        values_total_summary,
-        store_total_summary
+    jvm_memory_used_summary,
+    keys_total_summary,
+    values_total_summary,
+    store_total_summary
 )
 
 memory_summary <- data.frame(category = "memory", memory_summary)
@@ -111,8 +111,8 @@ system_cpu_usage_summary <- summary(system_cpu_usage)
 process_cpu_usage_summary <- summary(process_cpu_usage)
 
 cpu_summary <- rbind(
-        system_cpu_usage_summary,
-        process_cpu_usage_summary
+    system_cpu_usage_summary,
+    process_cpu_usage_summary
 )
 
 cpu_summary <- data.frame(category = "cpu", cpu_summary)
@@ -126,8 +126,8 @@ messages_client_receive <- extractInsights("insights.tcp.client.receive")
 # ----------------------------------------------------------------------------- collect summary data
 
 all_summary <- rbind(
-        memory_summary,
-        cpu_summary
+    memory_summary,
+    cpu_summary
 )
 all_summary <- data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
 
@@ -163,7 +163,7 @@ all_raw <- rbind(
 all_raw <- data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_raw)
 
 # finalize column order
-all_raw <- all_raw[,c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[, c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing store summary data to csv file")
