@@ -9,19 +9,17 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 3,
+    validator = \(x) length(x) == 2,
     failure_msg = "required arguments are not provided.",
     defaults = c(
         "../collected_data/metrics/samples/EX",
         # use all.raw.merged.csv or store.raw.merged.csv
-        "all.raw.merged.csv",
-        "collect_plot_raw_data=true"
+        "all.raw.merged.csv"
     )
 )
 
 io_folder <- args[1]
 input_file <- args[2]
-collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
 
 input_file <- paste(io_folder, input_file, sep = "/")
 
@@ -96,23 +94,16 @@ message_counts <- grouped_data %>% summarise(count = n())
 message_sizes <- grouped_data %>% summarise(sum = sum(metric_value / 1024))
 
 # Plot count of messages, grouped by consensusAlg & timestamp_sec
-plot_message_counts <- ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
+ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_message_counts", source = "processor")
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
-plot_message_sizes <- ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
+ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_message_sizes", source = "processor")
 
-if (collect_plot_raw_data) {
-    columns <- c("timestamp_sec", "count", "testName_algorithm", ".group")
-    savePlotData(plot_message_counts$data, columns, paste(io_folder, "plot_message_counts.dat", sep = "/"))
-
-    columns <- c("timestamp_sec", "sum", "testName_algorithm", ".group")
-    savePlotData(plot_message_sizes$data, columns, paste(io_folder, "plot_message_sizes.dat", sep = "/"))
-}

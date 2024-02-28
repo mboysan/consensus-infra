@@ -9,19 +9,17 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 3,
+    validator = \(x) length(x) == 2,
     failure_msg = "required arguments are not provided.",
     defaults = c(
         "../collected_data/metrics/samples/EX",
         # use all.raw.merged.csv or store.raw.merged.csv
-        "all.raw.merged.csv",
-        "collect_plot_raw_data=true"
+        "all.raw.merged.csv"
     )
 )
 
 io_folder <- args[1]
 input_file <- args[2]
-collect_plot_raw_data <- grepl("true", args[3], ignore.case = TRUE)
 
 input_file <- paste(io_folder, input_file, sep = "/")
 
@@ -94,21 +92,16 @@ process_cpu_data <- grouped_data %>%
     filter(metric_name == "process.cpu.usage")
 
 # Plot memory usage, grouped by consensusAlg, metric_name & timestamp_sec
-plot_memory <- ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_memory_data", source = "processor")
 
 # Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
-plot_cpu <- ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     geom_line() +
     labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_process_cpu_data", source = "processor")
 
-if (collect_plot_raw_data) {
-    columnNames <- c("timestamp_sec", "metric_value", "testName_algorithm", ".group")
-    savePlotData(plot_memory$data, columnNames, paste(io_folder, "plot_memory.dat", sep = "/"))
-    savePlotData(plot_cpu$data, columnNames, paste(io_folder, "plot_cpu.dat", sep = "/"))
-}
