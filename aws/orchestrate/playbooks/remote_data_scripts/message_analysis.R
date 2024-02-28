@@ -85,13 +85,13 @@ data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 data$metric_value <- as.numeric(data$metric_value)
 
 # Group the data
-grouped_data <- data %>% group_by(testName_algorithm, timestamp_sec)
+data <- data %>% group_by(testName_algorithm, timestamp_sec)
 
+# ----------------------------------------------------------------------------- plots
+
+info("Plotting message counts")
 # Count the number of messages per group
-message_counts <- grouped_data %>% summarise(count = n())
-
-# Sum the size of messages per group
-message_sizes <- grouped_data %>% summarise(sum = sum(metric_value / 1024))
+message_counts <- data %>% summarise(count = n())
 
 # Plot count of messages, grouped by consensusAlg & timestamp_sec
 ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
@@ -99,6 +99,11 @@ ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algori
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_message_counts", source = "processor")
+rm(message_counts); gc()
+
+info("Plotting message sizes")
+# Sum the size of messages per group
+message_sizes <- data %>% summarise(sum = sum(metric_value / 1024))
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
 ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
@@ -106,4 +111,5 @@ ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_message_sizes", source = "processor")
+rm(message_sizes); gc()
 

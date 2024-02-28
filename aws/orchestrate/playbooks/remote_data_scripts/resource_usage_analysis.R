@@ -63,9 +63,9 @@ data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 data$metric_value <- as.numeric(data$metric_value)
 
 # Group the data
-grouped_data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec)
+data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec)
 
-# ----------------------------------------------------------------------------- calculations
+# ----------------------------------------------------------------------------- plots
 
 # total memory consumption calculated with somes of both heap & non-heap spaces of:
 # jvm.memory.committed
@@ -81,15 +81,11 @@ grouped_data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec
 # jvm.memory.used
 # process.cpu.usage
 
+info("Plotting memory data")
 # jvm memory usage
-memory_data <- grouped_data %>%
-    filter(metric_name == "jvm.memory.used")
+memory_data <- data %>% filter(metric_name == "jvm.memory.used")
 # convert to MB
 memory_data$metric_value <- memory_data$metric_value / 1000 / 1000
-
-# process cpu usage
-process_cpu_data <- grouped_data %>%
-    filter(metric_name == "process.cpu.usage")
 
 # Plot memory usage, grouped by consensusAlg, metric_name & timestamp_sec
 ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
@@ -97,6 +93,11 @@ ggplot(memory_data, aes(x = timestamp_sec, y = metric_value, color = testName_al
     labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_memory_data", source = "processor")
+rm(memory_data); gc()
+
+info("Plotting cpu data")
+# process cpu usage
+process_cpu_data <- data %>% filter(metric_name == "process.cpu.usage")
 
 # Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
 ggplot(process_cpu_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +

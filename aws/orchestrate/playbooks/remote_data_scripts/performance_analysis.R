@@ -105,23 +105,24 @@ if (timescale_in_milliseconds) {
 info("Converting metric_value from microseconds to milliseconds")
 data$metric_value <- data$metric_value / 1000
 
-read_latency_data <- data %>% filter(metric_name == "read")
-update_latency_data <- data %>% filter(metric_name == "update")
-
 # ----------------------------------------------------------------------------- plots
 info("Plotting read latency")
+read_latency_data <- data %>% filter(metric_name == "read")
 ggplot(read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     stat_summary(fun = mean, geom = "line") +
     labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_read_latency", source = "processor")
+rm(read_latency_data); gc()
 
 info("Plotting update latency")
+update_latency_data <- data %>% filter(metric_name == "update")
 ggplot(update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
     stat_summary(fun = mean, geom = "line") +
     labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_update_latency", source = "processor")
+rm(update_latency_data); gc()
 
 info("Plotting operation latency")
 ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
