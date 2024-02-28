@@ -19,7 +19,8 @@ using <- function(...) {
 # list of packages/libraries required
 using(
   'dplyr',
-  'ggplot2'
+  'ggplot2',
+  'svglite'
 )
 
 # ----------------------------------------------------------------------------- utilitiy functions and constants
@@ -77,12 +78,15 @@ savePlotData <- function (data, columnNamesToInclude, outputFile) {
   write.csv(data, file = outputFile, row.names = FALSE)
 }
 
-exportPlot <- function(folder, fileName, source, extension="png", ggPlot=last_plot()) {
-  # TODO: define size and resolution
+exportPlot <- function(folder, fileName, source, extension="svg", ggPlot=last_plot()) {
   fileName <- paste(fileName, source, "out", extension, sep=".")
   fileName <- paste(folder, fileName, sep="/")
+
   info("exporting plot to file:", fileName)
   ggsave(fileName, plot=ggPlot)
+
+  info("Removing cached plot and freeing memory")
+  ggplot(); gc()
 }
 
 remove_outliers_from_metric_value <- function(data) {
