@@ -42,10 +42,10 @@ store_total <- extractInsights("insights.store.sizeOf.total")
 
 # ----------------------------------------------------------------------------- collect summary data
 memory_summary <- rbind(
-    summary(jvm_memory_used),
-    summary(keys_total),
-    summary(values_total),
-    summary(store_total)
+    doSummary(jvm_memory_used),
+    doSummary(keys_total),
+    doSummary(values_total),
+    doSummary(store_total)
 )
 memory_summary <- data.frame(category = "memory", memory_summary)
 memory_summary <- collectStoreSummaryData(memory_summary)

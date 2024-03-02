@@ -72,7 +72,7 @@ valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_de
     stop(failure_msg)
 }
 
-summary <- function(csv) {
+doSummary <- function(csv) {
     if (nrow(csv) == 0) {
         return(data.frame())
     }

@@ -132,28 +132,28 @@ throughput <- metric_as_df("throughput", throughput)
 # ----------------------------------------------------------------------------- collect summary data
 
 latency_summary <- rbind(
-    summary(read_latency),
-    summary(read_failed_latency),
-    summary(update_latency),
-    summary(update_failed_latency),
-    summary(insert_latency),
-    summary(insert_failed_latency),
-    summary(scan_latency),
-    summary(scan_failed_latency),
-    summary(read_modify_write_latency),
-    summary(read_modify_write_failed_latency)
+    doSummary(read_latency),
+    doSummary(read_failed_latency),
+    doSummary(update_latency),
+    doSummary(update_failed_latency),
+    doSummary(insert_latency),
+    doSummary(insert_failed_latency),
+    doSummary(scan_latency),
+    doSummary(scan_failed_latency),
+    doSummary(read_modify_write_latency),
+    doSummary(read_modify_write_failed_latency)
 )
 latency_summary <- data.frame(category = "latency", latency_summary)
 
 overall_summary <- rbind(
-    summary(read_count),
-    summary(update_count),
-    summary(insert_count),
-    summary(scan_count),
-    summary(readWrite_count),
-    summary(total_ops_count),
-    summary(runtime),
-    summary(throughput)
+    doSummary(read_count),
+    doSummary(update_count),
+    doSummary(insert_count),
+    doSummary(scan_count),
+    doSummary(readWrite_count),
+    doSummary(total_ops_count),
+    doSummary(runtime),
+    doSummary(throughput)
 )
 overall_summary <- overall_summary %>% filter(mean > 0, na.rm = TRUE)   # sanitize
 overall_summary <- data.frame(category = 'overall', overall_summary)

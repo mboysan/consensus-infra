@@ -71,7 +71,7 @@ message_summary <- data.frame()
 for (request in consensus_requests) {
     request_data <- extractInsights(request)
     if (nrow(request_data) > 0) {
-        request_summary_data <- summary(request_data)
+        request_summary_data <- doSummary(request_data)
         message_summary <- rbind(message_summary, request_summary_data)
         messages_raw <- rbind(messages_raw, request_data)
     }
@@ -80,8 +80,8 @@ for (request in consensus_requests) {
 rm(metrics_csv); gc()
 
 # ----------------------------------------------------------------------------- collect summary data
-total_request_count <- summary(count_as_df("total_consensus_request_count", messages_raw))
-total_request_size <- summary(sum_as_df("total_consensus_request_size", messages_raw))
+total_request_count <- doSummary(count_as_df("total_consensus_request_count", messages_raw))
+total_request_size <- doSummary(sum_as_df("total_consensus_request_size", messages_raw))
 message_summary <- rbind(message_summary, total_request_count, total_request_size)
 
 message_summary <- data.frame(category = "message", message_summary)

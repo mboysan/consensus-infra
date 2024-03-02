@@ -40,8 +40,8 @@ process_cpu_usage <- extractCpu("process.cpu.usage")
 
 # ----------------------------------------------------------------------------- collect summary data
 cpu_summary <- rbind(
-    summary(system_cpu_usage),
-    summary(process_cpu_usage)
+    doSummary(system_cpu_usage),
+    doSummary(process_cpu_usage)
 )
 cpu_summary <- data.frame(category = "cpu", cpu_summary)
 cpu_summary <- collectStoreSummaryData(cpu_summary)
