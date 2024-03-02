@@ -21,9 +21,9 @@ args <- valiadate_args(
     validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     # raft
-    # defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
     # bizur
-    defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
 )
 
 METRICS_FILE_NAME <- "client.metrics.txt"
@@ -38,7 +38,7 @@ output_folder <- paste(io_folder, test_group, test_name, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 
-info("analyzing client metrics of:", metrics_file)
+info("collecting client metrics of:", metrics_file)
 
 metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('metric', 'value', 'timestamp'))
 
@@ -55,28 +55,6 @@ extract <- function(metricName) {
     }
     data$value <- as.numeric(data$value)
     data
-}
-
-summary <- function(csv) {
-    metricName <- csv$metric[1]
-    data <- csv %>%
-        # mutate(value = value / 1024) %>%
-        summarize(
-            min = min(value),
-            max = max(value),
-            mean = mean(value),
-            p1 = quantile(value, 0.01),
-            p5 = quantile(value, 0.05),
-            p50 = quantile(value, 0.5),
-            p90 = quantile(value, 0.9),
-            p95 = quantile(value, 0.95),
-            p99 = quantile(value, 0.99),
-            p99.9 = quantile(value, 0.999),
-            p99.99 = quantile(value, 0.9999))
-    # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
-    data <- as.data.frame(data)
-    # add 'metric' column
-    data.frame(metric = metricName, data)
 }
 
 # return a compatible data.frame from the provided metric and value
@@ -195,7 +173,3 @@ write.csv(all_raw, out_file, row.names = FALSE)
 info("writing client summary data to csv file")
 out_file <- paste(output_folder, "client.summary.out.csv", sep = "/")
 write.csv(all_summary, out_file, row.names = FALSE)
-
-# debug
-print(all_summary)
-

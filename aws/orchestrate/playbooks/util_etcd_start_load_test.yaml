@@ -79,7 +79,7 @@
 - import_playbook: util_send_metrics.yaml
   vars:
     consensus_protocol: "etcd_raft"
-    resource_usage_analysis: false
-    message_analysis: false
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false
 
 - import_playbook: util_cleanup_workers.yaml

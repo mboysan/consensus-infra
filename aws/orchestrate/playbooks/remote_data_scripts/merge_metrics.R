@@ -21,11 +21,18 @@ test_folders <- list.dirs(io_folder, recursive = FALSE)
 
 # ----------------------------------------------------------------------------- helper functions
 
-mergeMetrics <- function(nodeType, metricsType) {
+mergeMetrics <- function(nodeType, metricsType, dataType) {
     merged_metrics_csv <- data.frame()
     for (folder in test_folders) {
-        # e.g. store.summary.out.csv
-        metrics_file <- paste(nodeType, metricsType, "out.csv", sep = ".")
+        # e.g. store.memory.summary.out.csv
+        metrics_file <- nodeType
+        if (!is.na(metricsType)) {
+            metrics_file <- paste(metrics_file, metricsType, sep = ".")
+        }
+        if (!is.na(dataType)) {
+            metrics_file <- paste(metrics_file, dataType, sep = ".")
+        }
+        metrics_file <- paste(metrics_file, "out.csv", sep = ".")
         metrics_file <- paste(folder, metrics_file, sep = "/")
 
         info("merging metrics from", metrics_file)
@@ -44,46 +51,39 @@ writeCsv <- function(fileName, data) {
 # ----------------------------------------------------------------- merge metrics from provided tests and write to csv
 
 # summary metrics
-client_summary_metrics <- NULL
-store_summary_metrics <- NULL
-
 if (merge_client_metrics) {
-    client_summary_metrics <- mergeMetrics("client", "summary")
+    client_summary_metrics <- mergeMetrics("client", NA, "summary")
     writeCsv("client.summary.merged.csv", client_summary_metrics)
+    rm(client_summary_metrics); gc()
 }
 
 if (merge_store_metrics) {
-    store_summary_metrics <- mergeMetrics("store", "summary")
-    writeCsv("store.summary.merged.csv", store_summary_metrics)
-}
+    store_memory_summary_metrics <- mergeMetrics("store", "memory", "summary")
+    writeCsv("store.memory.summary.merged.csv", store_memory_summary_metrics)
+    rm(store_memory_summary_metrics); gc()
 
-if (merge_client_metrics || merge_store_metrics) {
-    all_summary_metrics <- rbind(client_summary_metrics, store_summary_metrics)
-    writeCsv("all.summary.merged.csv", all_summary_metrics)
+    store_cpu_summary_metrics <- mergeMetrics("store", "cpu", "summary")
+    writeCsv("store.cpu.summary.merged.csv", store_cpu_summary_metrics)
+    rm(store_cpu_summary_metrics); gc()
 }
 
 # raw metrics
-client_raw_metrics <- NULL
-store_raw_metrics <- NULL
-
 if (merge_client_metrics) {
-    client_raw_metrics <- mergeMetrics("client", "raw")
+    client_raw_metrics <- mergeMetrics("client", NA, "raw")
     writeCsv("client.raw.merged.csv", client_raw_metrics)
+    rm(client_raw_metrics); gc()
 }
 
 if (merge_store_metrics) {
-    store_raw_metrics <- mergeMetrics("store", "raw")
-    writeCsv("store.raw.merged.csv", store_raw_metrics)
+    store_memory_raw_metrics <- mergeMetrics("store", "memory", "raw")
+    writeCsv("store.memory.raw.merged.csv", store_memory_raw_metrics)
+    rm(store_memory_raw_metrics); gc()
+
+    store_cpu_raw_metrics <- mergeMetrics("store", "cpu", "raw")
+    writeCsv("store.cpu.raw.merged.csv", store_cpu_raw_metrics)
+    rm(store_cpu_raw_metrics); gc()
+
+    store_message_raw_metrics <- mergeMetrics("store", "message", "raw")
+    writeCsv("store.message.raw.merged.csv", store_message_raw_metrics)
+    rm(store_message_raw_metrics); gc()
 }
-
-if (merge_client_metrics || merge_store_metrics) {
-    all_raw_metrics <- rbind(client_raw_metrics, store_raw_metrics)
-    writeCsv("all.raw.merged.csv", all_raw_metrics)
-}
-
-all_raw_metrics <- NULL
-all_summary_metrics <- NULL
-gc()
-
-# ----------------------------------------------------------------- 
-

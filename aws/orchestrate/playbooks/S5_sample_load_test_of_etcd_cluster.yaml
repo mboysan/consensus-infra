@@ -20,6 +20,6 @@
       insertproportion=0
       
       requestdistribution=zipfian
-    performance_analysis: true
-    resource_usage_analysis: false
-    message_analysis: false
+    analyze_client_metrics: true
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false

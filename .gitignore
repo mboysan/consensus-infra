@@ -8,6 +8,9 @@
 *.out.jpg
 *.out.pdf
 *.out.svg
+*.memory.metrics.txt
+*.cpu.metrics.txt
+*.message.metrics.txt
 *_ansible_vars.json
 
 ### aws

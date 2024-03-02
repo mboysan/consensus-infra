@@ -8,10 +8,10 @@
     consensus_protocol: "bizur"
     node_cli_params: >-
       bizur.numBuckets={{ bizur_num_buckets }}
-      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
-      metrics.insights.enabled={{ message_analysis | default(false) }}
+      metrics.jvm.enabled={{ analyze_store_jvm_metrics }}
+      metrics.insights.enabled={{ analyze_store_message_metrics }}
     store_cli_params: >-
       bizur.numBuckets={{ bizur_num_buckets }}
-      metrics.jvm.enabled={{ resource_usage_analysis | default(false) }}
-      metrics.insights.enabled={{ message_analysis | default(false) }}
+      metrics.jvm.enabled={{ analyze_store_jvm_metrics }}
+      metrics.insights.enabled={{ analyze_store_message_metrics }}
     workload: "{{ workload_definition }}"

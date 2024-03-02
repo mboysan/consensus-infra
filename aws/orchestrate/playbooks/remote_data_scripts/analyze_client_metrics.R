@@ -13,8 +13,7 @@ args <- valiadate_args(
     failure_msg = "required arguments are not provided.",
     defaults = c(
         "../collected_data/metrics/samples/EX",
-        # use all.raw.merged.csv or client.raw.merged.csv
-        "all.raw.merged.csv",
+        "client.raw.merged.csv",
         "remove_outliers_per_test=true",
         "timescale_in_milliseconds=false"
     )

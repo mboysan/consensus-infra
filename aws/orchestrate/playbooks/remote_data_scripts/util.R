@@ -72,6 +72,28 @@ valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_de
     stop(failure_msg)
 }
 
+summary <- function(csv) {
+    metricName <- csv$metric[1]
+    data <- csv %>%
+        # mutate(value = value / 1024) %>%
+        summarize(
+            min = min(value),
+            max = max(value),
+            mean = mean(value),
+            p1 = quantile(value, 0.01),
+            p5 = quantile(value, 0.05),
+            p50 = quantile(value, 0.5),
+            p90 = quantile(value, 0.9),
+            p95 = quantile(value, 0.95),
+            p99 = quantile(value, 0.99),
+            p99.9 = quantile(value, 0.999),
+            p99.99 = quantile(value, 0.9999))
+    # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
+    data <- as.data.frame(data)
+    # add 'metric' column
+    data.frame(metric = metricName, data)
+}
+
 savePlotData <- function(data, columnNamesToInclude, outputFile) {
     info("saving plot data to file:", outputFile)
     data <- data[, names(data) %in% columnNamesToInclude]
@@ -79,6 +101,10 @@ savePlotData <- function(data, columnNamesToInclude, outputFile) {
 }
 
 exportPlot <- function(folder, fileName, source, extension = "svg", ggPlot = last_plot()) {
+    if (exists("PLOT_SOURCE")) {
+        source <- PLOT_SOURCE
+    }
+
     fileName <- paste(fileName, source, "out", extension, sep = ".")
     fileName <- paste(folder, fileName, sep = "/")
 
