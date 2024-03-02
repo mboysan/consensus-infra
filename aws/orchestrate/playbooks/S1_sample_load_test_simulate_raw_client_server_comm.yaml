@@ -1,12 +1,14 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test on etcd cluster with a custom workload definition.
+# Performs a simple load test using raft consensus protocol with a custom workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: T_load_test_etcd_raft.yaml
+- import_playbook: T_load_test_consensus_simulate.yaml
   vars:
     test_group: "S"
-    test_name: "S5"
+    test_name: "S1"
+    broadcast_to_followers: false
+    forward_to_leader: false
     workload_definition: |
       recordcount=1000
       operationcount=1000

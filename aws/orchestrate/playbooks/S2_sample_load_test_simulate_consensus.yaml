@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test using raft consensus protocol with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: T_load_test_consensus_simulate.yaml
+  vars:
+    test_group: "S"
+    test_name: "S2"
+    broadcast_to_followers: true
+    forward_to_leader: true
+    workload_definition: |
+      recordcount=1000
+      operationcount=1000
+      workload=site.ycsb.workloads.CoreWorkload
+      
+      readallfields=true
+      
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+      
+      requestdistribution=zipfian
+    analyze_client_metrics: true
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false

@@ -4,15 +4,10 @@
   vars:
     consensus_protocol: "simulate"
     node_cli_params: >-
+      --node
       metrics.jvm.enabled={{ analyze_store_jvm_metrics }}
       metrics.insights.enabled={{ analyze_store_message_metrics }}
       simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
-      simulate.leader.broadcastToFollowers={{ broadcast_to_followers | default(false) }}
-      simulate.follower.forwardToLeader={{ forward_to_leader | default(false) }}
-    store_cli_params: >-
-      metrics.jvm.enabled={{ analyze_store_jvm_metrics }}
-      metrics.insights.enabled={{ analyze_store_message_metrics }}
-      simulate.leaderId={{ lookup('env','NODE_ID_TO_USE_AS_STORE') | mandatory }}
-      simulate.leader.broadcastToFollowers={{ broadcast_to_followers | default(false) }}
-      simulate.follower.forwardToLeader={{ forward_to_leader | default(false) }}
+      simulate.leader.broadcastToFollowers={{ broadcast_to_followers }}
+      simulate.follower.forwardToLeader={{ forward_to_leader }}
     workload: "{{ workload_definition }}"

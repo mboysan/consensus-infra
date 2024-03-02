@@ -6,7 +6,7 @@
 - import_playbook: T_load_test_consensus_raft.yaml
   vars:
     test_group: "S"
-    test_name: "S3"
+    test_name: "S5"
     workload_definition: |
       recordcount=1000
       operationcount=1000
