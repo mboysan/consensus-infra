@@ -65,6 +65,10 @@ if (merge_store_metrics) {
     store_cpu_summary_metrics <- mergeMetrics("store", "cpu", "summary")
     writeCsv("store.cpu.summary.merged.csv", store_cpu_summary_metrics)
     rm(store_cpu_summary_metrics); gc()
+
+    store_message_summary_metrics <- mergeMetrics("store", "message", "summary")
+    writeCsv("store.message.summary.merged.csv", store_message_summary_metrics)
+    rm(store_message_summary_metrics); gc()
 }
 
 # raw metrics

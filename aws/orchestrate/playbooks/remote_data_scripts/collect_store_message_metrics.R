@@ -42,21 +42,58 @@ consensus_requests <- c(
 searchStrings <- consensus_requests
 extractDataFromMetricsFile(main_metrics_file, metrics_file, searchStrings)
 
+# ----------------------------------------------------------------------------- helper functions
+
+# return a compatible data.frame from the provided metric and value
+metric_as_df <- function(metric, value) {
+    data.frame(metric = c(metric), value = c(value), timestamp = c(-1))
+}
+
+# count the rows in the given csv and return a compatible data.frame
+count_as_df <- function(metric, csv) {
+    csv <- csv %>% filter(value > -1, na.rm = TRUE)
+    metric_as_df(metric, nrow(csv))
+}
+
+# sum the rows in the given csv and return a compatible data.frame
+sum_as_df <- function(metric, csv) {
+    csv <- csv %>% filter(value > -1, na.rm = TRUE)
+    metric_as_df(metric, sum(csv$value))
+}
+
 # ----------------------------------------------------------------------------- prepare metrics
 info("analyzing store message metrics of:", metrics_file)
 
 metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('metric', 'value', 'timestamp'))
 
-# TODO: summary of message metrics
+messages_raw <- data.frame()
+message_summary <- data.frame()
+for (request in consensus_requests) {
+    request_data <- extractInsights(request)
+    if (nrow(request_data) > 0) {
+        request_summary_data <- summary(request_data)
+        message_summary <- rbind(message_summary, request_summary_data)
+        messages_raw <- rbind(messages_raw, request_data)
+    }
+}
+
+rm(metrics_csv); gc()
+
+# ----------------------------------------------------------------------------- collect summary data
+total_request_count <- summary(count_as_df("total_consensus_request_count", messages_raw))
+total_request_size <- summary(sum_as_df("total_consensus_request_size", messages_raw))
+message_summary <- rbind(message_summary, total_request_count, total_request_size)
+
+message_summary <- data.frame(category = "message", message_summary)
+message_summary <- collectStoreSummaryData(message_summary)
+
+info("writing store message summary data to csv file")
+out_file <- paste(output_folder, "store.message.summary.out.csv", sep = "/")
+write.csv(message_summary, out_file, row.names = FALSE)
+rm(message_summary); gc()
 
 # ----------------------------------------------------------------------------- collect raw timestamp data
-messages_raw <- rbind(
-    extractInsights("insights.tcp.server.send"),
-    extractInsights("insights.tcp.server.receive"),
-    extractInsights("insights.tcp.client.send"),
-    extractInsights("insights.tcp.client.receive")
-)
-messages_raw <- data.frame(category = "messages", messages_raw)
+messages_raw <- data.frame(category = "message", messages_raw)
 messages_raw <- collectStoreRawData(messages_raw)
 
 info("writing store message raw data to csv file")

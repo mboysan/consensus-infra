@@ -73,6 +73,10 @@ valiadate_args <- function(args, validator, failure_msg, defaults = NULL, use_de
 }
 
 summary <- function(csv) {
+    if (nrow(csv) == 0) {
+        return(data.frame())
+    }
+
     metricName <- csv$metric[1]
     data <- csv %>%
         # mutate(value = value / 1024) %>%
@@ -90,6 +94,10 @@ summary <- function(csv) {
             p99.99 = quantile(value, 0.9999))
     # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
     data <- as.data.frame(data)
+
+    # add 'count' column
+    data <- data.frame(count = nrow(csv), data)
+
     # add 'metric' column
     data.frame(metric = metricName, data)
 }
