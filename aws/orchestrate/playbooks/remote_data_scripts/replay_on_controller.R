@@ -6,12 +6,15 @@
 
 source("util.R")
 
-COLLECT_METRICS <- TRUE
-ANALYZE_METRICS <- TRUE
+COLLECT_METRICS <- FALSE
+ANALYZE_CLIENT_METRICS <- TRUE
+ANALYZE_STORE_CPU_METRICS <- FALSE
+ANALYZE_STORE_MEMORY_METRICS <- FALSE
+ANALYZE_STORE_MESSAGE_METRICS <- FALSE
 PLOT_SOURCE <- "controller"
 
-arg_io_folder <- "../collected_data/metrics/samples"
-arg_test_group <- "EX"
+arg_io_folder <- "../collected_data/metrics"
+arg_test_group <- "W2"
 arg_tests <- data.frame(
     c("EX1", "raft"),
     c("EX2", "bizur")
@@ -47,32 +50,38 @@ if (COLLECT_METRICS) {
     commandArgs <- commandArgs_bak
 }
 
-if (ANALYZE_METRICS) {
+if (ANALYZE_CLIENT_METRICS || ANALYZE_STORE_CPU_METRICS || ANALYZE_STORE_MEMORY_METRICS || ANALYZE_STORE_MESSAGE_METRICS) {
     # backup commandArgs
     commandArgs_bak <- commandArgs
     baseFolder <- paste0(arg_io_folder, "/", arg_test_group)
 
-    # -- client
-    commandArgs <- function (...) {
-        c(baseFolder, "client.raw.merged.csv", "remove_outliers_per_test=true", "timescale_in_milliseconds=false")
+    if (ANALYZE_CLIENT_METRICS) {
+        commandArgs <- function (...) {
+            c(baseFolder, "client.raw.merged.csv", "remove_outliers_per_test=true", "timescale_in_milliseconds=false")
+        }
+        source("analyze_client_metrics.R")
     }
-    source("analyze_client_metrics.R")
 
-    # -- store
-    commandArgs <- function (...) {
-        c(baseFolder, "store.cpu.raw.merged.csv")
+    if (ANALYZE_STORE_CPU_METRICS) {
+        commandArgs <- function (...) {
+            c(baseFolder, "store.cpu.raw.merged.csv")
+        }
+        source("analyze_store_cpu_metrics.R")
     }
-    source("analyze_store_cpu_metrics.R")
 
-    commandArgs <- function (...) {
-        c(baseFolder, "store.memory.raw.merged.csv")
+    if (ANALYZE_STORE_MEMORY_METRICS) {
+        commandArgs <- function (...) {
+            c(baseFolder, "store.memory.raw.merged.csv")
+        }
+        source("analyze_store_memory_metrics.R")
     }
-    source("analyze_store_memory_metrics.R")
 
-    commandArgs <- function (...) {
-        c(baseFolder, "store.message.raw.merged.csv")
+    if (ANALYZE_STORE_MESSAGE_METRICS) {
+        commandArgs <- function (...) {
+            c(baseFolder, "store.message.raw.merged.csv")
+        }
+        source("analyze_store_message_metrics.R")
     }
-    source("analyze_store_message_metrics.R")
 
     # restore commandArgs
     commandArgs <- commandArgs_bak
