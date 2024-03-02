@@ -50,4 +50,4 @@
   vars:
     collect_client_raw_data: true
 
-#- import_playbook: util_cleanup_processors.yaml
+- import_playbook: util_cleanup_processors.yaml
