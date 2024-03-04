@@ -4,12 +4,57 @@
 
 ---
 
-- name: Send test
-  hosts: clients
+- name: Debug
+  hosts: all
   tasks:
-    - shell:
-        cmd: |
-          bash -ilc 'scp -oStrictHostKeyChecking=no ~/util.R {{ workers_GROUP_processor_destination }}:~/test/util.R.bak'
+    - name: P1.3 - Copy the remote data scripts
+      copy:
+        src: ./remote_data_scripts/
+        dest: "{{ all_GROUP_home_dir }}"
+        mode: "0777"
+
+#- name: Fetches the results to controller
+#  hosts: processors
+#  any_errors_fatal: true
+#  tasks:
+#
+#    - name: Fetching metrics data
+#      synchronize:
+#        src: "{{ _archive_file }}"
+#        dest: "{{ _destination_on_controller }}"
+#        mode: pull
+#      vars:
+#        _archive_file: "{{ processors_GROUP_project_metrics_path }}/{{ test_group }}/sync.tar.gz"
+#        _destination_on_controller: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_group }}/"
+#
+#    - name: Extracting metrics data on controller
+#      delegate_to: 127.0.0.1
+#      shell:
+#        cmd: |
+#          tar -xvzf {{ _archive_name }} --strip-components=1
+#        chdir: "{{ lookup('env','COLLECTED_METRICS_PATH') | mandatory }}/{{ test_group }}/"
+#      vars:
+#        _archive_name: "sync.tar.gz"
+
+#- name: Debug
+#  hosts: clients
+#  tasks:
+#    - name: P2.3.5 - Copy workloads
+#      copy:
+#        src: ./workloads/
+#        dest: '{{ clients_GROUP_workloads_dir }}'
+#    - name: P1.3 - Copy the remote data scripts
+#      copy:
+#        src: ./remote_data_scripts/
+#        dest: "{{ all_GROUP_home_dir }}"
+#        mode: "0777"
+
+#- name: Send test
+#  hosts: clients
+#  tasks:
+#    - shell:
+#        cmd: |
+#          bash -ilc 'scp -oStrictHostKeyChecking=no ~/util.R {{ workers_GROUP_processor_destination }}:~/test/util.R.bak'
 
 #- name: Debug
 #  hosts: all
