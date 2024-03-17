@@ -41,11 +41,10 @@
           }
           
           amILeader() {
-            echo "$NODE_ID#askState" > command.tmp
             bash -ilc 'java \
                         -cp *.jar \
-                        com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} command=$(cat command.tmp)' > my_node_state.tmp
-            echo "askState -> received: "
+                        com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} cmd=checkIntegrity level=1 to=$NODE_ID' > my_node_state.tmp
+            echo "amILeader result:"
             cat my_node_state.tmp
           
             nodeIsLeader=$(grep -c "LEADER" my_node_state.tmp)
@@ -58,8 +57,8 @@
           amIFollowerToDisconnect() {
             bash -ilc 'java \
                         -cp *.jar \
-                        com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} command=0#askState' > node0_state.tmp
-            echo "0#askState -> received: "
+                        com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} cmd=checkIntegrity level=1 to=0' > node0_state.tmp
+            echo "amIFollowerToDisconnect result:"
             cat node0_state.tmp
           
             node0Follower=$(grep -c "FOLLOWER" node0_state.tmp)
@@ -76,8 +75,8 @@
           
           bash -ilc 'java \
                       -cp *.jar \
-                      com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} command=askProtocol' > protocol.tmp
-          echo "askProtocol -> received: "
+                      com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} cmd=checkIntegrity level=1 to=0' > protocol.tmp
+          echo "protocol result: "
           cat protocol.tmp
           RAFT=$(grep -c "raft" protocol.tmp)
           BIZUR=$(grep -c "bizur" protocol.tmp)
