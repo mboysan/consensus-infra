@@ -1,0 +1,29 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to check integrity of the nodes after load test.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Performing Integrity Check
+  hosts: node0
+  tasks:
+    - name: Prepare checkIntegrity script
+      template:
+        src: checkIntegrity.template.sh
+        dest: "{{ _home_dir }}/checkIntegrity.sh"
+        mode: "+x"
+      vars:
+        _mandatory_params: "destinations={{ workers_GROUP_store_destinations }} transport.message.callbackTimeoutMs=60000"
+        _server_name: "{{ inventory_hostname }}"
+        _home_dir: "{{ all_GROUP_home_dir }}"
+
+    - name: Running checkIntegrity script
+      shell:
+        cmd: |
+          bash -ilc './checkIntegrity.sh'
+        chdir: "{{ all_GROUP_home_dir }}"
+      register: checkIntegrity_task
+
+    - name: Print the output of checkIntegrity script
+      debug:
+        msg: |
+          {{ checkIntegrity_task.stdout_lines }}

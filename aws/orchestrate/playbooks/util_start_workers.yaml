@@ -36,6 +36,6 @@
 
     - name: Print fault injection result
       debug:
-        msg: "{{ job_result.stdout }}"
+        msg: "{{ job_result.stdout_lines }}"
         verbosity: 1
       when: inject_fault is defined
