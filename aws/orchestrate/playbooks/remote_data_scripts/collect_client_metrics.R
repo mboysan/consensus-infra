@@ -46,7 +46,7 @@ metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('metric', 'v
 
 extract <- function(metricName) {
     data <- metrics_csv %>%
-        filter(grepl(metricName, metric)) %>%
+        filter(metricName == metric) %>%
         group_by(timestamp)
     rowCount <- nrow(data)
     data <- as.data.frame(data)
