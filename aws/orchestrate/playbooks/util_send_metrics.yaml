@@ -57,7 +57,7 @@
       vars:
         _src_file: "{{ workers_GROUP_project_metrics_file }}"
         _dest_file: "{{ workers_GROUP_project_metrics_path }}/{{ test_group }}/{{ test_name }}/store.metrics.txt"
-      when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))
+      when: analyze_store_jvm_metrics or analyze_store_message_metrics
 
 - name: Collects metrics into csv files
   hosts: processors
@@ -78,4 +78,4 @@
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
         _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ consensus_protocol }}"
-      when: (resource_usage_analysis | default(true)) or (message_analysis | default(true))
+      when: analyze_store_jvm_metrics or analyze_store_message_metrics

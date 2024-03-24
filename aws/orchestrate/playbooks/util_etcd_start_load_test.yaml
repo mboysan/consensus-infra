@@ -43,6 +43,32 @@
       retries: 100
       delay: 10
 
+- name: Fault injection (if defined)
+  hosts: nodes
+  tasks:
+    - name: Prepare inject_fault script
+      template:
+        src: inject_fault_etcd.template.sh
+        dest: "{{ _home_dir }}/inject_fault_consensus.sh"
+        mode: "+x"
+      vars:
+        _server_name: "{{ inventory_hostname }}"
+        _home_dir: "{{ all_GROUP_home_dir }}"
+      when: inject_fault is defined
+
+    - name: Running inject_fault script
+      shell:
+        cmd: |
+          bash -ilc './inject_fault_consensus.sh'
+        chdir: "{{ all_GROUP_home_dir }}"
+      async: "{{ duration_sec * 2 | default(500) }}"
+      poll: 0
+      register: inject_fault_task
+      when: inject_fault is defined
+  vars:
+    delay_sec: "{{ inject_fault['delay_sec'] }}"
+    duration_sec: "{{ inject_fault['duration_sec'] }}"
+
 - name: Starts client(s)
   hosts: clients
   tasks:
@@ -74,12 +100,32 @@
         _client_params: >-
           -p cluster.members={{ workers_GROUP_etcd_store_destinations }}
 
+- name: Checks fault injection results
+  hosts: nodes
+  tasks:
+    - name: Checking fault injection results
+      async_status:
+        jid: "{{ inject_fault_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 1000
+      delay: 10
+      when: inject_fault is defined
+
+    - name: Print fault injection result
+      debug:
+        msg: "{{ job_result.stdout }}"
+        verbosity: 1
+      when: inject_fault is defined
+
+# ------------------------------------------------------------------------------------ Metrics collection and cleanup
+
 - import_playbook: util_stop_workers.yaml
 
 - import_playbook: util_send_metrics.yaml
   vars:
     consensus_protocol: "etcd_raft"
-    resource_usage_analysis: false
-    message_analysis: false
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false
 
 - import_playbook: util_cleanup_workers.yaml

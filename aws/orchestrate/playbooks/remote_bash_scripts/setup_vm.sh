@@ -52,6 +52,9 @@ sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-
 sudo apt-get update
 sudo apt-get install -y r-base
 
+# required by R packages (svglite, for example)
+sudo apt-get install -y libfontconfig1-dev
+
 # -------------------------------------------------- etcd
 
 ETCD_VER=v3.5.12

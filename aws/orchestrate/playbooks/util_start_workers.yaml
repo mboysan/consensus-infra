@@ -5,11 +5,11 @@
 ---
 - import_playbook: util_start_nodes.yaml
   vars:
-    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }}"
+    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
 
 - import_playbook: util_start_stores.yaml
   vars:
-    cli_params: "protocol={{ consensus_protocol }} {{ store_cli_params | default('') }}"
+    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
 
 - import_playbook: util_inject_fault.yaml
   vars:
@@ -32,4 +32,10 @@
       until: job_result.finished
       retries: 1000
       delay: 10
+      when: inject_fault is defined
+
+    - name: Print fault injection result
+      debug:
+        msg: "{{ job_result.stdout_lines }}"
+        verbosity: 1
       when: inject_fault is defined

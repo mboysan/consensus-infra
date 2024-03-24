@@ -3,10 +3,12 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: T_load_test_consensus_raft.yaml
+- import_playbook: T_load_test_consensus_simulate.yaml
   vars:
     test_group: "S"
     test_name: "S1"
+    broadcast_to_followers: false
+    forward_to_leader: false
     workload_definition: |
       recordcount=1000
       operationcount=1000
@@ -20,6 +22,6 @@
       insertproportion=0
       
       requestdistribution=zipfian
-    performance_analysis: true
-    resource_usage_analysis: true
-    message_analysis: true
+    analyze_client_metrics: true
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false

@@ -7,47 +7,35 @@
   tasks:
     - name: Setting global variables
       set_fact:
-        test_group: "W1"
+        test_group: "W5"
+        workload_definition: "workload_rw_100k"
         analyze_client_metrics: true
-        analyze_store_jvm_metrics: false
-        analyze_store_message_metrics: false
-        workload_definition: "workload_rw_1k"
+        analyze_store_jvm_metrics: true
+        analyze_store_message_metrics: true
+
+        inject_fault:
+          condition: 'disconnect follower'
+          delay_sec: 120
+          duration_sec: 60
+        # TODO: collect_logs
 
 #---------------------------------------------------------------
-
-# client to server raw communication test
-- import_playbook: T_load_test_consensus_simulate.yaml
-  vars:
-    test_name: "T1"
-    broadcast_to_followers: false
-    forward_to_leader: false
-
-# consensus simulation test
-- import_playbook: T_load_test_consensus_simulate.yaml
-  vars:
-    test_name: "T2"
-    broadcast_to_followers: true
-    forward_to_leader: true
 
 # raft consensus test
 - import_playbook: T_load_test_consensus_raft.yaml
   vars:
-    test_name: "T3"
+    test_name: "T1"
 
-# bizur consensus test
+# bizur consensus test with unbounded number of buckets
 - import_playbook: T_load_test_consensus_bizur.yaml
   vars:
-    test_name: "T4"
-
-# raft consensus on etcd test
-- import_playbook: T_load_test_etcd_raft.yaml
-  vars:
-    test_name: "T5"
+    test_name: "T2"
 
 #---------------------------------------------------------------
 
 - import_playbook: util_analyze_metrics.yaml
   vars:
     collect_client_raw_data: true
+    collect_store_raw_data: true
 
 - import_playbook: util_cleanup_processors.yaml

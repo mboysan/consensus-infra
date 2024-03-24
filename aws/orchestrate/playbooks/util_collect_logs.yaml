@@ -4,7 +4,7 @@
 
 ---
 
-- name: Fetches logs from workers to local controller (if DEBUG)
+- name: Fetches logs from workers to local controller
   hosts: workers
   any_errors_fatal: true
   tasks:

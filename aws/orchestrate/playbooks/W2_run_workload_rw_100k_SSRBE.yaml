@@ -7,11 +7,11 @@
   tasks:
     - name: Setting global variables
       set_fact:
-        test_group: "W1"
+        test_group: "W2"
         analyze_client_metrics: true
         analyze_store_jvm_metrics: false
         analyze_store_message_metrics: false
-        workload_definition: "workload_rw_1k"
+        workload_definition: "workload_rw_100k"
 
 #---------------------------------------------------------------
 

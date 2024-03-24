@@ -18,7 +18,7 @@ workers_GROUP_graphite_nc_port: "{{ lookup('env','GRAPHITE_NC_PORT') | mandatory
 workers_GROUP_dependency_slf4j_reload4j_version: '2.0.12'
 workers_GROUP_dependency_reload4j_version: '1.2.25'
 workers_GROUP_dependency_ycsb_version: '0.18.0-SNAPSHOT'
-workers_GROUP_dependency_consensus_version: '1.2'
+workers_GROUP_dependency_consensus_version: '1.7'
 
 workers_GROUP_dependency_slf4j_reload4j_url: 'https://repo1.maven.org/maven2/org/slf4j/slf4j-reload4j/{{ workers_GROUP_dependency_slf4j_reload4j_version }}/slf4j-reload4j-{{ workers_GROUP_dependency_slf4j_reload4j_version }}.jar'
 workers_GROUP_dependency_reload4j_url: 'https://repo1.maven.org/maven2/ch/qos/reload4j/reload4j/{{ workers_GROUP_dependency_reload4j_version }}/reload4j-{{ workers_GROUP_dependency_reload4j_version }}.jar'

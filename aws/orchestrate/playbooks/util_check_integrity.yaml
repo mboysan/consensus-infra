@@ -1,28 +1,29 @@
 #------------------------------------------------------------------------------------------------------------
-# Playbook to inject network faults in the system.
-# This playbook depends on all KV stores to be started first.
+# Playbook to check integrity of the nodes after load test.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Fault injection
-  hosts: nodes
+- name: Performing Integrity Check
+  hosts: node0
   tasks:
-    - name: Prepare inject_fault script
+    - name: Prepare checkIntegrity script
       template:
-        src: inject_fault_consensus.template.sh
-        dest: "{{ _home_dir }}/inject_fault_consensus.sh"
+        src: checkIntegrity.template.sh
+        dest: "{{ _home_dir }}/checkIntegrity.sh"
         mode: "+x"
       vars:
         _mandatory_params: "destinations={{ workers_GROUP_store_destinations }} transport.message.callbackTimeoutMs=60000"
         _server_name: "{{ inventory_hostname }}"
         _home_dir: "{{ all_GROUP_home_dir }}"
-        _condition: "{{ condition }}"
 
-    - name: Running inject_fault script
+    - name: Running checkIntegrity script
       shell:
         cmd: |
-          bash -ilc './inject_fault_consensus.sh'
+          bash -ilc './checkIntegrity.sh'
         chdir: "{{ all_GROUP_home_dir }}"
-      async: "{{ duration_sec * 2 | default(500) }}"
-      poll: 0
-      register: inject_fault_task
+      register: checkIntegrity_task
+
+    - name: Print the output of checkIntegrity script
+      debug:
+        msg: |
+          {{ checkIntegrity_task.stdout_lines }}

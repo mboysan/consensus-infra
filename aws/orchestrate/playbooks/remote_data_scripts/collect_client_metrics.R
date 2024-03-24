@@ -15,15 +15,15 @@
 
 source("util.R")
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
     validator = \(x) length(x) == 4,
     failure_msg = "required arguments are not provided.",
     # raft
-    # defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
     # bizur
-    defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
 )
 
 METRICS_FILE_NAME <- "client.metrics.txt"
@@ -38,7 +38,7 @@ output_folder <- paste(io_folder, test_group, test_name, sep = "/")
 
 # ----------------------------------------------------------------------------- prepare metrics
 
-info("analyzing client metrics of:", metrics_file)
+info("collecting client metrics of:", metrics_file)
 
 metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('metric', 'value', 'timestamp'))
 
@@ -46,7 +46,7 @@ metrics_csv <- read.csv(metrics_file, header = FALSE, col.names = c('metric', 'v
 
 extract <- function(metricName) {
     data <- metrics_csv %>%
-        filter(grepl(metricName, metric)) %>%
+        filter(metricName == metric) %>%
         group_by(timestamp)
     rowCount <- nrow(data)
     data <- as.data.frame(data)
@@ -55,28 +55,6 @@ extract <- function(metricName) {
     }
     data$value <- as.numeric(data$value)
     data
-}
-
-summary <- function(csv) {
-    metricName <- csv$metric[1]
-    data <- csv %>%
-        # mutate(value = value / 1024) %>%
-        summarize(
-            min = min(value),
-            max = max(value),
-            mean = mean(value),
-            p1 = quantile(value, 0.01),
-            p5 = quantile(value, 0.05),
-            p50 = quantile(value, 0.5),
-            p90 = quantile(value, 0.9),
-            p95 = quantile(value, 0.95),
-            p99 = quantile(value, 0.99),
-            p99.9 = quantile(value, 0.999),
-            p99.99 = quantile(value, 0.9999))
-        # pivot_longer(cols=-value, names_to = "metric", values_to = "value")
-    data <- as.data.frame(data)
-    # add 'metric' column
-    data.frame(metric = metricName, data)
 }
 
 # return a compatible data.frame from the provided metric and value
@@ -97,10 +75,10 @@ calc_runtime <- function(csv) {
 }
 
 calc_throughput <- function(csv) {
-    csv <- csv %>% filter(value > -1, na.rm=TRUE)
+    csv <- csv %>% filter(value > -1, na.rm = TRUE)
     runtime <- calc_runtime(csv)
     opCount <- nrow(csv)
-    throughput <- (opCount/runtime)
+    throughput <- (opCount / runtime)
     debug("runtime (sec)=[", runtime, "],", "total op count=[", opCount, "],", "throughput (ops/sec)=[", throughput, "]")
     throughput
 }
@@ -121,22 +99,22 @@ read_modify_write_failed_latency <- extract('read-modify-write-failed')
 # ----------------------------------------------------------------------------- collect raw timestamp data
 
 all_raw <- rbind(
-  read_latency,
-  read_failed_latency,
-  update_latency,
-  update_failed_latency,
-  insert_latency,
-  insert_failed_latency,
-  scan_latency,
-  scan_failed_latency,
-  read_modify_write_latency,
-  read_modify_write_failed_latency
+    read_latency,
+    read_failed_latency,
+    update_latency,
+    update_failed_latency,
+    insert_latency,
+    insert_failed_latency,
+    scan_latency,
+    scan_failed_latency,
+    read_modify_write_latency,
+    read_modify_write_failed_latency
 )
-all_raw <- all_raw %>% filter(value > -1, na.rm=TRUE)   # sanitize
+all_raw <- all_raw %>% filter(value > -1, na.rm = TRUE)   # sanitize
 all_raw <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
 
 # finalize column order
-all_raw <- all_raw[,c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[, c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
@@ -154,37 +132,37 @@ throughput <- metric_as_df("throughput", throughput)
 # ----------------------------------------------------------------------------- collect summary data
 
 latency_summary <- rbind(
-    summary(read_latency),
-    summary(read_failed_latency),
-    summary(update_latency),
-    summary(update_failed_latency),
-    summary(insert_latency),
-    summary(insert_failed_latency),
-    summary(scan_latency),
-    summary(scan_failed_latency),
-    summary(read_modify_write_latency),
-    summary(read_modify_write_failed_latency)
+    doSummary(read_latency),
+    doSummary(read_failed_latency),
+    doSummary(update_latency),
+    doSummary(update_failed_latency),
+    doSummary(insert_latency),
+    doSummary(insert_failed_latency),
+    doSummary(scan_latency),
+    doSummary(scan_failed_latency),
+    doSummary(read_modify_write_latency),
+    doSummary(read_modify_write_failed_latency)
 )
 latency_summary <- data.frame(category = "latency", latency_summary)
 
 overall_summary <- rbind(
-    summary(read_count),
-    summary(update_count),
-    summary(insert_count),
-    summary(scan_count),
-    summary(readWrite_count),
-    summary(total_ops_count),
-    summary(runtime),
-    summary(throughput)
+    doSummary(read_count),
+    doSummary(update_count),
+    doSummary(insert_count),
+    doSummary(scan_count),
+    doSummary(readWrite_count),
+    doSummary(total_ops_count),
+    doSummary(runtime),
+    doSummary(throughput)
 )
-overall_summary <- overall_summary %>% filter(mean > 0, na.rm=TRUE)   # sanitize
+overall_summary <- overall_summary %>% filter(mean > 0, na.rm = TRUE)   # sanitize
 overall_summary <- data.frame(category = 'overall', overall_summary)
 
 all_summary <- rbind(
     latency_summary,
     overall_summary
 )
-all_summary <- all_summary %>% filter(mean > -1, na.rm=TRUE)   # sanitize
+all_summary <- all_summary %>% filter(mean > -1, na.rm = TRUE)   # sanitize
 all_summary <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files
@@ -196,6 +174,4 @@ info("writing client summary data to csv file")
 out_file <- paste(output_folder, "client.summary.out.csv", sep = "/")
 write.csv(all_summary, out_file, row.names = FALSE)
 
-# debug
-print(all_summary)
-
+# fixme: fix read-failed & update-failed csvs. See W5 client.summary.merged.csv
