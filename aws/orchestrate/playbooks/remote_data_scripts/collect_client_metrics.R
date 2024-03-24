@@ -173,5 +173,3 @@ write.csv(all_raw, out_file, row.names = FALSE)
 info("writing client summary data to csv file")
 out_file <- paste(output_folder, "client.summary.out.csv", sep = "/")
 write.csv(all_summary, out_file, row.names = FALSE)
-
-# fixme: fix read-failed & update-failed csvs. See W5 client.summary.merged.csv
