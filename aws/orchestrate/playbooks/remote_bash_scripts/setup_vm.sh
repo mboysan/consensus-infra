@@ -3,9 +3,10 @@
 # -------------------------------------------------- already included
 # git
 
-# -------------------------------------------------- iperf (for network performance testing)
+# -------------------------------------------------- iperf & netperf (for network performance testing)
 sudo apt-get update
 sudo apt-get install -y iperf
+sudo apt-get install -y netperf
 
 # -------------------------------------------------- jdk-17
 # prepare
@@ -54,6 +55,21 @@ sudo apt-get install -y r-base
 
 # required by R packages (svglite, for example)
 sudo apt-get install -y libfontconfig1-dev
+
+# -------------------------------------------------- consul
+CURRENT_DIR=$(pwd)
+CONSUL_VERSION=1.18.1
+DOWNLOAD_URL="https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip"
+INSTALL_DIR="~/consul"
+
+rm -rf ${INSTALL_DIR} && mkdir -p ${INSTALL_DIR}
+cd ${INSTALL_DIR}
+
+wget $DOWNLOAD_URL
+unzip consul_${CONSUL_VERSION}_linux_amd64.zip
+
+./consul --version
+cd $CURRENT_DIR
 
 # -------------------------------------------------- etcd
 
