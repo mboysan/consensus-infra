@@ -17,3 +17,6 @@
           
           # kill etcd processes (errors ignored)
           bash -ilc 'kill $(ps -A | grep etcd | awk "{print $1}") || true'
+          
+          # kill consul processes (errors ignored)
+          bash -ilc 'kill $(ps -A | grep consul | awk "{print $1}") || true'

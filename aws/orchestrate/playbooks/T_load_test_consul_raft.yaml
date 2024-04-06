@@ -1,8 +1,8 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a load test of the etcd cluster with the provided workload definition.
+# Performs a load test of the consul cluster with the provided workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_load_test_etcd.yaml
+- import_playbook: util_start_load_test_consul.yaml
   vars:
     workload: "{{ workload_definition }}"
