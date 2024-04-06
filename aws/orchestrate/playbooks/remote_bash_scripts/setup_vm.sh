@@ -60,7 +60,7 @@ sudo apt-get install -y libfontconfig1-dev
 CURRENT_DIR=$(pwd)
 CONSUL_VERSION=1.18.1
 DOWNLOAD_URL="https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip"
-INSTALL_DIR="~/consul"
+INSTALL_DIR="$HOME/consul"
 
 rm -rf ${INSTALL_DIR} && mkdir -p ${INSTALL_DIR}
 cd ${INSTALL_DIR}
