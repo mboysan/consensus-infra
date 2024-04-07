@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------------------------------------
+# Starts workers for perf tests
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: util_start_consensus_nodes.yaml
+  vars:
+    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
+
+- import_playbook: util_start_consensus_stores.yaml
+  vars:
+    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
+
+- import_playbook: util_inject_fault_on_consensus.yaml
+  vars:
+    condition: "{{ inject_fault['condition'] }}"
+    delay_sec: "{{ inject_fault['delay_sec'] }}"
+    duration_sec: "{{ inject_fault['duration_sec'] }}"
+  when: inject_fault is defined
+
+- import_playbook: util_start_consensus_clients.yaml
+  vars:
+    cli_params: "{{ client_cli_params | default('') }}"
+
+- import_playbook: util_check_fault_injection_results.yaml
+
+- import_playbook: util_check_integrity.yaml

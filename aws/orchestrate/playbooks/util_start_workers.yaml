@@ -1,41 +1,13 @@
 #------------------------------------------------------------------------------------------------------------
-# Starts workers for perf tests
+# Starts workers
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_consensus_nodes.yaml
-  vars:
-    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
+- import_playbook: util_start_consensus_workers.yaml
+  when: cluster_type == "consensus"
 
-- import_playbook: util_start_consensus_stores.yaml
-  vars:
-    cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
+- import_playbook: util_start_etcd_workers.yaml
+  when: cluster_type == "etcd"
 
-- import_playbook: util_inject_fault.yaml
-  vars:
-    condition: "{{ inject_fault['condition'] }}"
-    delay_sec: "{{ inject_fault['delay_sec'] }}"
-    duration_sec: "{{ inject_fault['duration_sec'] }}"
-  when: inject_fault is defined
-
-- import_playbook: util_start_consensus_clients.yaml
-  vars:
-    cli_params: "{{ client_cli_params | default('') }}"
-
-- name: Checks fault injection results
-  hosts: nodes
-  tasks:
-    - name: Checking fault injection results
-      async_status:
-        jid: "{{ inject_fault_task.ansible_job_id }}"
-      register: job_result
-      until: job_result.finished
-      retries: 1000
-      delay: 10
-      when: inject_fault is defined
-
-    - name: Print fault injection result
-      debug:
-        msg: "{{ job_result.stdout_lines }}"
-        verbosity: 1
-      when: inject_fault is defined
+- import_playbook: util_start_consul_workers.yaml
+  when: cluster_type == "consul"

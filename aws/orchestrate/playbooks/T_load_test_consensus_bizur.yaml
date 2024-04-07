@@ -1,10 +1,11 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test using raft consensus protocol with a custom workload definition.
+# Performs a simple load test using bizur consensus protocol with a custom workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
 - import_playbook: util_start_load_test.yaml
   vars:
+    cluster_type: "consensus"
     consensus_protocol: "bizur"
     node_cli_params: >-
       --node

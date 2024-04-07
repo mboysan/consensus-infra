@@ -1,7 +1,11 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test using simulated consensus protocol with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
 
 ---
 - import_playbook: util_start_load_test.yaml
   vars:
+    cluster_type: "consensus"
     consensus_protocol: "simulate"
     node_cli_params: >-
       --node

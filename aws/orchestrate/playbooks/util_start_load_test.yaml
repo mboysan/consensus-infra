@@ -9,8 +9,6 @@
 
 - import_playbook: util_start_workers.yaml
 
-- import_playbook: util_check_integrity.yaml
-
 - import_playbook: util_stop_workers.yaml
 
 - import_playbook: util_collect_logs.yaml

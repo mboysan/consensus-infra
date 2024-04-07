@@ -1,0 +1,12 @@
+#------------------------------------------------------------------------------------------------------------
+# Starts workers for perf tests (for consul cluster)
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: util_start_consul_nodes.yaml
+
+- import_playbook: util_inject_fault_on_etcd_consul.yaml
+
+- import_playbook: util_start_consul_clients.yaml
+
+- import_playbook: util_check_fault_injection_results.yaml
