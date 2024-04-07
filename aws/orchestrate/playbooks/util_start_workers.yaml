@@ -3,11 +3,11 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_nodes.yaml
+- import_playbook: util_start_consensus_nodes.yaml
   vars:
     cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
 
-- import_playbook: util_start_stores.yaml
+- import_playbook: util_start_consensus_stores.yaml
   vars:
     cli_params: "protocol={{ consensus_protocol }} {{ node_cli_params | default('') }} {{ override_node_cli_params | default('') }}"
 
@@ -18,7 +18,7 @@
     duration_sec: "{{ inject_fault['duration_sec'] }}"
   when: inject_fault is defined
 
-- import_playbook: util_start_clients.yaml
+- import_playbook: util_start_consensus_clients.yaml
   vars:
     cli_params: "{{ client_cli_params | default('') }}"
 
