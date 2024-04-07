@@ -5,6 +5,7 @@
 ---
 - import_playbook: util_start_load_test.yaml
   vars:
+    cluster_type: "consensus"
     consensus_protocol: "raft"
     node_cli_params: >-
       --node

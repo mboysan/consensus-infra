@@ -95,6 +95,10 @@ truncate -s 0 $nodeDestinationsTmp
 etcdNodeDestinationsTmp=$tmpDir/endt
 truncate -s 0 $etcdNodeDestinationsTmp
 
+# a tmp variable for node destinations used by workers (for consul)
+consulNodeDestinationsTmp=$tmpDir/cndt
+truncate -s 0 $consulNodeDestinationsTmp
+
 # a tmp variable for store destinations used by clients
 storeDestinationsTmp=$tmpDir/sdt
 truncate -s 0 $storeDestinationsTmp
@@ -102,6 +106,10 @@ truncate -s 0 $storeDestinationsTmp
 # a tmp variable for peer destinations used by etcd
 etcdStoreDestinationsTmp=$tmpDir/epdt
 truncate -s 0 $etcdStoreDestinationsTmp
+
+# a tmp variable for peer destinations used by consul
+consulStoreDestinationsTmp=$tmpDir/cpdt
+truncate -s 0 $consulStoreDestinationsTmp
 
 # a tmp variable for nodes that will act as key-value store
 storeNodesTmp=$tmpDir/snt
@@ -147,6 +155,9 @@ function populateNodesInventory() {
         # append node destinations configuration (for etcd project)
         echo "$nodeName=http://$nodePrivateIp:$NODE_SERVING_PORT" >> "$etcdNodeDestinationsTmp"
 
+        # append node destinations configuration (for consul project)
+        echo "\"$nodePrivateIp:$NODE_SERVING_PORT\"" >> "$consulNodeDestinationsTmp"
+
         # append store destinations configuration
         if [ "$nodeIdToUseAsStore" -eq -1 ] || [ "$nodeIndex" -eq "$nodeIdToUseAsStore" ]; then
           echo "[INFO] using $nodeName as key-value store"
@@ -157,6 +168,9 @@ function populateNodesInventory() {
 
           # append store destinations configuration (for etcd project)
           echo "$nodeName=http://$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$etcdStoreDestinationsTmp"
+
+          # append store destinations configuration (for consul project)
+          echo "$nodeName=$nodePrivateIp:$CLIENT_SERVING_PORT" >> "$consulStoreDestinationsTmp"
         fi
 
         # write to inventory file
@@ -194,10 +208,14 @@ function populateWorkersInventory() {
     echo "workers_GROUP_node_destinations=$nodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     etcdNodeDestinations="$(xargs printf ',%s' < "$etcdNodeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_etcd_node_destinations=$etcdNodeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    consulNodeDestinations="$(xargs printf ',"%s"' < "$consulNodeDestinationsTmp" | cut -b 2-)"
+    echo "workers_GROUP_consul_node_destinations=[$consulNodeDestinations]" >> "$ANSIBLE_INVENTORY_FILE"
     storeDestinations="$(xargs printf ',%s' < "$storeDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_store_destinations=$storeDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     etcdStoreDestinations="$(xargs printf ',%s' < "$etcdStoreDestinationsTmp" | cut -b 2-)"
     echo "workers_GROUP_etcd_store_destinations=$etcdStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
+    consulStoreDestinations="$(xargs printf ',%s' < "$consulStoreDestinationsTmp" | cut -b 2-)"
+    echo "workers_GROUP_consul_store_destinations=$consulStoreDestinations" >> "$ANSIBLE_INVENTORY_FILE"
     processorPrivateIp="$(xargs printf ',%s' < "$processorPrivateIpTmp" | cut -b 2-)"
     echo "workers_GROUP_processor_destination=$processorPrivateIp" >> "$ANSIBLE_INVENTORY_FILE"
     totalNodeCount=$(xargs printf ',%s' < "$totalNodeCountTmp" | cut -b 2-)

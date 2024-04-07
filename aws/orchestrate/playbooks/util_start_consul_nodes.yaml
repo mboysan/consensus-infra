@@ -1,0 +1,57 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook that starts a consul cluster.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Starts all Consul KV stores
+  hosts: nodes
+  tasks:
+    - name: Delete config dir
+      file:
+        path: '{{ nodes_GROUP_consul_config_dir }}'
+        state: absent
+
+    - name: Prepare consul configuration script
+      template:
+        src: consul_config.template.sh
+        dest: "{{ all_GROUP_home_dir }}/consul_config.sh"
+        mode: "+x"
+      vars:
+        nodeId: "{{ nodes_GROUP_current_node_id }}"
+        expected_number_of_nodes: "{{ groups['nodes'] | length }}"
+        consulPortGrpc: "{{ lookup('env','RESERVED_PORT_START') | int | mandatory + 2 }}"
+        consulPortServer: "{{ lookup('env','RESERVED_PORT_START') | int | mandatory + 3 }}"
+        consulPortSerfLan: "{{ lookup('env','NODE_SERVING_PORT') | int | mandatory }}"
+        consulPortHttp: "{{ lookup('env','CLIENT_SERVING_PORT') | int | mandatory }}"
+        node_destinations_json_array: "{{ workers_GROUP_consul_node_destinations | to_json }}"
+
+    - name: Execute consul configuration
+      shell:
+        cmd: |
+          bash -ilc './consul_config.sh'
+        chdir: "{{ all_GROUP_home_dir }}"
+
+    - name: Starting all consul KV stores (async)
+      shell:
+        cmd: |
+          set -m
+          
+          # run in background
+          bash -ilc './consul agent -config-dir={{ _config_dir }} -log-file={{ _consul_logs }}' &
+          
+          bash -ilc 'sleep 1m'
+        chdir: "{{ nodes_GROUP_consul_working_dir }}"
+      vars:
+        _config_dir: "{{ nodes_GROUP_consul_config_dir }}/node{{ nodes_GROUP_current_node_id }}"
+        _consul_logs: "{{ workers_GROUP_project_log_file }}"
+      async: 100
+      poll: 0
+      register: start_stores_task
+
+    - name: Waiting stores to start
+      async_status:
+        jid: "{{ start_stores_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10

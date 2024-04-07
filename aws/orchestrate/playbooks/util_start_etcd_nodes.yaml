@@ -1,0 +1,39 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook that starts an etcd cluster.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Starts all etcd KV stores
+  hosts: nodes
+  tasks:
+    - name: Starting all etcd KV stores (async)
+      shell:
+        cmd: |
+          set -m
+          
+          # run in background
+          bash -ilc '
+            etcdMyPeerIp=$(~/private_ip.sh); echo $etcdMyPeerIp;
+            ./etcd  --name "node{{ nodes_GROUP_current_node_id }}" \
+                    --initial-advertise-peer-urls "http://$etcdMyPeerIp:{{ nodes_GROUP_node_serving_port }}" \
+                    --listen-peer-urls "http://$etcdMyPeerIp:{{ nodes_GROUP_node_serving_port }}" \
+                    --listen-client-urls "http://$etcdMyPeerIp:{{ nodes_GROUP_client_serving_port }}" \
+                    --advertise-client-urls "http://$etcdMyPeerIp:{{ nodes_GROUP_client_serving_port }}" \
+                    --initial-cluster-token my-etcd-cluster-1 \
+                    --initial-cluster "{{ workers_GROUP_etcd_node_destinations }}" \
+                    --data-dir {{ nodes_GROUP_etcd_working_dir }}/data \
+                    --initial-cluster-state new &> {{ workers_GROUP_project_log_file }}' &
+          
+          bash -ilc 'sleep 1m'
+        chdir: "{{ nodes_GROUP_etcd_working_dir }}"
+      async: 100
+      poll: 0
+      register: start_stores_task
+
+    - name: Waiting stores to start
+      async_status:
+        jid: "{{ start_stores_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 100
+      delay: 10

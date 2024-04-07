@@ -1,14 +1,12 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a simple load test using bizur consensus protocol with a custom workload definition.
+# Performs a load test of the consul cluster with the provided workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
 - import_playbook: util_start_load_test.yaml
   vars:
-    cluster_type: "consensus"
-    consensus_protocol: "bizur"
-    node_cli_params: >-
-      --node
-      metrics.jvm.enabled={{ analyze_store_jvm_metrics }}
-      metrics.insights.enabled={{ analyze_store_message_metrics }}
+    cluster_type: "consul"
+    consensus_protocol: "consul_raft"
     workload: "{{ workload_definition }}"
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false

@@ -7,23 +7,6 @@
   hosts: workers
   tasks:
     - name: Configuring log4j
-      shell:
-        cmd: |
-          set -m
-
-          log4jConf="{{ _log4j_config }}"
-          echo "$log4jConf" > {{ workers_GROUP_project_log_config_file}}
-          
-        chdir: "{{ workers_GROUP_project_log_path }}"
-      vars:
-        _log4j_config: |
-          # configure root logger
-          log4j.rootLogger={{ workers_GROUP_project_log_level }}, FILE
-
-          # Define the file appender
-          log4j.appender.FILE=org.apache.log4j.FileAppender
-          log4j.appender.FILE.File={{ workers_GROUP_project_log_file }}
-          log4j.appender.FILE.ImmediateFlush=true
-          log4j.appender.FILE.Append=false
-          log4j.appender.FILE.layout=org.apache.log4j.EnhancedPatternLayout
-          log4j.appender.FILE.layout.conversionPattern=%-5p %d{ABSOLUTE} [%t] %c{1.}.%M(): %m%n
+      template:
+        src: log4j.template.properties
+        dest: '{{ workers_GROUP_project_log_config_file }}'

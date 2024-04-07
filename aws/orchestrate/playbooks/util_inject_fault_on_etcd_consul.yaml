@@ -1,0 +1,30 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to inject network faults in the system (for etcd, consul clusters).
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Fault injection (if defined)
+  hosts: nodes
+  tasks:
+    - name: Prepare inject_fault script
+      template:
+        src: inject_fault_etcd_consul.template.sh
+        dest: "{{ _home_dir }}/inject_fault_etcd_consul.sh"
+        mode: "+x"
+      vars:
+        _server_name: "{{ inventory_hostname }}"
+        _home_dir: "{{ all_GROUP_home_dir }}"
+      when: inject_fault is defined
+
+    - name: Running inject_fault script
+      shell:
+        cmd: |
+          bash -ilc './inject_fault_etcd_consul.sh'
+        chdir: "{{ all_GROUP_home_dir }}"
+      async: "{{ duration_sec * 2 | default(500) }}"
+      poll: 0
+      register: inject_fault_task
+      when: inject_fault is defined
+  vars:
+    delay_sec: "{{ inject_fault['delay_sec'] }}"
+    duration_sec: "{{ inject_fault['duration_sec'] }}"

@@ -1,8 +1,12 @@
 #------------------------------------------------------------------------------------------------------------
-# Performs a load test of the etcd cluster with an optionally provided workload definition.
+# Performs a load test of the etcd cluster with the provided workload definition.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_etcd_start_load_test.yaml
+- import_playbook: util_start_load_test.yaml
   vars:
+    cluster_type: "etcd"
+    consensus_protocol: "etcd_raft"
     workload: "{{ workload_definition }}"
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false

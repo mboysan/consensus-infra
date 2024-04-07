@@ -1,0 +1,22 @@
+#------------------------------------------------------------------------------------------------------------
+# Playbook to check fault injection results.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- name: Checks fault injection results
+  hosts: nodes
+  tasks:
+    - name: Checking fault injection results
+      async_status:
+        jid: "{{ inject_fault_task.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 1000
+      delay: 10
+      when: inject_fault is defined
+
+    - name: Print fault injection result
+      debug:
+        msg: "{{ job_result.stdout_lines }}"
+        verbosity: 1
+      when: inject_fault is defined

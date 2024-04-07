@@ -34,7 +34,7 @@
     - name: P1.5 - Run the setup_vm script (async)
       shell:
         cmd: |
-          bash -ilc './setup_vm.sh'
+          bash -ilc './setup_vm.sh' > {{ all_GROUP_ansible_cmd_out }} 2>&1
         chdir: "{{ all_GROUP_home_dir }}"
       async: 600
       poll: 0

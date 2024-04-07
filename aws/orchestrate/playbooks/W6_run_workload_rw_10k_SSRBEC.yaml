@@ -7,11 +7,11 @@
   tasks:
     - name: Setting global variables
       set_fact:
-        test_group: "W1"
+        test_group: "W6"
         analyze_client_metrics: true
         analyze_store_jvm_metrics: false
         analyze_store_message_metrics: false
-        workload_definition: "workload_rw_1k"
+        workload_definition: "workload_rw_10k"
 
 #---------------------------------------------------------------
 
@@ -43,6 +43,11 @@
 - import_playbook: T_load_test_etcd_raft.yaml
   vars:
     test_name: "T5"
+
+# raft consensus on consul test
+- import_playbook: T_load_test_consul_raft.yaml
+  vars:
+    test_name: "T6"
 
 #---------------------------------------------------------------
 
