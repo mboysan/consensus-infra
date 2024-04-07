@@ -84,7 +84,7 @@
         src: ./workloads/
         dest: '{{ clients_GROUP_workloads_dir }}'
 
-- name: P2.4 - Configure log4j and metrics on workers
+- name: P2.4 - Configure logs and metrics directories on workers
   hosts: workers
   any_errors_fatal: true
   tasks:
@@ -93,12 +93,7 @@
         path: '{{ workers_GROUP_project_log_path }}'
         state: directory
 
-    - name: P2.4.2 - Copy log4j template
-      template:
-        src: log4j.properties.j2
-        dest: '{{ workers_GROUP_project_log_config_file }}'
-
-    - name: P2.4.3 - Create metrics directory
+    - name: P2.4.2 - Create metrics directory
       file:
         path: '{{ workers_GROUP_project_metrics_path }}'
         state: directory
