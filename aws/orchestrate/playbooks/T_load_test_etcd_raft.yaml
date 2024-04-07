@@ -3,6 +3,8 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- import_playbook: util_start_load_test_etcd.yaml
+- import_playbook: util_start_load_test_etcd_consul.yaml
   vars:
+    consensus_protocol: "etcd_raft"
+    cluster_type: "etcd"
     workload: "{{ workload_definition }}"
