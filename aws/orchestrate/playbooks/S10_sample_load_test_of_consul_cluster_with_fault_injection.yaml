@@ -1,0 +1,29 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test on etcd cluster with a custom workload definition.
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: T_load_test_consul_raft.yaml
+  vars:
+    test_group: "S"
+    test_name: "S10"
+    workload_definition: |
+      recordcount=1000
+      operationcount=1000
+      workload=site.ycsb.workloads.CoreWorkload
+      
+      readallfields=true
+      
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+      
+      requestdistribution=zipfian
+    analyze_client_metrics: true
+    analyze_store_jvm_metrics: false
+    analyze_store_message_metrics: false
+
+    inject_fault:
+      delay_sec: 10
+      duration_sec: 60
