@@ -44,6 +44,11 @@
   vars:
     test_name: "T5"
 
+# raft consensus on etcd test
+- import_playbook: T_load_test_consul_raft.yaml
+  vars:
+    test_name: "T6"
+
 #---------------------------------------------------------------
 
 - import_playbook: util_analyze_metrics.yaml
