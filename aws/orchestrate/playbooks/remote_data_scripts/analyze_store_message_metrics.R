@@ -49,7 +49,8 @@ ggplot(message_counts, aes(x = timestamp_sec, y = count, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_message_counts", source = "processor")
 rm(message_counts); gc()
 
@@ -65,5 +66,6 @@ ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_message_sizes", source = "processor")

@@ -13,8 +13,8 @@ ANALYZE_STORE_MEMORY_METRICS <- FALSE
 ANALYZE_STORE_MESSAGE_METRICS <- FALSE
 PLOT_SOURCE <- "controller"
 
-arg_io_folder <- "../collected_data/metrics"
-arg_test_group <- "W2"
+arg_io_folder <- "../collected_data/metrics/samples"
+arg_test_group <- "EX"
 arg_tests <- data.frame(
     c("EX1", "consensus", "raft"),
     c("EX2", "consensus", "bizur")

@@ -113,7 +113,8 @@ ggplot(successful_read_latency_data, aes(x = timestamp_sec, y = metric_value, co
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_read_latency", source = "processor")
 rm(successful_read_latency_data); gc()
 rm(failed_read_latency_data); gc()
@@ -126,7 +127,8 @@ ggplot(successful_update_latency_data, aes(x = timestamp_sec, y = metric_value, 
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_update_latency", source = "processor")
 rm(successful_update_latency_data); gc()
 rm(failed_update_latency_data); gc()
@@ -139,5 +141,6 @@ ggplot(successful_latency_data, aes(x = timestamp_sec, y = metric_value, color =
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_operation_latency", source = "processor")

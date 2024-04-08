@@ -49,5 +49,6 @@ ggplot(data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
-    theme_minimal()
+    theme_minimal() +
+    theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_process_cpu_data", source = "processor")
