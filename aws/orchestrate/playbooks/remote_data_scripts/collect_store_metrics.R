@@ -17,12 +17,12 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 4,
+    validator = \(x) length(x) == 5,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX1", "consensus", "raft")
     # bizur
-    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX2", "consensus", "bizur")
 )
 
 # backup commandArgs
@@ -31,9 +31,10 @@ commandArgs_bak <- commandArgs
 io_folder <- args[1]
 test_group <- args[2]
 test_name <- args[3]
-consensus_alg <- args[4]
+cluster_type <- args[4]
+consensus_alg <- args[5]
 commandArgs <- function (...) {
-    c(io_folder, test_group, test_name, consensus_alg)
+    c(io_folder, test_group, test_name, cluster_type, consensus_alg)
 }
 
 source("collect_store_memory_metrics.R")

@@ -3,10 +3,10 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts all etcd KV stores
+- name: Starts etcd KV stores
   hosts: nodes
   tasks:
-    - name: Starting all etcd KV stores (async)
+    - name: Starting etcd KV stores (async)
       shell:
         cmd: |
           set -m

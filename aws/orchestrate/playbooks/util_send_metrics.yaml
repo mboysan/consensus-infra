@@ -69,7 +69,7 @@
           bash -ilc './collect_client_metrics.R {{ _args }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ consensus_protocol }}"
+        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ cluster_type }} {{ consensus_protocol }}"
 
     - name: Grouping store metrics
       shell:
@@ -77,5 +77,5 @@
           bash -ilc './collect_store_metrics.R {{ _args }}' > {{ all_GROUP_ansible_cmd_out }}
         chdir: "{{ all_GROUP_home_dir }}"
       vars:
-        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ consensus_protocol }}"
+        _args: "{{ processors_GROUP_project_metrics_path }} {{ test_group }} {{ test_name }} {{ cluster_type }} {{ consensus_protocol }}"
       when: analyze_store_jvm_metrics or analyze_store_message_metrics

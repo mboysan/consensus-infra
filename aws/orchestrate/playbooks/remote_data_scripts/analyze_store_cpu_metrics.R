@@ -45,7 +45,7 @@ info("Plotting cpu data")
 data <- data %>% filter(metric_name == "process.cpu.usage")
 
 # Plot process cpu usage, grouped by consensusAlg, metric_name & timestamp_sec
-ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +

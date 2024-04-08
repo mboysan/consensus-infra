@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts client(s)
+- name: Starts consul client(s)
   hosts: clients
   tasks:
     - name: Starting consul client(s) (perf test)

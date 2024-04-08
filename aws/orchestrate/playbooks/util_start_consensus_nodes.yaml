@@ -1,12 +1,12 @@
 #------------------------------------------------------------------------------------------------------------
-# Playbook to start all nodes
+# Playbook to start consensus nodes
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts all nodes
+- name: Starts consensus nodes
   hosts: nodes
   tasks:
-    - name: Starting all nodes (async)
+    - name: Starting consensus nodes (async)
       shell:
         cmd: |
           set -m

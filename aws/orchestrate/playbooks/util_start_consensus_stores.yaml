@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------------------------------------
-# Playbook to start all KV stores.
+# Playbook to start consensus KV stores.
 # This playbook depends on all the nodes to be started first.
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts all KV stores
+- name: Starts consensus KV stores
   hosts: stores
   tasks:
-    - name: Starting all KV stores (async)
+    - name: Starting consensus KV stores (async)
       shell:
         cmd: |
           set -m

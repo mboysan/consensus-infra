@@ -31,9 +31,9 @@ input_file <- paste(io_folder, input_file, sep = "/")
 data <- read.csv(input_file, header = FALSE, stringsAsFactors = FALSE)
 
 # Rename the columns
-names(data) <- c("nodeType", "testGroup", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
-data$testName_algorithm <- paste0(data$testGroup, data$testName)    # EXEX1
-data$testName_algorithm <- paste(data$testName_algorithm, data$consensusAlg, sep = "_")   # EXEX1_raft
+names(data) <- c("nodeType", "testGroup", "testName", "clusterType", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+data$test_id <- paste0(data$testGroup, data$testName)    # EXEX1
+data$test_id <- paste(data$test_id, data$clusterType, data$consensusAlg, sep = "_")   # EXEX1_consensus_raft
 
 # filter for client metrics
 data <- data %>% filter(nodeType == "client")
@@ -93,12 +93,12 @@ if (remove_outliers_per_test) {
 # Group the data
 if (timescale_in_milliseconds) {
     data <- data %>%
-        group_by(testName_algorithm, metric_name, timestamp_sec)
+        group_by(test_id, metric_name, timestamp_sec)
 } else {
     data <- data %>%
-        group_by(testName_algorithm, metric_name, timestamp_sec) %>%
+        group_by(test_id, metric_name, timestamp_sec) %>%
         mutate(metric_value = mean(metric_value)) %>%
-        distinct(testName_algorithm, metric_name, metric_value, timestamp_sec, .keep_all = TRUE)
+        distinct(test_id, metric_name, metric_value, timestamp_sec, .keep_all = TRUE)
 }
 
 info("Converting metric_value from microseconds to milliseconds")
@@ -108,10 +108,10 @@ data$metric_value <- data$metric_value / 1000
 info("Plotting read latency")
 successful_read_latency_data <- data %>% filter(metric_name == "read")
 failed_read_latency_data <- data %>% filter(metric_name == "read-failed")
-ggplot(successful_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(successful_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
-    geom_point(data = failed_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm), size = 4, shape = 4) +
+    geom_point(data = failed_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_read_latency", source = "processor")
@@ -121,10 +121,10 @@ rm(failed_read_latency_data); gc()
 info("Plotting update latency")
 successful_update_latency_data <- data %>% filter(metric_name == "update")
 failed_update_latency_data <- data %>% filter(metric_name == "update-failed")
-ggplot(successful_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(successful_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
-    geom_point(data = failed_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm), size = 4, shape = 4) +
+    geom_point(data = failed_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_update_latency", source = "processor")
@@ -134,10 +134,10 @@ rm(failed_update_latency_data); gc()
 info("Plotting operation latency")
 successful_latency_data <- data %>% filter(!grepl("failed", metric_name, ignore.case = TRUE))
 failed_latency_data <- data %>% filter(grepl("failed", metric_name, ignore.case = TRUE))
-ggplot(successful_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(successful_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
-    geom_point(data = failed_latency_data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm), size = 4, shape = 4) +
+    geom_point(data = failed_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
     labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
     theme_minimal()
 exportPlot(io_folder, "plot_operation_latency", source = "processor")

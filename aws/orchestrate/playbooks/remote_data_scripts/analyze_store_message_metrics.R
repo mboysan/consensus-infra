@@ -45,7 +45,7 @@ message_counts <- data %>% summarise(count = n())
 message_counts <- message_counts %>% arrange(timestamp_sec)
 
 # Plot count of messages, grouped by consensusAlg & timestamp_sec
-ggplot(message_counts, aes(x = timestamp_sec, y = count, color = testName_algorithm)) +
+ggplot(message_counts, aes(x = timestamp_sec, y = count, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Count", title = "Count of Messages per Second") +
@@ -61,7 +61,7 @@ message_sizes <- data %>% summarise(sum = sum(metric_value / 1024))
 message_sizes <- message_sizes %>% arrange(timestamp_sec)
 
 # Plot size of messages, grouped by consensusAlg & timestamp_sec
-ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = testName_algorithm)) +
+ggplot(message_sizes, aes(x = timestamp_sec, y = sum, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "Sum of Message Sizes (kB)", title = "Sum of Message Sizes per Second") +
