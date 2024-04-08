@@ -64,6 +64,10 @@ roundToNearestSecond <- function(data) {
     info("Rounding the timestamp to the nearest second")
     data$timestamp_sec <- round(data$timestamp_sec)
     data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
+
+    # extract minutes:seconds string using substr and store time information as POSIXct, using an arbitrary date
+    # inspired by: https://stackoverflow.com/a/12868358
+    data$timestamp_sec <- as.POSIXct(paste("2012-01-01", substr(data$timestamp_sec, 15, 20)))
     data
 }
 
@@ -112,7 +116,7 @@ ggplot(successful_read_latency_data, aes(x = timestamp_sec, y = metric_value, co
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_read_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
-    labs(x = "Time (seconds)", y = "Read Latency (ms)", title = "Read Latency per Second") +
+    labs(x = "Time (min:sec)", y = "Read Latency (ms)", title = "Read Latency per Second") +
     theme_minimal() +
     theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_read_latency", source = "processor")
@@ -126,7 +130,7 @@ ggplot(successful_update_latency_data, aes(x = timestamp_sec, y = metric_value, 
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_update_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
-    labs(x = "Time (seconds)", y = "Update Latency (ms)", title = "Update Latency per Second") +
+    labs(x = "Time (min:sec)", y = "Update Latency (ms)", title = "Update Latency per Second") +
     theme_minimal() +
     theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_update_latency", source = "processor")
@@ -140,7 +144,7 @@ ggplot(successful_latency_data, aes(x = timestamp_sec, y = metric_value, color =
     # geom_point() +
     stat_summary(fun = mean, geom = "line") +
     geom_point(data = failed_latency_data, aes(x = timestamp_sec, y = metric_value, color = test_id), size = 4, shape = 4) +
-    labs(x = "Time (seconds)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
+    labs(x = "Time (min:sec)", y = "Operation Latency (ms)", title = "Operation Latency per Second") +
     theme_minimal() +
     theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_operation_latency", source = "processor")
