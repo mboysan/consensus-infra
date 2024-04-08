@@ -48,7 +48,8 @@ data <- data %>% filter(metric_name == "process.cpu.usage")
 ggplot(data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     geom_point() +
     geom_line() +
-    labs(x = "Time (min:sec)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
+    labs(x = "Time (HH:MM:SS)", y = "Process CPU Usage (%)", title = "Process CPU Usage Percent per Second") +
+    scale_x_time(labels = scales::time_format("%H:%M:%S")) +
     theme_minimal() +
     theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_process_cpu_data", source = "processor")
