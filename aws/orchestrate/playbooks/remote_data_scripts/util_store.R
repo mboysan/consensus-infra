@@ -29,13 +29,25 @@ extractInsights <- function(metricName, convertToMilliseconds = TRUE) {
 }
 
 collectStoreSummaryData <- function(summaryData) {
-    data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, summaryData)
+    data.frame(
+        nodeType = "store",
+        testGroup = test_group,
+        testName = test_name,
+        clusterType = cluster_type,
+        consensusAlg = consensus_alg,
+        summaryData)
 }
 
 collectStoreRawData <- function(rawData) {
-    rawData <- data.frame(nodeType = "store", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, rawData)
+    rawData <- data.frame(
+        nodeType = "store",
+        testGroup = test_group,
+        testName = test_name,
+        clusterType = cluster_type,
+        consensusAlg = consensus_alg,
+        rawData)
     # finalize column order
-    rawData <- rawData[, c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+    rawData <- rawData[, c('nodeType', 'testGroup', 'testName', 'clusterType', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
     rawData
 }
 
@@ -57,9 +69,9 @@ prepareStoreResourceUsageMetrics <- function(data) {
     info("preparing store resource usage metrics")
 
     # Rename the columns
-    names(data) <- c("nodeType", "testGroup", "testName", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
-    data$testName_algorithm <- paste0(data$testGroup, data$testName)    # EXEX1
-    data$testName_algorithm <- paste(data$testName_algorithm, data$consensusAlg, sep = "_")   # EXEX1_raft
+    names(data) <- c("nodeType", "testGroup", "testName", "clusterType", "consensusAlg", "category", "metric_name", "metric_value", "timestamp")
+    data$test_id <- paste0(data$testGroup, data$testName)    # EXEX1
+    data$test_id <- paste(data$test_id, data$clusterType, data$consensusAlg, sep = "_")   # EXEX1_consensus_raft
 
     # filter for store metrics and test names
     data <- data %>% filter(nodeType == "store")
@@ -77,7 +89,7 @@ prepareStoreResourceUsageMetrics <- function(data) {
     data$metric_value <- as.numeric(data$metric_value)
 
     # Group the data
-    data <- data %>% group_by(testName_algorithm, metric_name, timestamp_sec)
+    data <- data %>% group_by(test_id, metric_name, timestamp_sec)
     data
 }
 

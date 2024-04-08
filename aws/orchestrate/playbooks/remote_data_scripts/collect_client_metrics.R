@@ -9,8 +9,8 @@
 #' @param test_name name of the test that was run
 #' @param consensus_protocol the consensus protocol used in the test
 #' @examples
-#' ./collect_client_metrics.R <io_folder> <test_group> <test_name> <consensus_protocol>
-#' ./collect_client_metrics.R ../collected_data/metrics/samples ./ EX EX1 "raft"
+#' ./collect_client_metrics.R <io_folder> <test_group> <test_name> <cluster_type> <consensus_protocol>
+#' ./collect_client_metrics.R ../collected_data/metrics/samples ./ EX EX1 "consensus" "raft"
 #'
 
 source("util.R")
@@ -18,12 +18,12 @@ source("util.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 4,
+    validator = \(x) length(x) == 5,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "consensus", "raft")
     # bizur
-    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "consensus", "bizur")
 )
 
 METRICS_FILE_NAME <- "client.metrics.txt"
@@ -31,7 +31,8 @@ METRICS_FILE_NAME <- "client.metrics.txt"
 io_folder <- args[1]
 test_group <- args[2]
 test_name <- args[3]
-consensus_alg <- args[4]
+cluster_type <- args[4]
+consensus_alg <- args[5]
 
 metrics_file <- paste(io_folder, test_group, test_name, METRICS_FILE_NAME, sep = "/")
 output_folder <- paste(io_folder, test_group, test_name, sep = "/")
@@ -111,10 +112,17 @@ all_raw <- rbind(
     read_modify_write_failed_latency
 )
 all_raw <- all_raw %>% filter(value > -1, na.rm = TRUE)   # sanitize
-all_raw <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, category = "latency", all_raw)
+all_raw <- data.frame(
+    nodeType = "client",
+    testGroup = test_group,
+    testName = test_name,
+    clusterType = cluster_type,
+    consensusAlg = consensus_alg,
+    category = "latency",
+    all_raw)
 
 # finalize column order
-all_raw <- all_raw[, c('nodeType', 'testGroup', 'testName', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
+all_raw <- all_raw[, c('nodeType', 'testGroup', 'testName', 'clusterType', 'consensusAlg', 'category', 'metric', 'value', 'timestamp')]
 
 read_count <- count_as_df('read_count', read_latency)
 update_count <- count_as_df('update_count', update_latency)
@@ -163,7 +171,13 @@ all_summary <- rbind(
     overall_summary
 )
 all_summary <- all_summary %>% filter(mean > -1, na.rm = TRUE)   # sanitize
-all_summary <- data.frame(nodeType = "client", testGroup = test_group, testName = test_name, consensusAlg = consensus_alg, all_summary)
+all_summary <- data.frame(
+    nodeType = "client",
+    testGroup = test_group,
+    testName = test_name,
+    clusterType = cluster_type,
+    consensusAlg = consensus_alg,
+    all_summary)
 
 # ----------------------------------------------------------------------------- write all to csv files
 info("writing client raw data to csv file")

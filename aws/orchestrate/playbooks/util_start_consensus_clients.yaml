@@ -4,10 +4,10 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts client(s)
+- name: Starts consensus client(s)
   hosts: clients
   tasks:
-    - name: Starting client(s) (perf test)
+    - name: Starting consensus client(s) (perf test)
       shell:
         cmd: |
           set -m

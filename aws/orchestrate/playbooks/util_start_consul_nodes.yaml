@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------------------------------------
 
 ---
-- name: Starts all Consul KV stores
+- name: Starts consul KV stores
   hosts: nodes
   tasks:
     - name: Delete config dir

@@ -48,7 +48,7 @@ data <- data %>% filter(metric_name == "jvm.memory.used")
 data$metric_value <- data$metric_value / 1000 / 1000
 
 # Plot memory usage, grouped by consensusAlg, metric_name & timestamp_sec
-ggplot(data, aes(x = timestamp_sec, y = metric_value, color = testName_algorithm)) +
+ggplot(data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     geom_point() +
     geom_line() +
     labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +

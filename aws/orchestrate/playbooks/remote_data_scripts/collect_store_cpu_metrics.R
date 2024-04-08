@@ -6,12 +6,12 @@ source("util_store.R")
 args <- commandArgs(trailingOnly = TRUE)
 args <- valiadate_args(
     args = args,
-    validator = \(x) length(x) == 4,
+    validator = \(x) length(x) == 5,
     failure_msg = "required arguments are not provided.",
     # raft
-    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "raft")
+    defaults = c("../collected_data/metrics/samples", "EX", "EX1", "consensus", "raft")
     # bizur
-    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "bizur")
+    # defaults = c("../collected_data/metrics/samples", "EX", "EX2", "consensus", "bizur")
 )
 
 MAIN_METRICS_FILE_NAME <- "store.metrics.txt"
@@ -20,7 +20,8 @@ METRICS_FILE_NAME <- "store.cpu.metrics.txt"
 io_folder <- args[1]
 test_group <- args[2]
 test_name <- args[3]
-consensus_alg <- args[4]
+cluster_type <- args[4]
+consensus_alg <- args[5]
 
 main_metrics_file <- paste(io_folder, test_group, test_name, MAIN_METRICS_FILE_NAME, sep = "/")
 metrics_file <- paste(io_folder, test_group, test_name, METRICS_FILE_NAME, sep = "/")
