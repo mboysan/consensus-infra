@@ -86,6 +86,10 @@ prepareStoreResourceUsageMetrics <- function(data) {
     data$timestamp_sec <- round(data$timestamp_sec)
     data$timestamp_sec <- as.POSIXct(data$timestamp_sec, origin = "1970-01-01")
 
+    # extract minutes:seconds string using substr and store time information as POSIXct, using an arbitrary date
+    # inspired by: https://stackoverflow.com/a/12868358
+    data$timestamp_sec <- as.POSIXct(paste("2012-01-01", substr(data$timestamp_sec, 15, 20)))
+
     data$metric_value <- as.numeric(data$metric_value)
 
     # Group the data

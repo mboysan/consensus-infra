@@ -51,7 +51,7 @@ data$metric_value <- data$metric_value / 1000 / 1000
 ggplot(data, aes(x = timestamp_sec, y = metric_value, color = test_id)) +
     geom_point() +
     geom_line() +
-    labs(x = "Time (seconds)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
+    labs(x = "Time (min:sec)", y = "JVM Memory (MB)", title = "JVM Memory Used per Second") +
     theme_minimal() +
     theme(legend.position = "bottom")
 exportPlot(io_folder, "plot_memory_data", source = "processor")
