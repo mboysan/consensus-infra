@@ -1,0 +1,13 @@
+"nodeType","testGroup","testName","clusterType","consensusAlg","category","metric","count","min","max","mean","p1","p5","p50","p90","p95","p99","p99.9","p99.99"
+"store","W7","T1","consensus","raft","memory","jvm.memory.used",41,16342608,37109320,28181752,16454972.8,16849864,31138296,36162280,36393968,36913902.4,37089778.24,37107365.824
+"store","W7","T1","consensus","raft","memory","insights.store.sizeOf.keys",41,0,72565,37897.243902439,0,0,42803,72565,72565,72565,72565,72565
+"store","W7","T1","consensus","raft","memory","insights.store.sizeOf.values",41,0,345639,180506.658536585,0,0,203830,345639,345639,345639,345639,345639
+"store","W7","T1","consensus","raft","memory","insights.store.sizeOf.total",41,0,418204,218403.902439024,0,0,246633,418204,418204,418204,418204,418204
+"store","W7","T2","consensus","bizur","memory","jvm.memory.used",48,17110392,35793824,27751266.1666667,17811240.96,19633506.4,30252476,34541978.4,35376472.4,35758671.76,35790308.776,35793472.4776
+"store","W7","T2","consensus","bizur","memory","insights.store.sizeOf.keys",48,0,72549,33679.625,0,0,25097.5,72549,72549,72549,72549,72549
+"store","W7","T2","consensus","bizur","memory","insights.store.sizeOf.values",48,0,345530,160404.854166667,0,0,119518.5,345530,345530,345530,345530,345530
+"store","W7","T2","consensus","bizur","memory","insights.store.sizeOf.total",48,0,418079,194084.479166667,0,0,144616,418079,418079,418079,418079,418079
+"store","W7","T3","consensus","bizur","memory","jvm.memory.used",69,16237024,36054880,28339907.2463768,17927155.84,19789417.6,30859280,35259915.2,35755068.8,35938039.68,36043195.968,36053711.5968
+"store","W7","T3","consensus","bizur","memory","insights.store.sizeOf.keys",69,0,72852,36046.115942029,0,0,35086,72852,72852,72852,72852,72852
+"store","W7","T3","consensus","bizur","memory","insights.store.sizeOf.values",69,0,346947,171665.52173913,0,0,167097,346947,346947,346947,346947,346947
+"store","W7","T3","consensus","bizur","memory","insights.store.sizeOf.total",69,0,419799,207711.637681159,0,0,202183,419799,419799,419799,419799,419799

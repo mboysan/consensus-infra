@@ -6,18 +6,19 @@
 
 source("util.R")
 
-COLLECT_METRICS <- FALSE
+COLLECT_METRICS <- FALSE    # useful for testing the entire workflow (e.g. samples/EX)
 ANALYZE_CLIENT_METRICS <- TRUE
-ANALYZE_STORE_CPU_METRICS <- FALSE
-ANALYZE_STORE_MEMORY_METRICS <- FALSE
-ANALYZE_STORE_MESSAGE_METRICS <- FALSE
+ANALYZE_STORE_CPU_METRICS <- TRUE
+ANALYZE_STORE_MEMORY_METRICS <- TRUE
+ANALYZE_STORE_MESSAGE_METRICS <- TRUE
 PLOT_SOURCE <- "controller"
 
 arg_io_folder <- "../collected_data/metrics/samples"
-arg_test_group <- "EX"
+arg_test_group <- "W7"
 arg_tests <- data.frame(
-    c("EX1", "consensus", "raft"),
-    c("EX2", "consensus", "bizur")
+    c("T1", "consensus", "raft"),
+    c("T2", "consensus", "bizur"),
+    c("T3", "consensus", "bizur")
 )
 arg_tests <- t(arg_tests)    # flip the matrix
 

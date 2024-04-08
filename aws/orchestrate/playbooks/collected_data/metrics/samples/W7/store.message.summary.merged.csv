@@ -1,0 +1,16 @@
+"nodeType","testGroup","testName","clusterType","consensusAlg","category","metric","count","min","max","mean","p1","p5","p50","p90","p95","p99","p99.9","p99.99"
+"store","W7","T1","consensus","raft","message","insights.tcp.server.receive.sizeOf.AppendEntriesRequest",10162,387,616,555.422751426884,390,501,504,616,616,616,616,616
+"store","W7","T1","consensus","raft","message","total_consensus_request_count",1,10162,10162,10162,10162,10162,10162,10162,10162,10162,10162,10162
+"store","W7","T1","consensus","raft","message","total_consensus_request_size",1,5644206,5644206,5644206,5644206,5644206,5644206,5644206,5644206,5644206,5644206,5644206
+"store","W7","T2","consensus","bizur","message","insights.tcp.client.send.sizeOf.PleaseVoteRequest",18,261,263,262.222222222222,261,261,262,263,263,263,263,263
+"store","W7","T2","consensus","bizur","message","insights.tcp.server.receive.sizeOf.ReplicaReadRequest",14487,253,259,257.952440118727,256,257,258,259,259,259,259,259
+"store","W7","T2","consensus","bizur","message","insights.tcp.server.receive.sizeOf.ReplicaWriteRequest",7963,483,1865,797.345096069321,485,486,762,1173,1177,1451,1727,1864.2038
+"store","W7","T2","consensus","bizur","message","insights.tcp.server.receive.sizeOf.HeartbeatRequest",253,239,246,244.948616600791,242.52,244,245,246,246,246,246,246
+"store","W7","T2","consensus","bizur","message","total_consensus_request_count",1,22721,22721,22721,22721,22721,22721,22721,22721,22721,22721,22721
+"store","W7","T2","consensus","bizur","message","total_consensus_request_size",1,10152908,10152908,10152908,10152908,10152908,10152908,10152908,10152908,10152908,10152908,10152908
+"store","W7","T3","consensus","bizur","message","insights.tcp.client.send.sizeOf.PleaseVoteRequest",28,260,263,261.785714285714,260,260.35,262,263,263,263,263,263
+"store","W7","T3","consensus","bizur","message","insights.tcp.server.receive.sizeOf.ReplicaReadRequest",19892,254,259,257.961290971245,256,257,258,259,259,259,259,259
+"store","W7","T3","consensus","bizur","message","insights.tcp.server.receive.sizeOf.ReplicaWriteRequest",13362,481,625,552.652896273013,484,485,487,625,625,625,625,625
+"store","W7","T3","consensus","bizur","message","insights.tcp.client.send.sizeOf.HeartbeatRequest",277,242,246,245,243,244,245,246,246,246,246,246
+"store","W7","T3","consensus","bizur","message","total_consensus_request_count",1,33559,33559,33559,33559,33559,33559,33559,33559,33559,33559,33559
+"store","W7","T3","consensus","bizur","message","total_consensus_request_size",1,12591109,12591109,12591109,12591109,12591109,12591109,12591109,12591109,12591109,12591109,12591109

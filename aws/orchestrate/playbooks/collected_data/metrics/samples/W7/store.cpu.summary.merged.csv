@@ -1,0 +1,7 @@
+"nodeType","testGroup","testName","clusterType","consensusAlg","category","metric","count","min","max","mean","p1","p5","p50","p90","p95","p99","p99.9","p99.99"
+"store","W7","T1","consensus","raft","cpu","system.cpu.usage",41,0,0.91,0.164390243902439,0,0,0.03,0.41,0.53,0.822,0.9012,0.90912
+"store","W7","T1","consensus","raft","cpu","process.cpu.usage",41,0,0.91,0.129756097560976,0,0,0.02,0.38,0.53,0.822,0.9012,0.90912
+"store","W7","T2","consensus","bizur","cpu","system.cpu.usage",48,0,0.99,0.16,0.0047,0.01,0.03,0.333,0.6355,0.99,0.99,0.99
+"store","W7","T2","consensus","bizur","cpu","process.cpu.usage",48,0,0.99,0.137083333333333,0.0047,0.01,0.02,0.32,0.6465,0.99,0.99,0.99
+"store","W7","T3","consensus","bizur","cpu","system.cpu.usage",69,0,0.99,0.134057971014493,0,0,0.03,0.32,0.382,0.9628,0.98728,0.989728
+"store","W7","T3","consensus","bizur","cpu","process.cpu.usage",69,0,0.98,0.106811594202899,0,0.01,0.01,0.31,0.366,0.9528,0.97728,0.979728
