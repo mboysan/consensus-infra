@@ -20,6 +20,7 @@ using <- function(...) {
 using(
     'dplyr',
     'ggplot2',
+    'hms',
     'svglite'
 )
 
