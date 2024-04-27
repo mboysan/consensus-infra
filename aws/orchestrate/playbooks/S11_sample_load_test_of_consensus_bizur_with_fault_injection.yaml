@@ -1,0 +1,30 @@
+#------------------------------------------------------------------------------------------------------------
+# Performs a simple load test with failure injection (using bizur consensus).
+#------------------------------------------------------------------------------------------------------------
+
+---
+- import_playbook: T_load_test_consensus_bizur.yaml
+  vars:
+    test_group: "S"
+    test_name: "S11"
+    workload_definition: |
+      recordcount=10000
+      operationcount=10000
+      workload=site.ycsb.workloads.CoreWorkload
+      
+      readallfields=true
+      
+      readproportion=0.5
+      updateproportion=0.5
+      scanproportion=0
+      insertproportion=0
+      
+      requestdistribution=zipfian
+    analyze_client_metrics: true
+    analyze_store_jvm_metrics: true
+    analyze_store_message_metrics: true
+
+    inject_fault:
+      condition: 'N/A'
+      delay_sec: 20
+      duration_sec: 30
