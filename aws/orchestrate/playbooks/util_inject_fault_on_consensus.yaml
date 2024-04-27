@@ -13,7 +13,7 @@
         dest: "{{ _home_dir }}/inject_fault_consensus.sh"
         mode: "+x"
       vars:
-        _mandatory_params: "destinations={{ workers_GROUP_store_destinations }} transport.message.callbackTimeoutMs=60000"
+        _mandatory_params: "destinations={{ workers_GROUP_store_destinations }}"
         _server_name: "{{ inventory_hostname }}"
         _home_dir: "{{ all_GROUP_home_dir }}"
         _condition: "{{ condition }}"

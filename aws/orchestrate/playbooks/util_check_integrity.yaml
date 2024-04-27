@@ -12,8 +12,8 @@
         dest: "{{ _home_dir }}/checkIntegrity.sh"
         mode: "+x"
       vars:
-        _mandatory_params: "destinations={{ workers_GROUP_store_destinations }} transport.message.callbackTimeoutMs=60000"
-        _level: 4
+        _mandatory_params: "destinations={{ workers_GROUP_store_destinations }}"
+        _level: 10
         _server_name: "{{ inventory_hostname }}"
         _home_dir: "{{ all_GROUP_home_dir }}"
 
@@ -26,5 +26,4 @@
 
     - name: Print the output of checkIntegrity script
       debug:
-        msg: |
-          {{ checkIntegrity_task.stdout_lines }}
+        msg: "{{ checkIntegrity_task.stdout_lines }}"
