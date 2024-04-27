@@ -32,4 +32,5 @@
           -p measurement.raw.separator=,
           -p exportfile={{ workers_GROUP_project_metrics_file }}
         _client_params: >-
+          -p threadcount={{ client_threadcount | default(1) }}
           -p cluster.members={{ workers_GROUP_etcd_store_destinations }}
