@@ -16,6 +16,9 @@ echo "[INFO] provisioning the stack..."
 # provision the stack (asks for confirmation)
 terraform apply
 
+echo "[INFO] waiting 2 minutes for the stack to be ready..."
+sleep 2m
+
 # ---------------------------------------------
 cd "$ANSIBLE_WORKING_DIR" || exit 1
 ./prepare_orchestration.sh

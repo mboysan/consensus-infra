@@ -11,7 +11,7 @@ sendCommand() {
   cd $CONSENSUS_PROJ_DIR
   java \
     -cp *.jar \
-    com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} cmd=checkIntegrity level=4 > /tmp/sendCommand.out 2>&1
+    com.mboysan.consensus.KVStoreClientCLI {{ _mandatory_params }} cmd=checkIntegrity level={{ _level }} > /tmp/sendCommand.out 2>&1
   cd $CURR_DIR
 }
 
