@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
   "panels": [
     {
@@ -109,7 +108,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\ntestGroupToUse=\"EX\"\r\nsourceToUse=\"client\"\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n    testId: strings.split(v: r.filename, t: \".\")[0] + \".\" + strings.split(v: r.filename, t: \".\")[1],\r\n    source: strings.split(v: r.filename, t: \".\")[2]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == testGroupToUse and r.source == sourceToUse)\r\n\r\nt1Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n  |> filter(fn: (r) => r.metric == \"read\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => key._field == \"value\", idx: 0)\r\n\r\nt2Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> filter(fn: (r) => r.metric == \"read\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => key._field == \"value\", idx: 0)\r\n\r\ndiff = uint(v: t2Start._time) - uint(v: t1Start._time)\r\n\r\nt1Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n\r\nt2Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n\r\n\r\nunionedData = union(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> drop(columns: [\"_field\", \"host\", \"_start\", \"_stop\"])\r\n  |> yield(name: \"unionedData\")\r\n",
+          "query": "import \"strings\"\r\n\r\ntestGroupToUse=\"EX\"\r\nsourceToUse=\"client\"\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n    source: strings.split(v: r.filename, t: \".\")[2]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == testGroupToUse and r.source == sourceToUse)\r\n\r\nt1Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n  |> filter(fn: (r) => r.metric == \"read\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => key._field == \"value\", idx: 0)\r\n\r\nt2Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> filter(fn: (r) => r.metric == \"read\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => key._field == \"value\", idx: 0)\r\n\r\ndiff = uint(v: t2Start._time) - uint(v: t1Start._time)\r\n\r\nt1Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n\r\nt2Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))\r\n",
           "refId": "A"
         }
       ],
@@ -118,8 +117,8 @@
         {
           "id": "renameByRegex",
           "options": {
-            "regex": ".*filename=\"([^\"]+)\\.client\\.raw\\.csv\", metric=\"([^\"]+)\".*",
-            "renamePattern": "$1 - $2"
+            "regex": ".*metric=\"([^\"]+)\", testId=\"([^\"]+)\".*",
+            "renamePattern": "$2 - $1"
           }
         }
       ],
