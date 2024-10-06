@@ -7,7 +7,7 @@ datasources:
     url: http://influxdb:8086
     jsonData:
       version: Flux
-      organization: myorg
-      defaultBucket: clientmetrics
+      organization: mboysan_org
+      defaultBucket: client_metrics_raw
     secureJsonData:
       token: mytoken

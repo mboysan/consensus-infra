@@ -1,9 +1,7 @@
 #!/bin/bash
 
-export INFLUX_ORG="myorg"
+export INFLUX_ORG="mboysan_org"
 
-# clientmetrics bucket already exists, skipping.
-#influx bucket create -n "clientmetrics" -o "$INFLUX_ORG"
-
-# create the storemetrics bucket.
-influx bucket create -n "storemetrics" -o "$INFLUX_ORG"
+influx bucket create -n "client_metrics_raw" -o "$INFLUX_ORG"
+influx bucket create -n "client_metrics_summary" -o "$INFLUX_ORG"
+influx bucket create -n "store_metrics" -o "$INFLUX_ORG"
