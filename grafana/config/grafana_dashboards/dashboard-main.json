@@ -22,11 +22,95 @@
   "links": [],
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 3,
+      "panels": [],
+      "title": "Load Test Stats",
+      "type": "row"
+    },
+    {
       "datasource": {
         "default": true,
         "type": "influxdb",
         "uid": "P951FEA4DE68E13C5"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunioned = union(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n\r\nt1Mean = t1Data |> mean() |> map(fn: (r) => ({ r with valType: \"mean\", testGroup: \"${workload}\", testName: \"EX1\"}))\r\nt1Min = t1Data |> min() |> map(fn: (r) => ({ r with valType: \"min\"}))\r\nt1Max = t1Data |> max() |> map(fn: (r) => ({ r with valType: \"max\"}))\r\n//t1P99 = t1Data |> quantile(q:0.90)\r\n\r\nunionedData = union(tables: [t1Mean, t1Min, t1Max])\r\n//  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\"])\r\n//pivotedData = unionedData\r\n//  |> pivot(rowKey:[\"testName\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\n//pivotedData\r\nunionedData",
+          "refId": "A"
+        }
+      ],
+      "title": "Panel Title",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -36,7 +120,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "latency (ms)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -86,7 +170,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 9
       },
       "id": 1,
       "options": {
@@ -109,11 +193,116 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))\r\n",
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n",
           "refId": "A"
         }
       ],
-      "title": "New Panel",
+      "title": "R/W Latency",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*metric=\"([^\"]+)\", testId=\"([^\"]+)\".*",
+            "renamePattern": "$2 - $1"
+          }
+        }
+      ],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "latency (ms)",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "hide": false,
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunioned = union(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n\r\nunioned\r\n  |> group(columns: [\"testId\"])\r\n  |> window(every: 100ms)\r\n  |> mean()\r\n  |> duplicate(column: \"_stop\", as: \"_time\")\r\n  |> window(every: inf)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Average Latency",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -133,7 +322,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "EX",
           "value": "EX"
         },
@@ -166,13 +355,13 @@
     ]
   },
   "time": {
-    "from": "2024-10-05T09:47:18.008Z",
-    "to": "2024-10-05T09:47:49.063Z"
+    "from": "2024-10-05T09:47:20.320Z",
+    "to": "2024-10-05T09:47:50.231Z"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Test Dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 7,
+  "version": 2,
   "weekStart": ""
 }
