@@ -109,7 +109,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\ntestGroupToUse=\"${workload}\"\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == testGroupToUse)\r\n\r\nt1Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\nt2Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\ndiffT2T1 = if exists t2Start._time then uint(v: t2Start._time) - uint(v: t1Start._time) else uint(v: 0)\r\n\r\nt1Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n\r\nt2Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diffT2T1)}))\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))\r\n",
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))\r\n",
           "refId": "A"
         }
       ],
@@ -173,6 +173,6 @@
   "timezone": "browser",
   "title": "Test Dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 4,
+  "version": 7,
   "weekStart": ""
 }
