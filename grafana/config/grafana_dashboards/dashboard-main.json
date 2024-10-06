@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -82,8 +83,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 21,
-        "w": 16,
+        "h": 14,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -108,7 +109,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\ntestGroupToUse=\"EX\"\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == testGroupToUse)\r\n\r\nt1Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\nt2Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\ndiffT2T1 = if exists t2Start._time then uint(v: t2Start._time) - uint(v: t1Start._time) else uint(v: 0)\r\n\r\nt1Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n\r\nt2Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diffT2T1)}))\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))",
+          "query": "import \"strings\"\r\n\r\ntestGroupToUse=\"${workload}\"\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1]\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == testGroupToUse)\r\n\r\nt1Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\nt2Start = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n  |> first()\r\n  |> findRecord(fn: (key) => true, idx: 0)\r\n\r\ndiffT2T1 = if exists t2Start._time then uint(v: t2Start._time) - uint(v: t1Start._time) else uint(v: 0)\r\n\r\nt1Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX1\")\r\n\r\nt2Data = allData\r\n  |> filter(fn: (r) => r.testName == \"EX2\")\r\n  |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diffT2T1)}))\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> filter(fn: (r) => r.metric != \"cleanup\")\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with testId: (r.testGroup + \".\" + r.testName) }))\r\n",
           "refId": "A"
         }
       ],
@@ -129,7 +130,40 @@
   "schemaVersion": 39,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "EX",
+          "value": "EX"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "workload",
+        "options": [
+          {
+            "selected": true,
+            "text": "EX",
+            "value": "EX"
+          },
+          {
+            "selected": false,
+            "text": "W1",
+            "value": "W1"
+          },
+          {
+            "selected": false,
+            "text": "W2",
+            "value": "W2"
+          }
+        ],
+        "query": "EX, W1, W2",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
     "from": "2024-10-05T09:47:18.008Z",
@@ -139,6 +173,6 @@
   "timezone": "browser",
   "title": "Test Dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 1,
+  "version": 4,
   "weekStart": ""
 }
