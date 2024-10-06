@@ -1,6 +1,6 @@
 import "strings"
 
-t1Start = from(bucket: "mybucket")
+t1Start = from(bucket: "clientmetrics")
   |> range(start: -10y)
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX"))
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX1"))
@@ -9,7 +9,7 @@ t1Start = from(bucket: "mybucket")
   |> first()
   |> findRecord(fn: (key) => key._field == "value", idx: 0)
 
-t2Start = from(bucket: "mybucket")
+t2Start = from(bucket: "clientmetrics")
   |> range(start: -10y)
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX"))
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX2"))
@@ -20,14 +20,14 @@ t2Start = from(bucket: "mybucket")
 
 diff = uint(v: t2Start._time) - uint(v: t1Start._time)
 
-t1Data = from(bucket: "mybucket")
+t1Data = from(bucket: "clientmetrics")
   |> range(start: -10y)
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX"))
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX1"))
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "client"))
   |> filter(fn: (r) => r.metric != "cleanup")
 
-t2Data = from(bucket: "mybucket")
+t2Data = from(bucket: "clientmetrics")
   |> range(start: -10y)
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX"))
   |> filter(fn: (r) => strings.containsStr(v: r.filename, substr: "EX2"))

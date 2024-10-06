@@ -8,6 +8,6 @@ datasources:
     jsonData:
       version: Flux
       organization: myorg
-      defaultBucket: mybucket
+      defaultBucket: clientmetrics
     secureJsonData:
       token: mytoken

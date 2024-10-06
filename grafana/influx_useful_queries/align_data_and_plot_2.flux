@@ -3,7 +3,7 @@ import "strings"
 testGroupToUse="EX"
 sourceToUse="client"
 
-allData = from(bucket: "mybucket")
+allData = from(bucket: "clientmetrics")
   |> range(start: -10y)
   |> map(fn: (r) => ({
     r with
