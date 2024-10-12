@@ -22,19 +22,6 @@
   "links": [],
   "panels": [
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 3,
-      "panels": [],
-      "title": "Load Test Stats",
-      "type": "row"
-    },
-    {
       "datasource": {
         "default": true,
         "type": "influxdb",
@@ -73,7 +60,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 0
       },
       "id": 4,
       "options": {
@@ -97,12 +84,25 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunioned = union(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n\r\nt1Mean = t1Data |> mean() |> map(fn: (r) => ({ r with valType: \"mean\", testGroup: \"${workload}\", testName: \"EX1\"}))\r\nt1Min = t1Data |> min() |> map(fn: (r) => ({ r with valType: \"min\"}))\r\nt1Max = t1Data |> max() |> map(fn: (r) => ({ r with valType: \"max\"}))\r\n//t1P99 = t1Data |> quantile(q:0.90)\r\n\r\nunionedData = union(tables: [t1Mean, t1Min, t1Max])\r\n//  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\"])\r\n//pivotedData = unionedData\r\n//  |> pivot(rowKey:[\"testName\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\n//pivotedData\r\nunionedData",
+          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName),\r\n    _value: r._value / 1000.0\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nt1Mean = t1Data |> mean() |> map(fn: (r) => ({ r with valType: \"mean\", testGroup: \"${workload}\", testName: \"EX1\"})) |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\nt1Min = t1Data |> min() |> map(fn: (r) => ({ r with valType: \"min\"}))\r\nt1Max = t1Data |> max() |> map(fn: (r) => ({ r with valType: \"max\"}))\r\n//t1P99 = t1Data |> quantile(q:0.90)\r\n\r\nunionedData = union(tables: [t1Mean, t1Min, t1Max])\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\npivotedData\r\n//unionedData\r\n",
           "refId": "A"
         }
       ],
       "title": "Panel Title",
       "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "panels": [],
+      "title": "Load Test Stats",
+      "type": "row"
     },
     {
       "datasource": {
@@ -362,6 +362,6 @@
   "timezone": "browser",
   "title": "Test Dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
