@@ -65,7 +65,7 @@ services:
         target: /etc/grafana/provisioning/datasources/datasources.yaml
     volumes:
       - ./config/grafana-dashboard-provision.yaml:/etc/grafana/provisioning/dashboards/main.yaml
-      - ./config/grafana_dashboards:/var/lib/grafana/dashboards
+      - ./config/grafana_dashboards:/var/lib/grafana/dashboards:rw
       - grafana_data:/var/lib/grafana
     depends_on:
       - influxdb
