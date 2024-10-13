@@ -23,7 +23,7 @@
   "panels": [
     {
       "datasource": {
-        "default": true,
+        "default": false,
         "type": "influxdb",
         "uid": "P951FEA4DE68E13C5"
       },
@@ -78,12 +78,24 @@
                 "value": 442
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_value {_field=\"value\", _start=\"2014-10-13 22:05:21.01443097 +0000 UTC\", _stop=\"2024-10-13 10:05:21.01443097 +0000 UTC\", bucket=\"client_metrics_raw\", filename=\"EX.EX1.client.raw.csv\", metric=\"update\"}"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1495
+              }
+            ]
           }
         ]
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -109,11 +121,20 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nreconstructRows = (data, valType, testName) => {\r\n  return data\r\n    |> map(fn: (r) => ({ r with valType: valType, testGroup: \"${workload}\", testName: testName}))\r\n    |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n    |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n    |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n}\r\n\r\nfnMin = (data) => data |> min()\r\nfnMax = (data) => data |> max()\r\nfnMean = (data) => data |> mean()\r\n\r\ncalcMean = (data, testName) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> mean()\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> mean()\r\n\r\n  o = union(tables: [r, u])\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> mean()\r\n\r\n  return reconstructRows(data: union(tables: [r, u, o]), valType: \"mean\", testName: testName)\r\n}\r\n\r\ncalcMin = (data, testName) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> min()\r\n    |> map(fn: (r) => ({ r with valType: \"min\"}))\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> min()\r\n    |> map(fn: (r) => ({ r with valType: \"min\"}))\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> min()\r\n    |> map(fn: (r) => ({ r with valType: \"min\"}))\r\n\r\n  return union(tables: [r, u])\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName),\r\n    _value: r._value / 1000.0\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nt1MeanRead = t1Data\r\n  |> filter(fn: (r) => r.metric == \"read\")\r\n  |> mean()\r\nt1MeanUpdate = t1Data\r\n  |> filter(fn: (r) => r.metric == \"update\")\r\n  |> mean()\r\n\r\nt1Mean0 = union(tables: [t1MeanRead, t1MeanUpdate])\r\n  |> map(fn: (r) => ({ r with valType: \"mean\", testGroup: \"${workload}\", testName: \"EX1\"}))\r\n  |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n  |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n  |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n\r\nt1Mean = calcMean(data: allData, testName: \"EX1\")\r\n//t1Min = calcMin(data: allData, testName: \"EX1\")\r\n\r\n//t1Mean = t1Data |> mean() |> map(fn: (r) => ({ r with valType: \"mean\", testGroup: \"${workload}\", testName: \"EX1\"})) |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\nt1Min = t1Data |> min() |> map(fn: (r) => ({ r with valType: \"min\"}))\r\nt1Max = t1Data |> max() |> map(fn: (r) => ({ r with valType: \"max\"}))\r\n//t1P99 = t1Data |> quantile(q:0.90)\r\n\r\nt1Min0 = t1Data |> map(fn: (r) => ({ r with metric: \"overall\" })) |> min() |> map(fn: (r) => ({ r with valType: \"min\"}))\r\n\r\n//unionedData = union(tables: [t1Mean, t1Min, t1Max])\r\nunionedData = t1Mean\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\", \"metric\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\", \"metric0\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\n//pivotedData\r\n//unionedData\r\n\r\n//t1Mean\r\n\r\n//unionedData |> mean()\r\n\r\nunion(tables: [t1Min, t1Min0])\r\n//t1Min0",
+          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nreconstructRows = (data, valType, testName) => {\r\n  return data\r\n    |> first()\r\n    |> map(fn: (r) => ({ r with valType: valType, testGroup: \"${workload}\", testName: testName}))\r\n    |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n    |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n    |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n}\r\n\r\ncalculate = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> fn()\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> fn()\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: valType, testName: testName)\r\n}\r\n\r\ncalculateOverall = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> fn()\r\n\r\n  return reconstructRows(data: o, valType: valType, testName: testName)\r\n}\r\n\r\ncalcQuantile = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> quantile(q: qVal)\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\ncalcQuantileOverall = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: o, valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName),\r\n    _value: r._value / 1000.0\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\n\r\ngetResults = (testName) => {\r\n  return union(tables: [\r\n    calculate(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculateOverall(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculate(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculateOverall(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculate(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calculateOverall(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.50),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.50)\r\n  ])\r\n}\r\n\r\nunionedData = union(tables: [\r\n    getResults(testName: \"EX1\"),\r\n    getResults(testName: \"EX2\"),\r\n    getResults(testName: \"EX3\")\r\n  ])\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\", \"metric\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\", \"metric0\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\npivotedData\r\n",
           "refId": "A"
         }
       ],
       "title": "Panel Title",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "metric0",
+            "renamePattern": "metric"
+          }
+        }
+      ],
       "type": "table"
     },
     {
@@ -387,6 +408,6 @@
   "timezone": "browser",
   "title": "load-test-dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 6,
+  "version": 4,
   "weekStart": ""
 }
