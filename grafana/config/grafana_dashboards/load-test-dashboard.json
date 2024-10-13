@@ -125,7 +125,7 @@
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Latency Stats",
       "transformations": [
         {
           "id": "renameByRegex",
@@ -408,6 +408,6 @@
   "timezone": "browser",
   "title": "load-test-dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 4,
+  "version": 6,
   "weekStart": ""
 }
