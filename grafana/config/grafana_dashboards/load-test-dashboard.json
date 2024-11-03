@@ -23,7 +23,7 @@
   "panels": [
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "influxdb",
         "uid": "P951FEA4DE68E13C5"
       },
@@ -121,7 +121,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nreconstructRows = (data, valType, testName) => {\r\n  return data\r\n    |> first()\r\n    |> map(fn: (r) => ({ r with valType: valType, testGroup: \"${workload}\", testName: testName}))\r\n    |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n    |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n    |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n}\r\n\r\ncalculate = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> fn()\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> fn()\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: valType, testName: testName)\r\n}\r\n\r\ncalculateOverall = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> fn()\r\n\r\n  return reconstructRows(data: o, valType: valType, testName: testName)\r\n}\r\n\r\ncalcQuantile = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> quantile(q: qVal)\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\ncalcQuantileOverall = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: o, valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName),\r\n    _value: r._value / 1000.0\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\n\r\ngetResults = (testName) => {\r\n  return union(tables: [\r\n    calculate(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculateOverall(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculate(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculateOverall(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculate(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calculateOverall(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.50),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.50)\r\n  ])\r\n}\r\n\r\nunionedData = union(tables: [\r\n    getResults(testName: \"EX1\"),\r\n    getResults(testName: \"EX2\"),\r\n    getResults(testName: \"EX3\")\r\n  ])\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\", \"metric\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\", \"metric0\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\npivotedData\r\n",
+          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nreconstructRows = (data, valType, testName) => {\r\n  return data\r\n    |> first()\r\n    |> map(fn: (r) => ({ r with valType: valType, testGroup: \"${workload}\", testName: testName}))\r\n    |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n    |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n    |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n}\r\n\r\ncalculate = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> fn()\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> fn()\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: valType, testName: testName)\r\n}\r\n\r\ncalculateOverall = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> fn()\r\n\r\n  return reconstructRows(data: o, valType: valType, testName: testName)\r\n}\r\n\r\ncalcQuantile = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> quantile(q: qVal)\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\ncalcQuantileOverall = (data, testName, qVal) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> quantile(q: qVal)\r\n\r\n  return reconstructRows(data: o, valType: \"p${qVal * 100.0}\", testName: testName)\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName),\r\n    _value: r._value / 1000.0\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\n\r\ngetResults = (testName) => {\r\n  return union(tables: [\r\n    calculate(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculateOverall(data: allData, testName: testName, valType: \"mean\", fn: mean),\r\n    calculate(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculateOverall(data: allData, testName: testName, valType: \"min\", fn: min),\r\n    calculate(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calculateOverall(data: allData, testName: testName, valType: \"max\", fn: max),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.99),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.90),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.75),\r\n    calcQuantile(data: allData, testName: testName, qVal: 0.50),\r\n    calcQuantileOverall(data: allData, testName: testName, qVal: 0.50)\r\n  ])\r\n}\r\n\r\nunionedData = union(tables: [\r\n    getResults(testName: \"T1\"),\r\n    getResults(testName: \"T2\"),\r\n    getResults(testName: \"T3\")\r\n  ])\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\", \"metric\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\", \"metric0\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\npivotedData\r\n",
           "refId": "A"
         }
       ],
@@ -239,7 +239,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n",
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"T1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"T1\")\r\nt2Data = getTestData(data: allData, testName: \"T2\")\r\n\r\nunion(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n",
           "refId": "A"
         }
       ],
@@ -344,7 +344,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "hide": false,
-          "query": "import \"strings\"\r\n\r\nfirstTestName = \"EX1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"EX1\")\r\nt2Data = getTestData(data: allData, testName: \"EX2\")\r\n\r\nunioned = union(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n\r\nunioned\r\n  |> group(columns: [\"testId\"])\r\n  |> window(every: 100ms)\r\n  |> mean()\r\n  |> duplicate(column: \"_stop\", as: \"_time\")\r\n  |> window(every: inf)\r\n",
+          "query": "import \"strings\"\r\n\r\nfirstTestName = \"T1\"\r\n\r\ngetStartTime = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> filter(fn: (r) => r.metric == \"read\" or r.metric == \"update\")\r\n    |> first()\r\n    |> findRecord(fn: (key) => true, idx: 0)\r\n}\r\n\r\ntimeDiff = (t1, t2) => {\r\n  return if exists t2._time then uint(v: t2._time) - uint(v: t1._time) else uint(v: 0)\r\n}\r\n\r\ngetTestData = (data, testName) => {\r\n  t1Start = getStartTime(data: data, testName: firstTestName)\r\n  t2Start = getStartTime(data: data, testName: testName)\r\n  diff = timeDiff(t1: t1Start, t2: t2Start)\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n    |> map(fn: (r) => ({r with _time: time(v: uint(v: r._time) - diff)}))\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({\r\n    r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\nt1Data = getTestData(data: allData, testName: \"T1\")\r\nt2Data = getTestData(data: allData, testName: \"T2\")\r\n\r\nunioned = union(tables: [t1Data, t2Data])\r\n  |> rename(columns: {filename: \"testId\"})\r\n  |> map(fn: (r) => ({ r with \r\n      testId: (r.testGroup + \".\" + r.testName),\r\n      _value: r._value / 1000.0\r\n    }))\r\n\r\nunioned\r\n  |> group(columns: [\"testId\"])\r\n  |> window(every: 100ms)\r\n  |> mean()\r\n  |> duplicate(column: \"_stop\", as: \"_time\")\r\n  |> window(every: inf)\r\n",
           "refId": "A"
         }
       ],
@@ -368,9 +368,9 @@
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "EX",
-          "value": "EX"
+          "selected": true,
+          "text": "W0",
+          "value": "W0"
         },
         "hide": 0,
         "includeAll": false,
@@ -378,9 +378,14 @@
         "name": "workload",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "EX",
             "value": "EX"
+          },
+          {
+            "selected": true,
+            "text": "W0",
+            "value": "W0"
           },
           {
             "selected": false,
@@ -393,7 +398,7 @@
             "value": "W2"
           }
         ],
-        "query": "EX, W1, W2",
+        "query": "EX, W0, W1, W2",
         "queryValue": "",
         "skipUrlSync": false,
         "type": "custom"
@@ -408,6 +413,6 @@
   "timezone": "browser",
   "title": "load-test-dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 6,
+  "version": 2,
   "weekStart": ""
 }
