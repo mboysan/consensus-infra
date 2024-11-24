@@ -138,12 +138,128 @@
       "type": "table"
     },
     {
+      "datasource": {
+        "default": false,
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_value {_field=\"value\", _start=\"2014-10-12 20:09:20.122282798 +0000 UTC\", _stop=\"2024-10-12 08:09:20.122282798 +0000 UTC\", bucket=\"client_metrics_raw\", filename=\"EX.EX1.client.raw.csv\", metric=\"update\"}"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 353
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_value {_field=\"value\", _start=\"2014-10-12 20:17:29.452563364 +0000 UTC\", _stop=\"2024-10-12 08:17:29.452563364 +0000 UTC\", bucket=\"client_metrics_raw\", filename=\"EX.EX1.client.raw.csv\", metric=\"update\"}"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 442
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_value {_field=\"value\", _start=\"2014-10-13 22:05:21.01443097 +0000 UTC\", _stop=\"2024-10-13 10:05:21.01443097 +0000 UTC\", bucket=\"client_metrics_raw\", filename=\"EX.EX1.client.raw.csv\", metric=\"update\"}"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 1495
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"strings\"\r\n\r\ngetTestData = (data, testName) => {\r\n  return data\r\n    |> filter(fn: (r) => r.testName == testName)\r\n}\r\n\r\nreconstructRows = (data, valType, testName) => {\r\n  return data\r\n    |> first()\r\n    |> map(fn: (r) => ({ r with valType: valType, testGroup: \"${workload}\", testName: testName}))\r\n    |> map(fn: (r) => ({ r with testId: r.testGroup + \".\" + r.testName }))\r\n    |> map(fn: (r) => ({ r with metric0: r.metric }))\r\n    |> map(fn: (r) => ({ r with metric: r.metric0 }))\r\n}\r\n\r\ncalculate = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  r = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"read\")\r\n    |> fn()\r\n\r\n  u = dataForTestName\r\n    |> filter(fn: (r) => r.metric == \"update\")\r\n    |> fn()\r\n\r\n  return reconstructRows(data: union(tables: [r, u]), valType: valType, testName: testName)\r\n}\r\n\r\ncalculateOverall = (data, testName, valType, fn) => {\r\n  dataForTestName = getTestData(data: data, testName: testName)\r\n\r\n  o = dataForTestName\r\n    |> map(fn: (r) => ({ r with metric: \"overall\" }))\r\n    |> fn()\r\n\r\n  return reconstructRows(data: o, valType: valType, testName: testName)\r\n}\r\n\r\nallData = from(bucket: \"client_metrics_raw\")\r\n  |> range(start: -10y)\r\n  |> map(fn: (r) => ({ r with \r\n    testGroup: strings.split(v: r.filename, t: \".\")[0],\r\n    testName: strings.split(v: r.filename, t: \".\")[1],\r\n  }))\r\n  |> map(fn: (r) => ({ r with \r\n    testId: (r.testGroup + \".\" + r.testName)\r\n  }))\r\n  |> filter(fn: (r) => r.testGroup == \"${workload}\" and r.metric != \"cleanup\")\r\n\r\n\r\ngetResults = (testName) => {\r\n  return union(tables: [\r\n    calculate(data: allData, testName: testName, valType: \"opCount\", fn: count),\r\n    calculateOverall(data: allData, testName: testName, valType: \"opCount\", fn: count)\r\n  ])\r\n}\r\n\r\nunionedData = union(tables: [\r\n    getResults(testName: \"T1\"),\r\n    getResults(testName: \"T2\"),\r\n    getResults(testName: \"T3\")\r\n  ])\r\n  |> drop(columns: [\"_time\", \"_field\", \"_start\", \"_stop\", \"bucket\", \"filename\", \"metric\"])\r\n\r\npivotedData = unionedData\r\n  |> pivot(rowKey:[\"testId\", \"metric0\"], columnKey: [\"valType\"], valueColumn: \"_value\")\r\n\r\npivotedData\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Operation Counts",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "metric0",
+            "renamePattern": "metric"
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 3,
       "panels": [],
@@ -216,7 +332,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 17
       },
       "id": 1,
       "options": {
@@ -321,7 +437,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 31
       },
       "id": 2,
       "options": {
@@ -368,7 +484,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "W0",
           "value": "W0"
         },
@@ -413,6 +529,6 @@
   "timezone": "browser",
   "title": "load-test-dashboard",
   "uid": "cdzynrgkske0wa",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
