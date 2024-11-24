@@ -15,17 +15,6 @@ services:
       - DOCKER_INFLUXDB_INIT_BUCKET=init_bucket
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mytoken
 
-  telegraf:
-    image: telegraf:latest
-    container_name: telegraf
-    volumes:
-      - ./config/telegraf.conf:/etc/telegraf/telegraf.conf:ro
-      - ./metrics:/var/log
-    environment:
-      - INFLUX_TOKEN=mytoken
-    depends_on:
-      - influxdb
-
   loki:
     image: grafana/loki:latest
     container_name: loki
