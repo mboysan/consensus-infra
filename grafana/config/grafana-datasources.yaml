@@ -6,6 +6,7 @@ datasources:
     access: proxy
     url: http://influxdb:8086
     jsonData:
+      timeout: 60
       version: Flux
       organization: mboysan_org
       defaultBucket: client_metrics_raw
